@@ -5,7 +5,6 @@ class EcoCounterObservation(models.Model):
         managed = False
         db_table = 'ecocounter_observations'
     
-    
     # ID alone is not primary key    
     id = models.BigIntegerField(primary_key=True)
     direction = models.CharField(max_length=32)
@@ -31,5 +30,7 @@ class EcoCounterCounter(models.Model):
     source = models.CharField(max_length=32)
     geom = models.CharField(max_length=255) # TODO: convert later to correct type
     
-
+    def get_latest_observation(self):
+        latest_observation = EcoCounterObservation.objects.filter(id=self.id).latest('datetime')
+        return latest_observation
 

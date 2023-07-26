@@ -5,6 +5,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register(r'counters', views.CounterViewSet)
 router.register(r'observations', views.ObservationViewSet)
+router.register(r'data', views.StationsDataView, basename='data')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
