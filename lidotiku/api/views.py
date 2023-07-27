@@ -28,15 +28,15 @@ class StationsData:
 class Observation:
     now = datetime.now() # TODO: Replace with some value from somewhere
     def __init__(self, observation):
-        self.id = observation.id or None
-        self.stationId = observation.id or None
+        self.id = getattr(observation, 'id', None)
+        self.stationId = getattr(observation, 'id', None)
         self.name = 'name'
-        self.shortName = observation.unit or None
-        self.timeWindowStart = observation.datetime or None
-        self.timeWindowEnd = observation.datetime or None
-        self.measuredTime = observation.datetime or None
-        self.value = observation.value or None
-        self.unit = observation.unit or ''
+        self.shortName = getattr(observation, 'unit', None)
+        self.timeWindowStart = getattr(observation, 'datetime', None)
+        self.timeWindowEnd = getattr(observation, 'datetime', None)
+        self.measuredTime = getattr(observation, 'datetime', None)
+        self.value = getattr(observation, 'value', None)
+        self.unit = getattr(observation, 'unit', '')
 
 class StationsDataView(viewsets.ViewSet):
 
