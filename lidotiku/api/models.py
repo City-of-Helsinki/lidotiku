@@ -1,6 +1,6 @@
 from django.db import models
 
-class EcoCounterObservation(models.Model):
+class Observation(models.Model):
     class Meta:
         managed = False
         db_table = 'vw_observations'
@@ -16,7 +16,7 @@ class EcoCounterObservation(models.Model):
     datetime = models.DateTimeField(db_index=True)
     source = models.CharField(max_length=32)
 
-class EcoCounterCounter(models.Model):
+class Counter(models.Model):
     class Meta:
         managed = False
         db_table = 'vw_counters'
@@ -31,8 +31,8 @@ class EcoCounterCounter(models.Model):
     geom = models.CharField(max_length=255) # TODO: convert later to correct type
     
     def get_latest_observation(self):
-        if EcoCounterObservation.objects.filter(id=self.id).exists():
-            latest_observation = EcoCounterObservation.objects.filter(id=self.id).latest('datetime')
+        if Observation.objects.filter(id=self.id).exists():
+            latest_observation = Observation.objects.filter(id=self.id).latest('datetime')
         else:
-            latest_observation = EcoCounterObservation.objects.none()
+            latest_observation = Observation.objects.none()
         return latest_observation

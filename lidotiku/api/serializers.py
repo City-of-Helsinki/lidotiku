@@ -1,4 +1,4 @@
-from .models import EcoCounterCounter, EcoCounterObservation 
+from .models import Counter, Observation 
 from rest_framework import serializers
 
 
@@ -8,7 +8,7 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer):
     properties = serializers.SerializerMethodField()
 
     class Meta:
-        model = EcoCounterCounter
+        model = Counter
         fields = ['type', 'id', 'geometry', 'properties']
     
 
@@ -40,7 +40,7 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer):
 
 class ObservationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = EcoCounterObservation
+        model = Observation
         fields = ['id','direction','value','unit','typeofmeasurement','phenomenondurationseconds','vehicletype','datetime','source']
 
 class SensorValueSerializer(serializers.Serializer):

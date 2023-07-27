@@ -1,5 +1,5 @@
 from datetime import datetime
-from .models import EcoCounterCounter, EcoCounterObservation
+from .models import Counter, Observation
 from rest_framework import viewsets
 from rest_framework.response import Response
 from .serializers import CounterSerializer, ObservationSerializer, StationDataSerializer, StationsSerializer
@@ -9,7 +9,7 @@ class CounterViewSet(viewsets.ModelViewSet):
     """
     API endpoint for counters/sensors.
     """
-    queryset = EcoCounterCounter.objects.all()
+    queryset = Counter.objects.all()
     serializer_class = CounterSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
@@ -17,7 +17,7 @@ class ObservationViewSet(viewsets.ModelViewSet):
     """
     API endpoint for observations.
     """
-    queryset = EcoCounterObservation.objects.all()[:999]
+    queryset = Observation.objects.all()[:999]
     serializer_class = ObservationSerializer
     # permission_classes = [permissions.IsAuthenticated]
 class StationsData:
@@ -42,7 +42,7 @@ class StationsDataView(viewsets.ViewSet):
 
     def list(self, request):
         now = datetime.now()
-        queryset = EcoCounterCounter.objects.all()
+        queryset = Counter.objects.all()
         for counter in queryset:
             counter.tmsNumber = counter.id
             counter.dataUpdatedTime = now

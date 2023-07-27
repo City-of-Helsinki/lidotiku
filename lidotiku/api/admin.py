@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import EcoCounterCounter
+from .models import Counter
 
-@admin.register(EcoCounterCounter)
-class EcoCounterCounterAdmin(admin.ModelAdmin):
+@admin.register(Counter)
+class CounterAdmin(admin.ModelAdmin):
     pass
