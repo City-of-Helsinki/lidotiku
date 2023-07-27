@@ -43,23 +43,23 @@ class ObservationSerializer(serializers.HyperlinkedModelSerializer):
         model = Observation
         fields = ['id','direction','value','unit','typeofmeasurement','phenomenondurationseconds','vehicletype','datetime','source']
 
-class SensorValueSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    stationId = serializers.IntegerField()
-    name = serializers.CharField()
-    shortName = serializers.CharField()
-    timeWindowStart = serializers.DateTimeField()
-    timeWindowEnd = serializers.DateTimeField()
-    measuredTime = serializers.DateTimeField()
-    value = serializers.IntegerField(allow_null=True)
-    unit = serializers.CharField()
+class SensorValuesSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    stationId = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    shortName = serializers.CharField(read_only=True)
+    timeWindowStart = serializers.DateTimeField(read_only=True)
+    timeWindowEnd = serializers.DateTimeField(read_only=True)
+    measuredTime = serializers.DateTimeField(read_only=True)
+    value = serializers.IntegerField(read_only=True, allow_null=True)
+    unit = serializers.CharField(read_only=True)
 
-class StationsSerializer(serializers.Serializer):
+class CountersValuesSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    tmsNumber = serializers.IntegerField()
-    dataUpdatedTime = serializers.DateTimeField()
-    sensorValues = SensorValueSerializer()
+    tmsNumber = serializers.IntegerField(read_only=True)
+    dataUpdatedTime = serializers.DateTimeField(read_only=True)
+    sensorValues = SensorValuesSerializer(read_only=True)
 
-class StationDataSerializer(serializers.Serializer):
-    dataUpdatedTime = serializers.DateTimeField()
-    stations = StationsSerializer(many=True)
+class CounterDataSerializer(serializers.Serializer):
+    dataUpdatedTime = serializers.DateTimeField(read_only=True)
+    stations = CountersValuesSerializer(read_only=True, many=True)

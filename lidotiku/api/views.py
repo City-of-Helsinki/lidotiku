@@ -2,7 +2,7 @@ from datetime import datetime
 from .models import Counter, Observation
 from rest_framework import viewsets
 from rest_framework.response import Response
-from .serializers import CounterSerializer, ObservationSerializer, StationDataSerializer, StationsSerializer
+from .serializers import CounterSerializer, ObservationSerializer, CounterDataSerializer
 
 
 class CounterViewSet(viewsets.ModelViewSet):
@@ -20,7 +20,7 @@ class ObservationViewSet(viewsets.ModelViewSet):
     queryset = Observation.objects.all()[:999]
     serializer_class = ObservationSerializer
     # permission_classes = [permissions.IsAuthenticated]
-class StationsData:
+class CountersData:
     def __init__(self, dataUpdatedTime, stations):
         self.dataUpdatedTime = dataUpdatedTime
         self.stations = stations
@@ -38,7 +38,7 @@ class Observation:
         self.value = getattr(observation, 'value', None)
         self.unit = getattr(observation, 'unit', '')
 
-class StationsDataView(viewsets.ViewSet):
+class CountersDataView(viewsets.ViewSet):
 
     def list(self, request):
         now = datetime.now()
@@ -47,7 +47,7 @@ class StationsDataView(viewsets.ViewSet):
             counter.tmsNumber = counter.id
             counter.dataUpdatedTime = now
             counter.sensorValues = Observation(counter.get_latest_observation())
-        data = StationsData(dataUpdatedTime=now, stations=queryset)
-        serializer = StationDataSerializer(data)
+        data = CountersData(dataUpdatedTime=now, stations=queryset)
+        serializer = CounterDataSerializer(data)
         
         return Response(serializer.data)
