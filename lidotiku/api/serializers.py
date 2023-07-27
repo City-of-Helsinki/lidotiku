@@ -23,13 +23,13 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer):
     
     def get_properties(self, obj):
         return {
-            "id": obj.id,
+            'id': obj.id,
             # in digitraffic API tmsNumber is sometimes the same as ID, sometimes not
-            "tmsNumber": obj.id,
-            "name": obj.name,
-            "collectionStatus": "",
-            "state": "",
-            "dataUpdatedTime" : ""
+            'tmsNumber': obj.id,
+            'name': obj.name,
+            'collectionStatus': '',
+            'state': '',
+            'dataUpdatedTime' : ''
         }
 
 
