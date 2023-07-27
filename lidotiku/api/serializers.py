@@ -3,9 +3,39 @@ from rest_framework import serializers
 
 
 class CounterSerializer(serializers.HyperlinkedModelSerializer):
+    type = serializers.SerializerMethodField()
+    geometry = serializers.SerializerMethodField()
+    properties = serializers.SerializerMethodField()
+
     class Meta:
         model = EcoCounterCounter
-        fields = ['id', 'name', 'classifying','longitude','latitude','crs_epsg','source','geom']
+        fields = ['type', 'id', 'geometry', 'properties']
+    
+
+    def get_type(self, obj):
+        return "Feature"
+
+    def get_geometry(self, obj):  
+        return {  
+            'type': 'Point',  
+            'coordinates': [obj.longitude, obj.latitude]
+        }  
+    
+    def get_properties(self, obj):
+        return {
+            "id": obj.id,
+            # in digitraffic API tmsNumber is sometimes the same as ID, sometimes not
+            "tmsNumber": obj.id,
+            "name": obj.name,
+            "collectionStatus": "",
+            "state": "",
+            "dataUpdatedTime" : ""
+        }
+
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        return data
 
 
 class ObservationSerializer(serializers.HyperlinkedModelSerializer):
