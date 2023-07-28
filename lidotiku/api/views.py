@@ -6,6 +6,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Counter, Observation
 from .serializers import CounterSerializer, ObservationSerializer, CounterDataSerializer
+from .utils import generateSensorName
 
 
 class CounterViewSet(viewsets.ModelViewSet):
@@ -45,17 +46,18 @@ class CountersDataView(viewsets.ViewSet):
     def _get_observations_for_counters(self, queryset: QuerySet[Counter]):
         for counter in queryset:
             observation = counter.get_latest_observation()
-            measurement_time = getattr(observation, 'datetime', None)
-            duration_delta = timedelta(seconds=getattr(observation, 'phenomenondurationseconds', 0))
-            time_window_start = (measurement_time - duration_delta) if measurement_time else None
-            sensor_values = {
+            measurementTime = getattr(observation, 'datetime', None)
+            durationDelta = timedelta(seconds=getattr(observation, 'phenomenondurationseconds', 0))
+            timeWindowStart = (measurementTime - durationDelta) if measurementTime else None
+            sensorName = generateSensorName(type=getattr(observation, 'typeofmeasurement', 'count'), duration=getattr(observation, 'phenomenondurationseconds', 3600))
+            sensorValues = {
                 'id': getattr(observation, 'id', None),
-                'station_id': getattr(observation, 'id', None),
-                'name': getattr(counter, 'name', None),
-                'short_name': getattr(counter, 'name', None),
-                'time_window_start': time_window_start,
-                'time_window_end': measurement_time,
-                'measured_time': measurement_time,
+                'stationId': getattr(observation, 'id', None),
+                'name': sensorName,
+                'shortName': getattr(counter, 'name', None),
+                'timeWindowStart': timeWindowStart,
+                'timeWindowEnd': measurementTime,
+                'measuredTime': measurementTime,
                 'value': getattr(observation, 'value', None),
                 'unit': getattr(observation, 'unit', '')
             }
