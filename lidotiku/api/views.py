@@ -46,7 +46,7 @@ class CountersDataView(viewsets.ViewSet):
         for counter in queryset:
             counter.tmsNumber = counter.id
             counter.dataUpdatedTime = now
-            counter.sensorValues = Observation(counter.get_latest_observation())
+            counter.sensorValues = [Observation(counter.get_latest_observation())]
         data = CountersData(dataUpdatedTime=now, stations=queryset)
         serializer = CounterDataSerializer(data)
         

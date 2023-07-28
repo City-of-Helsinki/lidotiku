@@ -43,7 +43,7 @@ class ObservationSerializer(serializers.HyperlinkedModelSerializer):
         model = Observation
         fields = ['id','direction','value','unit','typeofmeasurement','phenomenondurationseconds','vehicletype','datetime','source']
 
-class SensorValuesSerializer(serializers.Serializer):
+class SensorSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     stationId = serializers.IntegerField(read_only=True)
     name = serializers.CharField(read_only=True)
@@ -58,7 +58,7 @@ class CountersValuesSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     tmsNumber = serializers.IntegerField(read_only=True)
     dataUpdatedTime = serializers.DateTimeField(read_only=True)
-    sensorValues = SensorValuesSerializer(read_only=True)
+    sensorValues = SensorSerializer(read_only=True, many=True)
 
 class CounterDataSerializer(serializers.Serializer):
     dataUpdatedTime = serializers.DateTimeField(read_only=True)
