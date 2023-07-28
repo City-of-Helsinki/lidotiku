@@ -66,7 +66,7 @@ class CountersDataView(viewsets.ViewSet):
 
     def list(self, request):
         queryset = Counter.objects.all()
-        queryset = self._prepare_data_for_qs(queryset)
+        queryset = self._get_observations_for_counters(queryset)
         latestUpdatedAt = getattr(Observation.objects.filter(id__in=queryset.values_list('id')).latest('datetime'), 'datetime', None)
         data = CountersData(dataUpdatedTime=latestUpdatedAt, stations=queryset)
         serializer = CounterDataSerializer(data)
