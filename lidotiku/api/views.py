@@ -6,7 +6,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Counter, Observation
 from .serializers import CounterSerializer, ObservationSerializer, CounterDataSerializer
-from .utils import generateSensorName
+from .utils import generateSensorName, getSensorInfo
 
 
 class CounterViewSet(viewsets.ModelViewSet):
@@ -50,16 +50,17 @@ class CountersDataView(viewsets.ViewSet):
             durationDelta = timedelta(seconds=getattr(observation, 'phenomenondurationseconds', 0))
             timeWindowStart = (measurementTime - durationDelta) if measurementTime else None
             sensorName = generateSensorName(type=getattr(observation, 'typeofmeasurement', 'count'), duration=getattr(observation, 'phenomenondurationseconds', 3600))
+            sensorInfo = getSensorInfo(sensorName)
             sensorValues = {
-                'id': getattr(observation, 'id', None),
+                'id': sensorInfo['id'],
                 'stationId': getattr(observation, 'id', None),
                 'name': sensorName,
-                'shortName': getattr(counter, 'name', None),
+                'shortName': sensorInfo['shortName'],
                 'timeWindowStart': timeWindowStart,
                 'timeWindowEnd': measurementTime,
                 'measuredTime': measurementTime,
                 'value': getattr(observation, 'value', None),
-                'unit': getattr(observation, 'unit', '')
+                'unit': sensorInfo['unit']
             }
             counter.tms_number = counter.id
             counter.data_updated_time = getattr(observation, 'datetime', None)
