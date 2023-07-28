@@ -1,6 +1,19 @@
 from django.db import models
 
-class Observation(models.Model):
+class ReadOnlyModel(models.Model):
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        pass
+
+    def update(self, *args, **kwargs):
+        pass
+
+    def delete(self, *args, **kwargs):
+        pass
+
+class Observation(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'vw_observations'
@@ -16,7 +29,7 @@ class Observation(models.Model):
     datetime = models.DateTimeField(db_index=True)
     source = models.CharField(max_length=32)
 
-class Counter(models.Model):
+class Counter(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = 'vw_counters'
