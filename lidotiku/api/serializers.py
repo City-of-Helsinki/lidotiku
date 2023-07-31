@@ -1,4 +1,4 @@
-from .models import Counter, Observation 
+from .models import Counter, Observation
 from rest_framework import serializers
 
 
@@ -13,9 +13,9 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer):
     
 
     def get_type(self, obj):
-        return "Feature"
+        return 'Feature'
 
-    def get_geometry(self, obj):  
+    def get_geometry(self, obj):
         return {  
             'type': 'Point',  
             'coordinates': [obj.longitude, obj.latitude]
@@ -25,13 +25,12 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer):
         return {
             'id': obj.id,
             # in digitraffic API tmsNumber is sometimes the same as ID, sometimes not
-            'tmsNumber': obj.id,
+            'tms_number': obj.id,
             'name': obj.name,
-            'collectionStatus': '',
+            'collection_status': '',
             'state': '',
-            'dataUpdatedTime' : ''
+            'data_updated_time': '',
         }
-
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -45,21 +44,21 @@ class ObservationSerializer(serializers.HyperlinkedModelSerializer):
 
 class SensorSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-    stationId = serializers.IntegerField(read_only=True)
+    station_id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(read_only=True)
-    shortName = serializers.CharField(read_only=True)
-    timeWindowStart = serializers.DateTimeField(read_only=True)
-    timeWindowEnd = serializers.DateTimeField(read_only=True)
-    measuredTime = serializers.DateTimeField(read_only=True)
+    short_name = serializers.CharField(read_only=True)
+    time_window_start = serializers.DateTimeField(read_only=True)
+    time_window_end = serializers.DateTimeField(read_only=True)
+    measured_time = serializers.DateTimeField(read_only=True)
     value = serializers.IntegerField(read_only=True, allow_null=True)
     unit = serializers.CharField(read_only=True)
 
 class CountersValuesSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    tmsNumber = serializers.IntegerField(read_only=True)
-    dataUpdatedTime = serializers.DateTimeField(read_only=True)
-    sensorValues = SensorSerializer(read_only=True, many=True)
+    tms_number = serializers.IntegerField(read_only=True)
+    data_updated_time = serializers.DateTimeField(read_only=True)
+    sensor_values = SensorSerializer(read_only=True, many=True)
 
 class CounterDataSerializer(serializers.Serializer):
-    dataUpdatedTime = serializers.DateTimeField(read_only=True)
+    data_updated_time = serializers.DateTimeField(read_only=True)
     stations = CountersValuesSerializer(read_only=True, many=True)
