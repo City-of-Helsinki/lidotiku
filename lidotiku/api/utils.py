@@ -10,8 +10,8 @@ def generate_sensor_name(measurement_type, duration, window_type='KIINTEA', dire
 def get_sensor_info(sensor_name):
     for sensor in SENSOR_DETAILS['sensors']:
         if sensor['name'] == sensor_name:
-            sensor_id = int(sensor['id']) if sensor['id'] else None
-            sensor_short_name = sensor['shortName'] if sensor['shortName'] else None
-            sensor_unit = sensor['unit'] if sensor['unit'] else None
+            sensor_id = int(sensor.get('id'))
+            sensor_short_name = sensor.get('shortName')
+            sensor_unit = sensor.get('unit')
             return {'id': sensor_id, 'short_name': sensor_short_name, 'unit' : sensor_unit}
     return {'id' : None, 'short_name': None, 'unit' : None}
