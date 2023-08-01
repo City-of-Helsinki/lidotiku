@@ -18,7 +18,7 @@ class ReadOnlyModel(models.Model):
 class Observation(ReadOnlyModel):
     class Meta:
         managed = False
-        db_table = "vw_observations"
+        db_table = '"lido"."vw_observations"'
 
     # ID alone is not primary key
     id = models.BigIntegerField(primary_key=True)
@@ -35,7 +35,7 @@ class Observation(ReadOnlyModel):
 class Counter(ReadOnlyModel):
     class Meta:
         managed = False
-        db_table = "vw_counters"
+        db_table = '"lido"."vw_counters"'
 
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=32)

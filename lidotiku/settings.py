@@ -78,8 +78,11 @@ WSGI_APPLICATION = "lidotiku.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "lidotiku.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "OPTIONS": {
+            "service": "lido",
+            "passfile": ".lido_pgpass",
+        },
     }
 }
 
