@@ -8,10 +8,13 @@
             "name": "Python: Django",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/lidotiku/manage.py",
+            "program": "${workspaceFolder}/manage.py",
             "args": [
                 "runserver"
             ],
+            "env": {
+                "PGSERVICEFILE": "${workspaceFolder}/.pgservice.conf"
+            },
             "django": true,
             "justMyCode": true
         }
