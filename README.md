@@ -32,7 +32,7 @@ Prerequisites: You need the psql tooling `psql` and `pg_dump`. Get them one way 
 
 1. Initialize the database schema, tables, indexes, views etc.:
 
-`psql --dbname=postgres --username=postgres --host=localhost < .devcontainers/db_init.sql`
+`psql --dbname=postgres --username=postgres --host=localhost < .devcontainer/db_init.sql`
 
 
 2. Take a dump from the database (replace host in the following script):
