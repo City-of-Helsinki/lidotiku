@@ -6,7 +6,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Counter, Observation
 from .serializers import CounterSerializer, ObservationSerializer, CounterDataSerializer
-from .utils import generateSensorName, getSensorInfo
+from .utils import generate_sensor_name, get_sensor_info
 
 
 class CounterViewSet(viewsets.ModelViewSet):
@@ -25,8 +25,8 @@ class ObservationViewSet(viewsets.ModelViewSet):
     serializer_class = ObservationSerializer
     # permission_classes = [permissions.IsAuthenticated]
 class CountersData:
-    def __init__(self, dataUpdatedTime, stations):
-        self.dataUpdatedTime = dataUpdatedTime
+    def __init__(self, data_updated_time, stations):
+        self.data_updated_time = data_updated_time
         self.stations = stations
 
 @dataclass
@@ -46,21 +46,21 @@ class CountersDataView(viewsets.ViewSet):
     def _get_observations_for_counters(self, queryset: QuerySet[Counter]):
         for counter in queryset:
             observation = counter.get_latest_observation()
-            measurementTime = getattr(observation, 'datetime', None)
-            durationDelta = timedelta(seconds=getattr(observation, 'phenomenondurationseconds', 0))
-            timeWindowStart = (measurementTime - durationDelta) if measurementTime else None
-            sensorName = generateSensorName(type=getattr(observation, 'typeofmeasurement', 'count'), duration=getattr(observation, 'phenomenondurationseconds', 3600))
-            sensorInfo = getSensorInfo(sensorName)
-            sensorValues = {
-                'id': sensorInfo['id'],
-                'stationId': getattr(observation, 'id', None),
-                'name': sensorName,
-                'shortName': sensorInfo['shortName'],
-                'timeWindowStart': timeWindowStart,
-                'timeWindowEnd': measurementTime,
-                'measuredTime': measurementTime,
+            measurement_time = getattr(observation, 'datetime', None)
+            duration_delta = timedelta(seconds=getattr(observation, 'phenomenondurationseconds', 0))
+            time_window_start = (measurement_time - duration_delta) if measurement_time else None
+            sensor_name = generate_sensor_name(measurement_type=getattr(observation, 'typeofmeasurement', 'count'), duration=getattr(observation, 'phenomenondurationseconds', 3600))
+            sensor_info = get_sensor_info(sensor_name)
+            sensor_values = {
+                'id': sensor_info['id'],
+                'station_id': getattr(observation, 'id', None),
+                'name': sensor_name,
+                'short_name': sensor_info['short_name'],
+                'time_window_start': time_window_start,
+                'time_window_end': measurement_time,
+                'measured_time': measurement_time,
                 'value': getattr(observation, 'value', None),
-                'unit': sensorInfo['unit']
+                'unit': sensor_info['unit']
             }
             counter.tms_number = counter.id
             counter.data_updated_time = getattr(observation, 'datetime', None)
@@ -71,12 +71,9 @@ class CountersDataView(viewsets.ViewSet):
         queryset = Counter.objects.all()
         queryset = self._get_observations_for_counters(queryset)
         latest_updated_at = getattr(Observation.objects.filter(id__in=queryset.values_list('id')).latest('datetime'), 'datetime', None)
-        data = CountersData(dataUpdatedTime=latest_updated_at, stations=queryset)
+        data = CountersData(data_updated_time=latest_updated_at, stations=queryset)
         serializer = CounterDataSerializer(data)
         
         return Response(serializer.data)
     
     CountersWithObservationsQueryset = QuerySet[Counter]
-
-    
-

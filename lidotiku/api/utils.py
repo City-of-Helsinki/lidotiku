@@ -1,18 +1,17 @@
-from .sensors import data
+from .sensors import SENSOR_DETAILS
 
-sensorMeasurementTypes = {'count' : 'OHITUKSET', 'speed': 'KESKINOPEUS'}
+sensor_measurement_types = {'count' : 'OHITUKSET', 'speed': 'KESKINOPEUS'}
 
-def generateSensorName(type, duration, windowType='KIINTEA', direction='SUUNTA1'):
-    sensorType = sensorMeasurementTypes[type]
-    sensorDuration = duration // 60
-    return f'{sensorType}_{sensorDuration}MIN_{windowType}_{direction}'
+def generate_sensor_name(measurement_type, duration, window_type='KIINTEA', direction='SUUNTA1'):
+    sensor_type = sensor_measurement_types[measurement_type]
+    sensor_duration = duration // 60
+    return f'{sensor_type}_{sensor_duration}MIN_{window_type}_{direction}'
 
-def getSensorInfo(sensorName):
-    for sensor in data['sensors']:
-        if sensor['name'] == sensorName:
-            sensorId = int(sensor['id']) if sensor['id'] else None
-            sensorShortName = sensor['shortName'] if sensor['shortName'] else None
-            sensorUnit = sensor['unit'] if sensor['unit'] else None
-            return {'id': sensorId, 'shortName': sensorShortName, 'unit' : sensorUnit}
-    return {'id' : None, 'shortName': None, 'unit' : None}
-
+def get_sensor_info(sensor_name):
+    for sensor in SENSOR_DETAILS['sensors']:
+        if sensor['name'] == sensor_name:
+            sensor_id = int(sensor['id']) if sensor['id'] else None
+            sensor_short_name = sensor['shortName'] if sensor['shortName'] else None
+            sensor_unit = sensor['unit'] if sensor['unit'] else None
+            return {'id': sensor_id, 'short_name': sensor_short_name, 'unit' : sensor_unit}
+    return {'id' : None, 'short_name': None, 'unit' : None}

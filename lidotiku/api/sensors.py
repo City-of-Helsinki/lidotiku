@@ -1,4 +1,4 @@
-data = {
+SENSOR_DETAILS = {
   "dataUpdatedTime" : "2022-09-26T08:22:24Z",
   "dataLastCheckedTime" : "2023-07-28T03:30:01Z",
   "sensors" : [ {
