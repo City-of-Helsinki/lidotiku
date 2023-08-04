@@ -157,48 +157,48 @@ UNION ALL
 
 -- lido.vw_observations source
 CREATE OR REPLACE VIEW lido.vw_observations
-AS SELECT lido.ecocounter_observations.id,
-    lido.ecocounter_observations.direction,
-    lido.ecocounter_observations.value,
-    lido.ecocounter_observations.unit,
-    lido.ecocounter_observations.typeofmeasurement,
-    lido.ecocounter_observations.phenomenondurationseconds,
-    lido.ecocounter_observations.vehicletype,
-    lido.ecocounter_observations.datetime,
-    lido.ecocounter_observations.source
+AS SELECT ecocounter_observations.id,
+    ecocounter_observations.direction,
+    ecocounter_observations.value,
+    ecocounter_observations.unit,
+    ecocounter_observations.typeofmeasurement,
+    ecocounter_observations.phenomenondurationseconds,
+    ecocounter_observations.vehicletype,
+    ecocounter_observations.datetime::timestamp with time zone AS datetime,
+    ecocounter_observations.source
    FROM lido.ecocounter_observations
 UNION ALL
- SELECT lido.infotripla_observations.id,
-    lido.infotripla_observations.direction,
-    lido.infotripla_observations.value,
-    lido.infotripla_observations.unit,
-    lido.infotripla_observations.typeofmeasurement,
-    lido.infotripla_observations.phenomenondurationseconds,
-    lido.infotripla_observations.vehicletype,
-    lido.infotripla_observations.datetime,
-    lido.infotripla_observations.source
+ SELECT infotripla_observations.id,
+    infotripla_observations.direction,
+    infotripla_observations.value,
+    infotripla_observations.unit,
+    infotripla_observations.typeofmeasurement,
+    infotripla_observations.phenomenondurationseconds,
+    infotripla_observations.vehicletype,
+    infotripla_observations.datetime::timestamp with time zone AS datetime,
+    infotripla_observations.source
    FROM lido.infotripla_observations
 UNION ALL
- SELECT lido.m680_observations.id,
-    lido.m680_observations.direction,
-    lido.m680_observations.value,
-    lido.m680_observations.unit,
-    lido.m680_observations.typeofmeasurement,
-    lido.m680_observations.phenomenondurationseconds,
-    lido.m680_observations.vehicletype,
-    lido.m680_observations.datetime,
-    lido.m680_observations.source
+ SELECT m680_observations.id,
+    m680_observations.direction,
+    m680_observations.value,
+    m680_observations.unit,
+    m680_observations.typeofmeasurement,
+    m680_observations.phenomenondurationseconds,
+    m680_observations.vehicletype,
+    m680_observations.datetime::timestamp with time zone AS datetime,
+    m680_observations.source
    FROM lido.m680_observations
 UNION ALL
- SELECT lido.marksman_observations.id,
-    lido.marksman_observations.direction::character varying AS direction,
-    lido.marksman_observations.value,
-    lido.marksman_observations.unit,
-    lido.marksman_observations.typeofmeasurement,
-    lido.marksman_observations.phenomenondurationseconds,
-    lido.marksman_observations.vehicletype,
-    lido.marksman_observations.datetime,
-    lido.marksman_observations.source
+ SELECT marksman_observations.id,
+    marksman_observations.direction::character varying(32) AS direction,
+    marksman_observations.value,
+    marksman_observations.unit,
+    marksman_observations.typeofmeasurement,
+    marksman_observations.phenomenondurationseconds,
+    marksman_observations.vehicletype,
+    marksman_observations.datetime,
+    marksman_observations.source
    FROM lido.marksman_observations;
 
 
