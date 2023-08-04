@@ -16,6 +16,8 @@ class ReadOnlyModel(models.Model):
 
 
 class Observation(ReadOnlyModel):
+    """Database View"""
+
     class Meta:
         managed = False
         db_table = '"lido"."vw_observations"'
@@ -33,6 +35,8 @@ class Observation(ReadOnlyModel):
 
 
 class Counter(ReadOnlyModel):
+    """Database View"""
+
     class Meta:
         managed = False
         db_table = '"lido"."vw_counters"'
@@ -54,3 +58,21 @@ class Counter(ReadOnlyModel):
         else:
             latest_observation = Observation.objects.none()
         return latest_observation
+
+
+class CounterWithLatestObservations(ReadOnlyModel):
+    """Database View"""
+
+    class Meta:
+        managed = False
+        db_table = '"lido"."vw_counters_with_latest_sensor_observations"'
+
+    id = models.BigIntegerField(primary_key=True)
+    short_name = models.CharField(db_column="name")
+    source = models.CharField()
+    measurement_type = models.CharField(db_column="measurementtype")
+    measured_time = models.DateTimeField(db_column="datetime")
+    phenomenondurationseconds = models.IntegerField()
+    unit = models.CharField()
+    value = models.IntegerField()
+    counter_updated_at = models.DateField()

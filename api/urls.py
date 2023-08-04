@@ -3,7 +3,9 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-router.register(r"counters/data", views.CountersDataView, basename="counters_data")
+router.register(
+    r"counters/data", views.CountersWithLatestObservationsView, basename="counters_data"
+)
 router.register(r"counters", views.CounterViewSet)
 router.register(r"observations", views.ObservationViewSet)
 

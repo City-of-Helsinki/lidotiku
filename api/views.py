@@ -1,12 +1,12 @@
+from itertools import groupby
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 from typing import List
 from django.db.models.query import QuerySet
 from rest_framework import viewsets
 from rest_framework.response import Response
-from .models import Counter, Observation
+from .models import Counter, Observation, CounterWithLatestObservations
 from .serializers import CounterSerializer, ObservationSerializer, CounterDataSerializer
-from .utils import generate_sensor_name, get_sensor_info
 
 
 class CounterViewSet(viewsets.ModelViewSet):
@@ -48,53 +48,58 @@ class ObservationData:
     unit: str
 
 
-class CountersDataView(viewsets.ViewSet):
-    def _get_observations_for_counters(self, queryset: QuerySet[Counter]):
-        for counter in queryset:
-            observation = counter.get_latest_observation()
-            measurement_time = getattr(observation, "datetime", None)
-            duration_delta = timedelta(
-                seconds=getattr(observation, "phenomenondurationseconds", 0)
-            )
-            time_window_start = (
-                (measurement_time - duration_delta) if measurement_time else None
-            )
-            sensor_name = generate_sensor_name(
-                measurement_type=getattr(observation, "typeofmeasurement", "count"),
-                duration=getattr(observation, "phenomenondurationseconds", 3600),
-            )
-            sensor_info = get_sensor_info(sensor_name)
-            sensor_values = {
-                "id": sensor_info["id"],
-                "station_id": getattr(observation, "id", None),
-                "name": sensor_name,
-                "short_name": sensor_info["short_name"],
-                "time_window_start": time_window_start,
-                "time_window_end": measurement_time,
-                "measured_time": measurement_time,
-                "value": getattr(observation, "value", None),
-                "unit": sensor_info["unit"],
-            }
-            counter.tms_number = counter.id
-            counter.data_updated_time = getattr(observation, "datetime", None)
-            counter.sensor_values: List[ObservationData] = [
-                ObservationData(**sensor_values)
-            ]
-        return queryset
+@dataclass
+class CountersWithObservations:
+    data_updated_time: datetime
+    stations: QuerySet[CounterWithLatestObservations]
 
+
+class CountersWithLatestObservationsView(viewsets.ViewSet):
     def list(self, request):
-        queryset = Counter.objects.all()
-        queryset = self._get_observations_for_counters(queryset)
+        # itertools.groupby() requires sorted iterable
+        queryset = CounterWithLatestObservations.objects.all().order_by("id")
+        counter_groups = []
+        # Group counters (sensors) due to LEFT JOIN in query with sensors returning multiple
+        for _k, g in groupby(queryset):
+            counter_groups.append(list(g))
+
+        counters = []
+        # Merges multiple counter rows by putting "duplicate" sensor rows in sensor_values
+        for sensors in counter_groups:
+            counter = sensors[0]
+            duration_delta = timedelta(
+                seconds=getattr(counter, "phenomenondurationseconds", 0)
+            )
+            measured_time = getattr(counter, "measured_time")
+            time_window_start = (
+                (measured_time - duration_delta) if measured_time else None
+            )
+            counter.sensor_values: List[ObservationData] = [
+                ObservationData(
+                    id=sensor.id,
+                    station_id=sensor.id,
+                    name=getattr(sensor, "measurement_type"),
+                    short_name=getattr(sensor, "short_name"),
+                    time_window_start=time_window_start,
+                    time_window_end=measured_time,
+                    measured_time=measured_time,
+                    value=getattr(sensor, "value"),
+                    unit=getattr(sensor, "unit"),
+                )
+                for sensor in sensors
+            ]
+            counter.tms_number = counter.id
+            counter.data_updated_time = counter.counter_updated_at
+            counters.append(counter)
+
         latest_updated_at = getattr(
-            Observation.objects.filter(id__in=queryset.values_list("id")).latest(
-                "datetime"
-            ),
+            Observation.objects.latest("datetime"),
             "datetime",
             None,
         )
-        data = CountersData(data_updated_time=latest_updated_at, stations=queryset)
+        data = CountersWithObservations(
+            data_updated_time=latest_updated_at, stations=counters
+        )
         serializer = CounterDataSerializer(data)
 
         return Response(serializer.data)
-
-    CountersWithObservationsQueryset = QuerySet[Counter]

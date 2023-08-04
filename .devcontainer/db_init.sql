@@ -114,44 +114,44 @@ CREATE INDEX IF NOT EXISTS marksman_observations_id_datetime_idx ON lido.marksma
 
 -- lido.vw_counters source
 CREATE OR REPLACE VIEW lido.vw_counters
-AS SELECT lido.ecocounter_counters.id,
-    lido.ecocounter_counters.name,
-    lido.ecocounter_counters.classifying,
-    lido.ecocounter_counters.longitude,
-    lido.ecocounter_counters.latitude,
-    lido.ecocounter_counters.crs_epsg,
-    lido.ecocounter_counters.source,
-    lido.ecocounter_counters.geom
+AS SELECT DISTINCT ON (ecocounter_counters.id) ecocounter_counters.id,
+    ecocounter_counters.name,
+    ecocounter_counters.classifying,
+    ecocounter_counters.longitude,
+    ecocounter_counters.latitude,
+    ecocounter_counters.crs_epsg,
+    ecocounter_counters.source,
+    ecocounter_counters.geom
    FROM lido.ecocounter_counters
 UNION ALL
- SELECT lido.infotripla_counters.id,
-    lido.infotripla_counters.name,
-    lido.infotripla_counters.classifying,
-    lido.infotripla_counters.longitude,
-    lido.infotripla_counters.latitude,
-    lido.infotripla_counters.crs_epsg,
-    lido.infotripla_counters.source,
-    lido.infotripla_counters.geom
+ SELECT DISTINCT ON (infotripla_counters.id) infotripla_counters.id,
+    infotripla_counters.name,
+    infotripla_counters.classifying,
+    infotripla_counters.longitude,
+    infotripla_counters.latitude,
+    infotripla_counters.crs_epsg,
+    infotripla_counters.source,
+    infotripla_counters.geom
    FROM lido.infotripla_counters
 UNION ALL
- SELECT lido.m680_counters.id,
-    lido.m680_counters.name,
-    lido.m680_counters.classifying,
-    lido.m680_counters.longitude,
-    lido.m680_counters.latitude,
-    lido.m680_counters.crs_epsg,
-    lido.m680_counters.source,
-    lido.m680_counters.geom
+ SELECT DISTINCT ON (m680_counters.id) m680_counters.id,
+    m680_counters.name,
+    m680_counters.classifying,
+    m680_counters.longitude,
+    m680_counters.latitude,
+    m680_counters.crs_epsg,
+    m680_counters.source,
+    m680_counters.geom
    FROM lido.m680_counters
 UNION ALL
- SELECT lido.marksman_counters.id,
-    lido.marksman_counters.name,
-    lido.marksman_counters.classifying,
-    lido.marksman_counters.longitude,
-    lido.marksman_counters.latitude,
-    lido.marksman_counters.crs_epsg,
-    lido.marksman_counters.source,
-    lido.marksman_counters.geom
+ SELECT DISTINCT ON (marksman_counters.id) marksman_counters.id,
+    marksman_counters.name,
+    marksman_counters.classifying,
+    marksman_counters.longitude,
+    marksman_counters.latitude,
+    marksman_counters.crs_epsg,
+    marksman_counters.source,
+    marksman_counters.geom
    FROM lido.marksman_counters;
 
 
@@ -200,3 +200,57 @@ UNION ALL
     lido.marksman_observations.datetime,
     lido.marksman_observations.source
    FROM lido.marksman_observations;
+
+
+-- lido.mvw_counter_measurement_types source
+-- Used to build a list of sensors from the observation data, needs to be updated
+-- if new sensors/measurement types are introduces with:
+-- REFRESH MATERIALIZED VIEW lido.mvw_counter_measurement_types;
+
+CREATE MATERIALIZED VIEW lido.mvw_counter_measurement_types
+TABLESPACE pg_default
+AS SELECT DISTINCT ON (vw_observations.id, vw_observations.typeofmeasurement, vw_observations.phenomenondurationseconds, vw_observations.direction) vw_observations.id,
+    vw_observations.typeofmeasurement,
+    vw_observations.phenomenondurationseconds,
+    vw_observations.direction,
+    concat(
+        CASE
+            WHEN vw_observations.typeofmeasurement::text ~~ 'count'::text THEN 'OHITUKSET'::text
+            ELSE 'KESKINOPEUS'::text
+        END, '_', (vw_observations.phenomenondurationseconds / 60)::text, 'MIN', '_',
+        CASE
+            WHEN vw_observations.phenomenondurationseconds IS NOT NULL THEN 'KIINTEA'::text
+            ELSE 'LIUKUVA'::text
+        END,
+        CASE
+            WHEN vw_observations.direction IS NULL OR (vw_observations.direction::text = ''::text) IS TRUE THEN ''::text
+            ELSE concat('_SUUNTA-', upper(replace(vw_observations.direction::text, ' '::text, '-'::text)))
+        END) AS measurementtype
+   FROM lido.vw_observations
+WITH DATA;
+
+
+-- lido.vw_counters_with_latest_sensor_observations source
+
+CREATE OR REPLACE VIEW lido.vw_counters_with_latest_sensor_observations
+AS SELECT DISTINCT ON (c.id, mt.measurementtype)
+	c.id, c.name, c.source, mt.measurementtype, o.datetime, o2.value, o2.unit, o2.phenomenondurationseconds, o3.datetime AS counter_updated_at
+FROM lido.vw_counters c
+LEFT JOIN lido.mvw_counter_measurement_types mt ON c.id = mt.id
+INNER JOIN (
+	SELECT id, MAX(datetime) datetime, typeofmeasurement, phenomenondurationseconds, direction
+	FROM lido.vw_observations GROUP BY id, typeofmeasurement, phenomenondurationseconds, direction
+	) AS o
+	ON o.id = c.id
+	AND o.typeofmeasurement = mt.typeofmeasurement
+	AND o.phenomenondurationseconds = mt.phenomenondurationseconds
+	AND o.direction = mt.direction
+INNER JOIN lido.vw_observations o2
+	ON o2.datetime = o.datetime
+	AND c.id = o2.id
+	AND o2.typeofmeasurement = mt.typeofmeasurement
+	AND o2.phenomenondurationseconds = mt.phenomenondurationseconds
+	AND o2.direction = mt.direction
+INNER JOIN (SELECT id, MAX(datetime) datetime FROM lido.vw_observations o3 GROUP BY id) AS o3
+	ON o3.id = c.id
+;
