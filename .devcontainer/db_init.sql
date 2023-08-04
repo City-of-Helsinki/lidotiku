@@ -206,7 +206,6 @@ UNION ALL
 -- Used to build a list of sensors from the observation data, needs to be updated
 -- if new sensors/measurement types are introduces with:
 -- REFRESH MATERIALIZED VIEW lido.mvw_counter_measurement_types;
-
 CREATE MATERIALIZED VIEW lido.mvw_counter_measurement_types
 TABLESPACE pg_default
 AS SELECT DISTINCT ON (vw_observations.id, vw_observations.typeofmeasurement, vw_observations.phenomenondurationseconds, vw_observations.direction) vw_observations.id,
@@ -216,25 +215,34 @@ AS SELECT DISTINCT ON (vw_observations.id, vw_observations.typeofmeasurement, vw
     concat(
         CASE
             WHEN vw_observations.typeofmeasurement::text ~~ 'count'::text THEN 'OHITUKSET'::text
-            ELSE 'KESKINOPEUS'::text
+            WHEN vw_observations.typeofmeasurement::text ~~ 'speed'::text THEN 'KESKINOPEUS'::text
+            ELSE ''::text
         END, '_', (vw_observations.phenomenondurationseconds / 60)::text, 'MIN', '_',
         CASE
             WHEN vw_observations.phenomenondurationseconds IS NOT NULL THEN 'KIINTEA'::text
-            ELSE 'LIUKUVA'::text
+            WHEN vw_observations.phenomenondurationseconds IS NOT NULL THEN 'LIUKUVA'::text
+            ELSE ''::text
         END,
         CASE
             WHEN vw_observations.direction IS NULL OR (vw_observations.direction::text = ''::text) IS TRUE THEN ''::text
             ELSE concat('_SUUNTA-', upper(replace(vw_observations.direction::text, ' '::text, '-'::text)))
-        END) AS measurementtype
-   FROM lido.vw_observations
+        END) AS measurementtypename,
+	concat(
+		CASE
+            WHEN vw_observations.typeofmeasurement::text ~~ 'count'::text THEN 'kpl/h'::text
+            WHEN vw_observations.typeofmeasurement::text ~~ 'speed'::text THEN 'km/h'::text
+            ELSE ''::text
+        END,
+        vw_observations.direction::text
+	) AS measurementtypeshortname
+   	FROM lido.vw_observations
 WITH DATA;
 
 
 -- lido.vw_counters_with_latest_sensor_observations source
-
 CREATE OR REPLACE VIEW lido.vw_counters_with_latest_sensor_observations
-AS SELECT DISTINCT ON (c.id, mt.measurementtype)
-	c.id, c.name, c.source, mt.measurementtype, o.datetime, o2.value, o2.unit, o2.phenomenondurationseconds, o3.datetime AS counter_updated_at
+AS SELECT DISTINCT ON (c.id, mt.measurementtypename)
+	c.id, c.name, c.source, mt.measurementtypename, mt.measurementtypeshortname, o.datetime, o2.value, o2.unit, o2.phenomenondurationseconds, o3.datetime AS counter_updated_at
 FROM lido.vw_counters c
 LEFT JOIN lido.mvw_counter_measurement_types mt ON c.id = mt.id
 INNER JOIN (

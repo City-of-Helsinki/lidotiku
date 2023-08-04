@@ -68,9 +68,9 @@ class CounterWithLatestObservations(ReadOnlyModel):
         db_table = '"lido"."vw_counters_with_latest_sensor_observations"'
 
     id = models.BigIntegerField(primary_key=True)
-    short_name = models.CharField(db_column="name")
+    short_name = models.CharField(db_column="measurementtypeshortname")
     source = models.CharField()
-    measurement_type = models.CharField(db_column="measurementtype")
+    measurement_type = models.CharField(db_column="measurementtypename")
     measured_time = models.DateTimeField(db_column="datetime")
     phenomenondurationseconds = models.IntegerField()
     unit = models.CharField()
