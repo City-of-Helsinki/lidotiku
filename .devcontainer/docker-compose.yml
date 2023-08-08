@@ -20,7 +20,9 @@ services:
     # user: vscode
 
   db:
-    image: postgis/postgis:14-3.3
+    build:
+      context: .
+      dockerfile: Dockerfile.psql
     restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
