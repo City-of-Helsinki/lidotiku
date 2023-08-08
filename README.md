@@ -32,7 +32,7 @@ Prerequisites: You need the psql tooling `psql` and `pg_dump`. Get them one way 
 
 1. Initialize the database schema, tables, indexes, views etc.:
 
-`psql --dbname=postgres --username=postgres --host=localhost < .devcontainer/db_init.sql`
+`psql --dbname=postgres --username=postgres --host=localhost --port=5431 < .devcontainer/db_init.sql`
 
 
 2. Take a dump from the database (replace host in the following script):
@@ -41,4 +41,56 @@ Prerequisites: You need the psql tooling `psql` and `pg_dump`. Get them one way 
 
 3. Restore the data (only):
 
-`psql --dbname=postgres --username=postgres --host=localhost < /tmp/pgdump/lido_backup_2023-08-01T13\:41.sql`
+`psql --dbname=postgres --username=postgres --host=localhost --port=5431 < /tmp/pgdump/lido_backup_2023-08-01T13\:41.sql`
+
+4. Refresh the materialized view:
+
+`REFRESH MATERIALIZED VIEW lido.mvw_counter_measurement_types;`
+
+
+### Cleaning the test dataset
+
+The test dataset seems to have duplicates, this is how you get rid of them.
+
+```sql
+DELETE FROM lido.ecocounter_counters a USING (
+    SELECT MIN(ctid) AS ctid, id
+    FROM lido.ecocounter_counters
+    GROUP BY id HAVING COUNT(*) > 1
+) b
+WHERE a.id = b.id
+AND a.ctid <> b.ctid;
+
+DELETE FROM lido.infotripla_counters a USING (
+    SELECT MIN(ctid) AS ctid, id
+    FROM lido.infotripla_counters
+    GROUP BY id HAVING COUNT(*) > 1
+) b
+WHERE a.id = b.id
+AND a.ctid <> b.ctid;
+
+DELETE FROM lido.m680_counters a USING (
+    SELECT MIN(ctid) AS ctid, id
+    FROM lido.m680_counters
+    GROUP BY id HAVING COUNT(*) > 1
+) b
+WHERE a.id = b.id
+AND a.ctid <> b.ctid;
+
+DELETE FROM lido.marksman_counters a USING (
+    SELECT MIN(ctid) AS ctid, id
+    FROM lido.marksman_counters
+    GROUP BY id HAVING COUNT(*) > 1
+) b
+WHERE a.id = b.id
+AND a.ctid <> b.ctid;
+```
+
+After cleaning it is possible to create primary keys for counters:
+
+```sql
+ALTER TABLE lido.ecocounter_counters ADD CONSTRAINT ecocounter_counters_pk PRIMARY KEY (id);
+ALTER TABLE lido.infotripla_counters ADD CONSTRAINT infotripla_counters_pk PRIMARY KEY (id);
+ALTER TABLE lido.m680_counters ADD CONSTRAINT m680_counters_pk PRIMARY KEY (id);
+ALTER TABLE lido.marksman_counters ADD CONSTRAINT marksman_counters_pk PRIMARY KEY (id);
+```

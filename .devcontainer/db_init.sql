@@ -110,6 +110,11 @@ CREATE TABLE IF NOT EXISTS lido.marksman_observations (
 CREATE INDEX IF NOT EXISTS marksman_observations_id_datetime_idx ON lido.marksman_observations USING btree (id, datetime);
 
 
+-- Creates indexes missing for the original database
+CREATE INDEX IF NOT EXISTS ecocounter_observations_id_datetime_idx ON lido.ecocounter_observations USING btree (id, datetime);
+CREATE INDEX IF NOT EXISTS m680_observations_id_datetime_idx ON lido.m680_observations USING btree (id, datetime);
+CREATE INDEX IF NOT EXISTS infotripla_observations_id_datetime_idx ON lido.infotripla_observations USING btree (id, datetime);
+
 -- Database views
 
 -- lido.vw_counters source
