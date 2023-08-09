@@ -15,25 +15,6 @@ class ReadOnlyModel(models.Model):
         pass
 
 
-class Observation(ReadOnlyModel):
-    """Database View"""
-
-    class Meta:
-        managed = False
-        db_table = '"lido"."vw_observations"'
-
-    # ID alone is not primary key
-    id = models.BigIntegerField(primary_key=True)
-    direction = models.CharField(max_length=32)
-    value = models.BigIntegerField(blank=True)
-    unit = models.CharField(max_length=8)
-    typeofmeasurement = models.CharField(max_length=32)
-    phenomenondurationseconds = models.BigIntegerField(blank=False)
-    vehicletype = models.CharField(max_length=32)
-    datetime = models.DateTimeField(db_index=True)
-    source = models.CharField(max_length=32)
-
-
 class Counter(ReadOnlyModel):
     """Database View"""
 
@@ -58,6 +39,27 @@ class Counter(ReadOnlyModel):
         else:
             latest_observation = Observation.objects.none()
         return latest_observation
+
+
+class Observation(ReadOnlyModel):
+    """Database View"""
+
+    class Meta:
+        managed = False
+        db_table = '"lido"."vw_observations"'
+        unique_together = ("id", "source")
+
+    # id (ctid) is only unique within a source
+    id = models.CharField(primary_key=True, db_column="ctid")
+    counter = models.ForeignKey(Counter, db_column="id", on_delete=models.RESTRICT)
+    direction = models.CharField(max_length=32)
+    value = models.BigIntegerField(blank=True)
+    unit = models.CharField(max_length=8)
+    typeofmeasurement = models.CharField(max_length=32)
+    phenomenondurationseconds = models.BigIntegerField(blank=False)
+    vehicletype = models.CharField(max_length=32)
+    datetime = models.DateTimeField(db_index=True)
+    source = models.CharField(max_length=32)
 
 
 class CounterWithLatestObservations(ReadOnlyModel):

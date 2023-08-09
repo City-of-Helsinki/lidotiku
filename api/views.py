@@ -3,8 +3,9 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass
 from typing import List
 from django.db.models.query import QuerySet
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from .models import Counter, Observation, CounterWithLatestObservations
 from .serializers import (
     CounterSerializer,
@@ -14,24 +15,43 @@ from .serializers import (
 )
 
 
+class LargeResultsSetPagination(PageNumberPagination):
+    page_size = 1000
+    page_size_query_param = "page_size"
+    max_page_size = 10000
+
+
 class CounterViewSet(viewsets.ModelViewSet):
     """
     API endpoint for counters/sensors.
     """
 
+    pagination_class = None
     queryset = Counter.objects.all()
     serializer_class = CounterSerializer
-    # permission_classes = [permissions.IsAuthenticated]
 
 
-class ObservationViewSet(viewsets.ModelViewSet):
+class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     API endpoint for observations.
     """
 
-    queryset = Observation.objects.all()[:999]
+    pagination_class = LargeResultsSetPagination
     serializer_class = ObservationSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Observation.objects.all()
+        counter = self.request.query_params.get("counter")
+        if counter:
+            queryset = queryset.filter(counter=counter)
+        start_time = self.request.query_params.get("start_time")
+        end_time = self.request.query_params.get("end_time")
+        if start_time:
+            queryset = queryset.filter(datetime__gte=start_time)
+        if end_time:
+            queryset = queryset.filter(datetime__lte=end_time)
+
+        return queryset.order_by("-datetime")
 
 
 @dataclass
@@ -89,6 +109,8 @@ def _group_counter_sensors_in_qs(queryset):
 
 
 class CounterWithLatestObservationsView(viewsets.ViewSet):
+    pagination_class = None
+
     def list(self, request, pk=None, counter_pk=None):
         queryset = CounterWithLatestObservations.objects.filter(id=counter_pk)
         counter = _group_counter_sensors_in_qs(queryset)[0]
@@ -97,6 +119,8 @@ class CounterWithLatestObservationsView(viewsets.ViewSet):
 
 
 class CountersWithLatestObservationsView(viewsets.ViewSet):
+    pagination_class = None
+
     def list(self, request):
         # itertools.groupby() requires sorted iterable
         queryset = CounterWithLatestObservations.objects.all().order_by("id")

@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework_nested import routers
 from . import views
 
-router = routers.SimpleRouter()
+router = routers.DefaultRouter()
 router.register(
     r"counters/data",
     views.CountersWithLatestObservationsView,
@@ -10,11 +10,11 @@ router.register(
 )
 
 router.register(r"counters", views.CounterViewSet)
-data_router = routers.NestedSimpleRouter(router, r"counters", lookup="counter")
+data_router = routers.NestedDefaultRouter(router, r"counters", lookup="counter")
 data_router.register(
     r"data", views.CounterWithLatestObservationsView, basename="counter-data"
 )
-router.register(r"observations", views.ObservationViewSet)
+router.register(r"observations", views.ObservationViewSet, basename="observations")
 
 
 urlpatterns = [
