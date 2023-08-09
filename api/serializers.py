@@ -3,30 +3,14 @@ from rest_framework import serializers
 
 
 class CounterSerializer(serializers.HyperlinkedModelSerializer):
-    type = serializers.SerializerMethodField()
     geometry = serializers.SerializerMethodField()
-    properties = serializers.SerializerMethodField()
 
     class Meta:
         model = Counter
-        fields = ["type", "id", "geometry", "properties"]
-
-    def get_type(self, obj):
-        return "Feature"
+        fields = ["id", "name", "classifying", "crs_epsg", "source", "geometry"]
 
     def get_geometry(self, obj):
         return {"type": "Point", "coordinates": [obj.longitude, obj.latitude]}
-
-    def get_properties(self, obj):
-        return {
-            "id": obj.id,
-            # in digitraffic API tmsNumber is sometimes the same as ID, sometimes not
-            "tms_number": obj.id,
-            "name": obj.name,
-            "collection_status": "",
-            "state": "",
-            "data_updated_time": "",
-        }
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
