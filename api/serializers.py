@@ -29,6 +29,8 @@ class ObservationSerializer(serializers.HyperlinkedModelSerializer):
             "value",
             "datetime",
             "source",
+            "counter",
+            "counter_id",
         ]
 
 
