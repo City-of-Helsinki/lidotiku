@@ -83,7 +83,6 @@ DATABASES = {
         "OPTIONS": {
             "service": "lido",
             "passfile": ".lido_pgpass",
-            "options": "-c search_path=lido",
         },
     }
 }

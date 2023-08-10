@@ -9,7 +9,7 @@ router.register(
     basename="counters-data",
 )
 
-router.register(r"counters", views.CounterViewSet)
+router.register(r"counters", views.CounterViewSet, basename="counters")
 data_router = routers.NestedDefaultRouter(router, r"counters", lookup="counter")
 data_router.register(
     r"data", views.CounterWithLatestObservationsView, basename="counter-data"

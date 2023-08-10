@@ -1,16 +1,25 @@
 from rest_framework import serializers
+from django.contrib.gis.db.models.functions import Distance
 from .models import Counter, Observation
 
 
 class CounterSerializer(serializers.HyperlinkedModelSerializer):
     geometry = serializers.SerializerMethodField()
+    dist = serializers.SerializerMethodField()
 
     class Meta:
         model = Counter
-        fields = ["id", "name", "classifying", "crs_epsg", "source", "geometry"]
+        fields = ["id", "name", "classifying", "crs_epsg", "source", "geometry", "dist"]
 
     def get_geometry(self, obj):
-        return {"type": "Point", "coordinates": [obj.longitude, obj.latitude]}
+        return {"type": "Point", "coordinates": [obj.geom.x, obj.geom.y]}
+
+    def get_dist(self, obj):
+        try:
+            dist: Distance = getattr(obj, "dist")
+            return dist.km
+        except AttributeError:
+            return None
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

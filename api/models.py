@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.gis.db import models as gis_models
 
 
 class ReadOnlyModel(models.Model):
@@ -29,7 +30,7 @@ class Counter(ReadOnlyModel):
     latitude = models.FloatField()
     crs_epsg = models.BigIntegerField()
     source = models.CharField(max_length=32)
-    geom = models.CharField(max_length=255)  # TODO: convert later to correct type
+    geom = gis_models.PointField()
 
     def get_latest_observation(self):
         if Observation.objects.filter(id=self.id).exists():

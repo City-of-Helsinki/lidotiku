@@ -3,9 +3,13 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass
 from typing import List
 from django.db.models.query import QuerySet
+from django.contrib.gis.geos import Point
+from django.contrib.gis.db.models.functions import Distance as DistanceFunction
+from django.contrib.gis.measure import Distance as DistanceObject
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+
 from .models import Counter, Observation, CounterWithLatestObservations
 from .serializers import (
     CounterSerializer,
@@ -27,8 +31,24 @@ class CounterViewSet(viewsets.ModelViewSet):
     """
 
     pagination_class = None
-    queryset = Counter.objects.all()
+
     serializer_class = CounterSerializer
+
+    def get_queryset(self):
+        queryset = Counter.objects.all()
+        lat = self.request.query_params.get("lat")
+        lon = self.request.query_params.get("lon")
+        distance = self.request.query_params.get("distance")
+        if lat is not None and lon is not None and distance is not None:
+            distance_object = DistanceObject(km=distance)
+            point = Point(x=float(lat), y=float(lon), srid=4326)
+            queryset = (
+                queryset.annotate(dist=DistanceFunction("geom", point))
+                .filter(dist__lte=distance_object)
+                .order_by("dist")
+            )
+
+        return queryset
 
 
 class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
