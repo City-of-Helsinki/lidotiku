@@ -1,5 +1,5 @@
-from .models import Counter, Observation
 from rest_framework import serializers
+from .models import Counter, Observation
 
 
 class CounterSerializer(serializers.HyperlinkedModelSerializer):
@@ -21,13 +21,12 @@ class ObservationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Observation
         fields = [
-            "id",
-            "direction",
-            "value",
-            "unit",
             "typeofmeasurement",
             "phenomenondurationseconds",
             "vehicletype",
+            "direction",
+            "unit",
+            "value",
             "datetime",
             "source",
         ]
