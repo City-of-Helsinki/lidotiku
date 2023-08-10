@@ -41,15 +41,22 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def get_queryset(self):
         queryset = Observation.objects.all()
+
         counter = self.request.query_params.get("counter")
-        if counter:
-            queryset = queryset.filter(counter=counter)
         start_time = self.request.query_params.get("start_time")
         end_time = self.request.query_params.get("end_time")
-        if start_time:
+        source = self.request.query_params.get("source")
+
+        if counter is not None:
+            queryset = queryset.filter(counter=counter)
+
+        if start_time is not None:
             queryset = queryset.filter(datetime__gte=start_time)
-        if end_time:
+        if end_time is not None:
             queryset = queryset.filter(datetime__lte=end_time)
+
+        if source is not None:
+            queryset = queryset.filter(source=source)
 
         return queryset.order_by("-datetime")
 
