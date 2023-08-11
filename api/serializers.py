@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from django.contrib.gis.db.models.functions import Distance
-from django.core.exceptions import ValidationError
+from django.contrib.gis.measure import Distance
 from .models import Counter, Observation
 
 
