@@ -17,20 +17,17 @@ def _app_is_ready() -> bool:
 def _database_is_ready() -> Tuple[bool, None] | Tuple[bool, Exception]:
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT 1")
+            cursor.execute("SELECT 1;")
+            row = cursor.fetchone()
+            if row is None:
+                raise DatabaseError("Unable to fetch from database")
             return True, None
     except (ImproperlyConfigured, DatabaseError, Error, ImportError) as error:
         return False, error
 
 
 def health_check(_request: HttpRequest) -> JsonResponse:
-    database_is_healthy, error = _database_is_ready()
-    if database_is_healthy:
-        return JsonResponse({"status": "ok"}, status=200)
-
-    return JsonResponse(
-        {"status": "error", "message": str(getattr(error, "error"))}, status=503
-    )
+    return JsonResponse({"status": "OK"}, status=200)
 
 
 def readiness(_request: HttpRequest) -> JsonResponse:
