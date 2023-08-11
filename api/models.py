@@ -33,6 +33,7 @@ class Counter(ReadOnlyModel):
     geom = gis_models.PointField()
 
     def get_latest_observation(self):
+        latest_observation: models.query.QuerySet[Observation] | Observation
         if Observation.objects.filter(id=self.id).exists():
             latest_observation = Observation.objects.filter(id=self.id).latest(
                 "datetime"

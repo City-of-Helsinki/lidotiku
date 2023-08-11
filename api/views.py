@@ -1,7 +1,6 @@
 from itertools import groupby
 from datetime import datetime, timedelta
 from dataclasses import dataclass
-from typing import List
 from django.db.models.query import QuerySet
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
@@ -98,7 +97,7 @@ class ObservationData:
 
 @dataclass
 class CountersWithObservations:
-    data_updated_time: datetime
+    data_updated_time: datetime | None
     stations: QuerySet[CounterWithLatestObservations]
 
 
@@ -117,7 +116,7 @@ def _group_counter_sensors_in_qs(queryset):
         )
         measured_time = getattr(counter, "measured_time")
         time_window_start = (measured_time - duration_delta) if measured_time else None
-        counter.sensor_values: List[ObservationData] = [
+        counter.sensor_values = [
             ObservationData(
                 id=sensor.id,
                 station_id=sensor.id,
