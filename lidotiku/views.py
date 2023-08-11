@@ -3,6 +3,8 @@ from django.http import JsonResponse, HttpRequest
 from django.db import connection, DatabaseError, Error
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured, AppRegistryNotReady
+from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import csrf_exempt
 
 
 def _app_is_ready() -> bool:
@@ -26,10 +28,14 @@ def _database_is_ready() -> Tuple[bool, None] | Tuple[bool, Exception]:
         return False, error
 
 
+@require_GET
+@csrf_exempt
 def health_check(_request: HttpRequest) -> JsonResponse:
     return JsonResponse({"status": "OK"}, status=200)
 
 
+@require_GET
+@csrf_exempt
 def readiness(_request: HttpRequest) -> JsonResponse:
     readiness_status = {
         "database": _database_is_ready(),
