@@ -1,3 +1,4 @@
+from . import views
 """
 URL configuration for lidotiku project.
 
@@ -19,5 +20,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path("api/", include("api.urls")),
+    path("healthz", views.health_check),
+    path("readiness", views.readiness),
     path("admin/", admin.site.urls),
 ]

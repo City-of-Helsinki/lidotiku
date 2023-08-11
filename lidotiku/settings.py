@@ -83,6 +83,7 @@ DATABASES = {
         "OPTIONS": {
             "service": "lido",
             "passfile": ".lido_pgpass",
+            "connect_timeout": "3",
         },
     }
 }
