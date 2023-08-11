@@ -14,8 +14,6 @@ from .serializers import (
     CounterSerializer,
     ObservationSerializer,
     CounterDataSerializer,
-    CountersValuesSerializer,
-    CounterDistanceSerializer,
 )
 
 
@@ -134,16 +132,6 @@ def _group_counter_sensors_in_qs(queryset):
         counter.data_updated_time = counter.counter_updated_at
         counters.append(counter)
     return counters
-
-
-class CounterWithLatestObservationsView(viewsets.ViewSet):
-    pagination_class = None
-
-    def list(self, request, pk=None, counter_pk=None):
-        queryset = CounterWithLatestObservations.objects.filter(id=counter_pk)
-        counter = _group_counter_sensors_in_qs(queryset)[0]
-        serializer = CountersValuesSerializer(counter)
-        return Response(serializer.data)
 
 
 class CountersWithLatestObservationsView(viewsets.ViewSet):

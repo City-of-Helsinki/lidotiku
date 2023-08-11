@@ -1,5 +1,5 @@
 from django.urls import include, path
-from rest_framework_nested import routers
+from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
@@ -8,17 +8,11 @@ router.register(
     views.CountersWithLatestObservationsView,
     basename="counters-data",
 )
-
-router.register(r"counters", views.CounterViewSet, basename="counters")
-data_router = routers.NestedDefaultRouter(router, r"counters", lookup="counter")
-data_router.register(
-    r"data", views.CounterWithLatestObservationsView, basename="counter-data"
-)
+router.register(r"counters", views.CounterViewSet)
 router.register(r"observations", views.ObservationViewSet, basename="observations")
 
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("", include(data_router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
 ]
