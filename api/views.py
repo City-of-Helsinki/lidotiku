@@ -16,6 +16,7 @@ from .serializers import (
     ObservationSerializer,
     CounterDataSerializer,
     CountersValuesSerializer,
+    CounterDistanceSerializer,
 )
 
 
@@ -40,6 +41,7 @@ class CounterViewSet(viewsets.ModelViewSet):
         lon = self.request.query_params.get("lon")
         distance = self.request.query_params.get("distance")
         if lat is not None and lon is not None and distance is not None:
+            self.serializer_class = CounterDistanceSerializer
             distance_object = DistanceObject(km=distance)
             point = Point(x=float(lat), y=float(lon), srid=4326)
             queryset = (

@@ -5,14 +5,25 @@ from .models import Counter, Observation
 
 class CounterSerializer(serializers.HyperlinkedModelSerializer):
     geometry = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Counter
+        fields = ["id", "name", "classifying", "crs_epsg", "source", "geometry"]
+
+    def get_geometry(self, obj):
+        return {"type": "Point", "coordinates": [obj.geom.x, obj.geom.y]}
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        return data
+
+
+class CounterDistanceSerializer(CounterSerializer):
     dist = serializers.SerializerMethodField()
 
     class Meta:
         model = Counter
         fields = ["id", "name", "classifying", "crs_epsg", "source", "geometry", "dist"]
-
-    def get_geometry(self, obj):
-        return {"type": "Point", "coordinates": [obj.geom.x, obj.geom.y]}
 
     def get_dist(self, obj):
         try:
@@ -20,10 +31,6 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer):
             return dist.km
         except AttributeError:
             return None
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        return data
 
 
 class ObservationSerializer(serializers.HyperlinkedModelSerializer):
