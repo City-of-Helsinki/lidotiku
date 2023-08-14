@@ -40,31 +40,53 @@ class CounterViewSet(viewsets.ModelViewSet):
         lon = self.request.query_params.get("lon")
         distance = self.request.query_params.get("distance")
 
-        if not any([lat, lon, distance]):
-            return queryset
+        coordinate_parameters = {
+            "latitude": lat,
+            "longitude": lon,
+            "distance": distance,
+        }
 
-        if not all([lat, lon, distance]):
+        if any(coordinate_parameters.values()) and not all(
+            coordinate_parameters.values()
+        ):
+            missing_params = [
+                key for key, value in coordinate_parameters.items() if value is None
+            ]
             raise ValidationError(
-                "Missing query argument, latitude, longitude and distance must all be provided"
+                f"Missing query argument(s): {', '.join(missing_params)}. Latitude, longitude and distance must all be provided"
             )
 
-        try:
-            lat = float(lat)
-            lon = float(lon)
-            distance = float(distance)
-        except Exception as exc:
-            raise ValidationError(
-                "Invalid query arguments, latitude, longtitude and distance must all be numbers"
-            ) from exc
+        if all(coordinate_parameters.values()):
+            invalid_parameters = []
 
-        self.serializer_class = CounterDistanceSerializer
-        distance_object = DistanceObject(km=distance)
-        point = Point(x=float(lat), y=float(lon), srid=4326)
-        queryset = (
-            queryset.annotate(dist=DistanceFunction("geom", point))
-            .filter(dist__lte=distance_object)
-            .order_by("dist")
-        )
+            try:
+                lat = float(lat)
+            except ValueError:
+                invalid_parameters.append("latitude")
+
+            try:
+                lon = float(lon)
+            except ValueError:
+                invalid_parameters.append("longitude")
+
+            try:
+                distance = float(distance)
+            except ValueError:
+                invalid_parameters.append("distance")
+
+            if len(invalid_parameters) > 0:
+                raise ValidationError(
+                    f"Invalid query argument(s): {', '.join(invalid_parameters)}. Latitude, longitude and distance must all be provided as numbers"
+                )
+
+            self.serializer_class = CounterDistanceSerializer
+            distance_object = DistanceObject(km=distance)
+            point = Point(x=float(lat), y=float(lon), srid=4326)
+            queryset = (
+                queryset.annotate(dist=DistanceFunction("geom", point))
+                .filter(dist__lte=distance_object)
+                .order_by("dist")
+            )
 
         return queryset
 
