@@ -4,109 +4,125 @@ CREATE SCHEMA IF NOT EXISTS lido;
 
 -- EcoCounter
 CREATE TABLE IF NOT EXISTS lido.ecocounter_counters (
-	id int8 NULL,
-	"name" varchar(32) NULL,
-	classifying bool NULL,
-	longitude float8 NULL,
-	latitude float8 NULL,
-	crs_epsg int8 NULL,
-	"source" varchar(32) NULL,
-	geom public.geometry(geometry, 4326) NULL
+    id bigint NOT NULL,
+    name character varying(32),
+    classifying boolean,
+    longitude double precision,
+    latitude double precision,
+    crs_epsg bigint,
+    source character varying(32),
+    geom public.geometry(Geometry,4326)
 );
+ALTER TABLE ONLY lido.ecocounter_counters
+    ADD CONSTRAINT ecocounter_counters_pkey PRIMARY KEY (id);
 CREATE INDEX IF NOT EXISTS ecocounter_counters_geom_1668597320638 ON lido.ecocounter_counters USING gist (geom);
 
 CREATE TABLE IF NOT EXISTS lido.ecocounter_observations (
-	id int8 NULL,
-	direction varchar(32) NULL,
-	value int8 NULL,
-	unit varchar(8) NULL,
-	typeofmeasurement varchar(32) NULL,
-	phenomenondurationseconds int8 NULL,
-	vehicletype varchar(32) NULL,
-	datetime timestamp NULL,
-	"source" varchar(32) NULL
+    id bigint NOT NULL,
+    direction character varying(32) NOT NULL,
+    value bigint,
+    unit character varying(8),
+    typeofmeasurement character varying(32) NOT NULL,
+    phenomenondurationseconds bigint NOT NULL,
+    vehicletype character varying(32) NOT NULL,
+    datetime timestamp without time zone NOT NULL,
+    source character varying(32)
 );
+ALTER TABLE ONLY lido.ecocounter_observations
+    ADD CONSTRAINT ecocounter_observations_pkey PRIMARY KEY (id, typeofmeasurement, phenomenondurationseconds, vehicletype, datetime, direction);
 CREATE INDEX IF NOT EXISTS ecocounter_observations_datetime_idx ON lido.ecocounter_observations USING brin (datetime) WITH (pages_per_range='64', autosummarize='on');
 
 
 -- InfoTripla
 CREATE TABLE IF NOT EXISTS lido.infotripla_counters (
-	id int8 NULL,
-	"name" varchar(32) NULL,
-	classifying bool NULL,
-	longitude float8 NULL,
-	latitude float8 NULL,
-	crs_epsg int8 NULL,
-	"source" varchar(32) NULL,
-	geom public.geometry(geometry, 4326) NULL
+    id bigint NOT NULL,
+    name character varying(32),
+    classifying boolean,
+    longitude double precision,
+    latitude double precision,
+    crs_epsg bigint,
+    source character varying(32),
+    geom public.geometry(Geometry,4326)
 );
+ALTER TABLE ONLY lido.infotripla_counters
+    ADD CONSTRAINT infotripla_counters_pkey PRIMARY KEY (id);
 CREATE INDEX IF NOT EXISTS infotripla_counters_geom_1668597318594 ON lido.infotripla_counters USING gist (geom);
 
 CREATE TABLE IF NOT EXISTS lido.infotripla_observations (
-	id int8 NULL,
-	direction varchar(32) NULL,
-	value int8 NULL,
-	unit varchar(8) NULL,
-	typeofmeasurement varchar(32) NULL,
-	phenomenondurationseconds int8 NULL,
-	vehicletype varchar(32) NULL,
-	datetime timestamp NULL,
-	"source" varchar(32) NULL
+    id bigint NOT NULL,
+    direction character varying(32) NOT NULL,
+    value bigint,
+    unit character varying(8),
+    typeofmeasurement character varying(32) NOT NULL,
+    phenomenondurationseconds bigint NOT NULL,
+    vehicletype character varying(32) NOT NULL,
+    datetime timestamp without time zone NOT NULL,
+    source character varying(32)
 );
+ALTER TABLE ONLY lido.infotripla_observations
+    ADD CONSTRAINT infotripla_observations_pkey PRIMARY KEY (id, typeofmeasurement, phenomenondurationseconds, vehicletype, datetime, direction);
 CREATE INDEX IF NOT EXISTS infotripla_observations_datetime_idx ON lido.infotripla_observations USING brin (datetime) WITH (pages_per_range='64', autosummarize='on');
 
 
 -- M680
 CREATE TABLE IF NOT EXISTS lido.m680_counters (
-	id int8 NULL,
-	"name" varchar(32) NULL,
-	classifying bool NULL,
-	longitude float8 NULL,
-	latitude float8 NULL,
-	crs_epsg int8 NULL,
-	"source" varchar(32) NULL,
-	geom public.geometry(geometry, 4326) NULL
+    id bigint NOT NULL,
+    name character varying(32),
+    classifying boolean,
+    longitude double precision,
+    latitude double precision,
+    crs_epsg bigint,
+    source character varying(32),
+    geom public.geometry(Geometry,4326)
 );
+ALTER TABLE ONLY lido.m680_counters
+    ADD CONSTRAINT m680_counters_pkey PRIMARY KEY (id);
 CREATE INDEX IF NOT EXISTS m680_counters_geom_1668600007799 ON lido.m680_counters USING gist (geom);
 
 CREATE TABLE IF NOT EXISTS lido.m680_observations (
-	id int8 NULL,
-	direction varchar(32) NULL,
-	value int8 NULL,
-	unit varchar(8) NULL,
-	typeofmeasurement varchar(32) NULL,
-	phenomenondurationseconds int8 NULL,
-	vehicletype varchar(32) NULL,
-	datetime timestamp NULL,
-	"source" varchar(32) NULL
+    id bigint NOT NULL,
+    direction character varying(32) NOT NULL,
+    value bigint,
+    unit character varying(8),
+    typeofmeasurement character varying(32) NOT NULL,
+    phenomenondurationseconds bigint NOT NULL,
+    vehicletype character varying(32) NOT NULL,
+    datetime timestamp without time zone NOT NULL,
+    source character varying(32)
 );
+ALTER TABLE ONLY lido.m680_observations
+    ADD CONSTRAINT m680_observations_pkey PRIMARY KEY (id, typeofmeasurement, phenomenondurationseconds, vehicletype, datetime, direction);
 CREATE INDEX IF NOT EXISTS m680_observations_datetime_idx ON lido.m680_observations USING brin (datetime) WITH (pages_per_range='64', autosummarize='on');
 
 
 -- Marksman
 CREATE TABLE IF NOT EXISTS lido.marksman_counters (
-	id int8 NULL,
-	"name" varchar(36) NULL,
-	classifying bool NULL,
-	longitude float8 NULL,
-	latitude float8 NULL,
-	crs_epsg int8 NULL,
-	"source" varchar(32) NULL,
-	geom public.geometry(geometry, 4326) NULL
+    id bigint NOT NULL,
+    name character varying(36),
+    classifying boolean,
+    longitude double precision,
+    latitude double precision,
+    crs_epsg bigint,
+    source character varying(32),
+    geom public.geometry(Geometry,4326)
 );
+ALTER TABLE ONLY lido.marksman_counters
+    ADD CONSTRAINT marksman_counters_pkey PRIMARY KEY (id);
 CREATE INDEX IF NOT EXISTS marksman_counters_geom_1687341319448 ON lido.marksman_counters USING gist (geom);
 
 CREATE TABLE IF NOT EXISTS lido.marksman_observations (
-	id int8 NULL,
-	direction int2 NULL,
-	value int8 NULL,
-	unit varchar(8) NULL,
-	typeofmeasurement varchar(6) NULL,
-	phenomenondurationseconds int8 NULL,
-	vehicletype varchar(32) NULL,
-	datetime timestamptz NULL,
-	"source" varchar(9) NULL
+    id bigint NOT NULL,
+    direction smallint NOT NULL,
+    value bigint,
+    unit character varying(8),
+    typeofmeasurement character varying(6) NOT NULL,
+    phenomenondurationseconds bigint NOT NULL,
+    vehicletype character varying(32) NOT NULL,
+    datetime timestamp with time zone NOT NULL,
+    source character varying(9)
 );
+ALTER TABLE ONLY lido.marksman_observations
+    ADD CONSTRAINT marksman_observations_pkey PRIMARY KEY (id, typeofmeasurement, phenomenondurationseconds, vehicletype, datetime, direction);
 CREATE INDEX IF NOT EXISTS marksman_observations_id_datetime_idx ON lido.marksman_observations USING btree (id, datetime);
 
 
