@@ -5,6 +5,7 @@ from django.db.models.query import QuerySet
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 from django.contrib.gis.measure import Distance as DistanceObject
+from django.core.exceptions import ValidationError
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
@@ -14,6 +15,7 @@ from .serializers import (
     CounterSerializer,
     ObservationSerializer,
     CounterDataSerializer,
+    CounterDistanceSerializer,
 )
 
 
@@ -37,15 +39,32 @@ class CounterViewSet(viewsets.ModelViewSet):
         lat = self.request.query_params.get("lat")
         lon = self.request.query_params.get("lon")
         distance = self.request.query_params.get("distance")
-        if lat is not None and lon is not None and distance is not None:
-            self.serializer_class = CounterDistanceSerializer
-            distance_object = DistanceObject(km=distance)
-            point = Point(x=float(lat), y=float(lon), srid=4326)
-            queryset = (
-                queryset.annotate(dist=DistanceFunction("geom", point))
-                .filter(dist__lte=distance_object)
-                .order_by("dist")
+
+        if not any([lat, lon, distance]):
+            return queryset
+
+        if not all([lat, lon, distance]):
+            raise ValidationError(
+                "Missing query argument, latitude, longitude and distance must all be provided"
             )
+
+        try:
+            lat = float(lat)
+            lon = float(lon)
+            distance = float(distance)
+        except Exception as exc:
+            raise ValidationError(
+                "Invalid query arguments, latitude, longtitude and distance must all be numbers"
+            ) from exc
+
+        self.serializer_class = CounterDistanceSerializer
+        distance_object = DistanceObject(km=distance)
+        point = Point(x=float(lat), y=float(lon), srid=4326)
+        queryset = (
+            queryset.annotate(dist=DistanceFunction("geom", point))
+            .filter(dist__lte=distance_object)
+            .order_by("dist")
+        )
 
         return queryset
 
