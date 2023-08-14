@@ -8,7 +8,7 @@ router.register(
     views.CountersWithLatestObservationsView,
     basename="counters-data",
 )
-router.register(r"counters", views.CounterViewSet)
+router.register(r"counters", views.CounterViewSet, basename="counters")
 router.register(r"observations", views.ObservationViewSet, basename="observations")
 
 
