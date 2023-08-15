@@ -1,11 +1,13 @@
 from itertools import groupby
 from datetime import datetime, timedelta
 from dataclasses import dataclass
+from django.db.models import Sum, Avg
 from django.db.models.query import QuerySet
+from django.db.models.functions import Trunc
+from django.db.models.expressions import Value
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 from django.contrib.gis.measure import Distance as DistanceObject
-from django.core.exceptions import ValidationError
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
@@ -13,10 +15,13 @@ from rest_framework.pagination import PageNumberPagination
 from .models import Counter, Observation, CounterWithLatestObservations
 from .serializers import (
     CounterSerializer,
-    ObservationSerializer,
-    CounterDataSerializer,
-    CounterDistanceSerializer,
     CounterFilterValidationSerializer,
+    CounterDistanceSerializer,
+    CounterDataSerializer,
+    ObservationSerializer,
+    ObservationFilterSerializer,
+    ObservationAggregatedSerializer,
+    ObservationAggregationFilterSerializer,
 )
 
 
@@ -66,12 +71,20 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = ObservationSerializer
 
     def get_queryset(self):
-        queryset = Observation.objects.all()
+        ObservationFilterSerializer(data=self.request.query_params).is_valid(
+            raise_exception=True
+        )
 
+        queryset = Observation.objects.all()
         counter = self.request.query_params.get("counter")
-        start_time = self.request.query_params.get("start_time")
-        end_time = self.request.query_params.get("end_time")
+        start_time = self.request.query_params.get("startTime")
+        end_time = self.request.query_params.get("endTime")
         source = self.request.query_params.get("source")
+        aggregation = {
+            "period": self.request.query_params.get("period"),
+            "measurement_type": self.request.query_params.get("measurement_type"),
+        }
+        measurement_type = aggregation.get("measurement_type")
 
         if counter is not None:
             queryset = queryset.filter(counter=counter)
@@ -84,7 +97,67 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         if source is not None:
             queryset = queryset.filter(source=source)
 
-        return queryset.order_by("-datetime")
+        if measurement_type is not None:
+            queryset = queryset.filter(typeofmeasurement=measurement_type)
+
+        return queryset.order_by("datetime")
+
+
+class ObservationAggregationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """
+    API endpoint for observations aggregation.
+    """
+
+    pagination_class = LargeResultsSetPagination
+    serializer_class = ObservationAggregatedSerializer
+
+    def get_queryset(self):
+        ObservationAggregationFilterSerializer(data=self.request.query_params).is_valid(
+            raise_exception=True
+        )
+
+        queryset = Observation.objects.all()
+        counter = self.request.query_params.get("counter")
+        start_time = self.request.query_params.get("start_time")
+        end_time = self.request.query_params.get("end_time")
+        aggregation = {
+            "period": self.request.query_params.get("period"),
+            "measurement_type": self.request.query_params.get("measurement_type"),
+        }
+        measurement_type = aggregation.get("measurement_type")
+
+        if all(aggregation.values()) and counter is not None:
+            queryset = queryset.filter(counter=counter)
+
+            if start_time is not None:
+                queryset = queryset.filter(datetime__gte=start_time)
+            if end_time is not None:
+                queryset = queryset.filter(datetime__lte=end_time)
+
+            aggregation_period = aggregation.get("period")
+            if measurement_type == "speed":
+                aggregation_calc = Avg("value")
+            else:  # measurement_type == "count"
+                aggregation_calc = Sum("value")
+
+            queryset = (
+                queryset.filter(typeofmeasurement=measurement_type)
+                .values("typeofmeasurement", "source")
+                .annotate(start_time=Trunc("datetime", kind=aggregation_period))
+                .values(
+                    "start_time",
+                    "counter_id",
+                    "direction",
+                    "unit",
+                )
+                .annotate(aggregated_value=aggregation_calc)
+                .annotate(period=Value(aggregation_period))
+                .order_by("start_time")
+            )
+            return queryset.order_by("start_time")
+
+        # Validation should raise ValidationError, so this is not expected to be returned.
+        return queryset.none()
 
 
 @dataclass

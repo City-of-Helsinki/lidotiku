@@ -9,7 +9,12 @@ router.register(
     basename="counters-data",
 )
 router.register(r"counters", views.CounterViewSet, basename="counter")
-router.register(r"observations", views.ObservationViewSet, basename="observations")
+router.register(r"observations", views.ObservationViewSet, basename="observation")
+router.register(
+    r"observations/aggregation",
+    views.ObservationAggregationViewSet,
+    basename="observation-aggregation",
+)
 
 
 urlpatterns = [
