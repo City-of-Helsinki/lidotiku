@@ -11,22 +11,26 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import environ
+
+env = environ.Env(DEBUG=(bool, False))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+environ.Env.read_env(os.path.join(BASE_DIR, ".localenv"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-hi(f*jo_bfzsuh!5rqbvc4bn#xjn9dfc+0$z0*u4hwvh5n^u!o"
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS: list[str] = []
-
 
 # Application definition
 
@@ -67,10 +71,13 @@ WSGI_APPLICATION = "lidotiku.wsgi.application"
 
 DATABASES = {
     "default": {
+        "NAME": env("DATABASE_NAME"),
+        "USER": env("DATABASE_USER"),
+        "PASSWORD": env("DATABASE_PASSWORD"),
+        "HOST": env("DATABASE_HOST"),
+        "PORT": env("DATABASE_PORT"),
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "OPTIONS": {
-            "service": "lido",
-            "passfile": ".lido_pgpass",
             "connect_timeout": "3",
         },
     }
