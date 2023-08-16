@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.gis.db.models.functions import Distance
+from django.core.exceptions import ValidationError
 from .models import Counter, Observation
 
 
@@ -19,18 +20,60 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class CounterDistanceSerializer(CounterSerializer):
-    dist = serializers.SerializerMethodField()
+    distance = serializers.SerializerMethodField()
 
     class Meta:
         model = Counter
-        fields = ["id", "name", "classifying", "crs_epsg", "source", "geometry", "dist"]
+        fields = [
+            "id",
+            "name",
+            "classifying",
+            "crs_epsg",
+            "source",
+            "geometry",
+            "distance",
+        ]
 
-    def get_dist(self, obj):
+    def get_distance(self, obj):
         try:
-            dist: Distance = getattr(obj, "dist")
-            return dist.km
+            distance: Distance = getattr(obj, "distance")
+            return distance.km
         except AttributeError:
             return None
+
+
+class CounterFilterValidationSerializer(serializers.Serializer):
+    longitude = serializers.FloatField(required=False)
+    latitude = serializers.FloatField(required=False)
+    distance = serializers.FloatField(required=False)
+
+    def validate(self, attrs):
+        longitude = attrs.get("longitude")
+        latitude = attrs.get("latitude")
+        distance = attrs.get("distance")
+
+        coordinate_parameters = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "distance": distance,
+        }
+
+        validation_errors = {}
+
+        if any(coordinate_parameters.values()) and not all(
+            coordinate_parameters.values()
+        ):
+            missing_params = [
+                key for key, value in coordinate_parameters.items() if value is None
+            ]
+            validation_errors[
+                "Missing parameters"
+            ] = f"Missing query argument(s): {', '.join(missing_params)}. Latitude, longitude and distance must all be provided"
+
+        if validation_errors:
+            raise ValidationError(validation_errors)
+
+        return attrs
 
 
 class ObservationSerializer(serializers.HyperlinkedModelSerializer):
