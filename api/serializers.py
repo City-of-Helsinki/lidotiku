@@ -35,11 +35,8 @@ class CounterDistanceSerializer(CounterSerializer):
         ]
 
     def get_distance(self, obj):
-        try:
-            distance: Distance = getattr(obj, "distance")
-            return distance.km
-        except AttributeError:
-            return None
+        distance: Distance = getattr(obj, "distance", None)
+        return getattr(distance, "km", None)
 
 
 class CounterFilterValidationSerializer(serializers.Serializer):
