@@ -111,7 +111,7 @@ class ObservationSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySeri
 
 
 class ObservationFilterSerializer(ReadOnlySerializer):
-    counter = serializers.IntegerField(required=False)
+    counter = serializers.ListField(required=False, child=serializers.IntegerField())
     start_time = serializers.CharField(required=False)
     end_time = serializers.CharField(required=False)
     # pylint: disable=protected-access, no-member
@@ -119,6 +119,9 @@ class ObservationFilterSerializer(ReadOnlySerializer):
         Observation()._meta.get_field("source"),
         required=False,
     )
+    measurement_type = serializers.CharField(required=False)
+    vehicle_type = serializers.CharField(required=False)
+    order = serializers.ChoiceField(choices=["asc", "desc"], required=False)
 
 
 class ObservationAggregatedSerializer(
@@ -146,7 +149,6 @@ class ObservationAggregatedSerializer(
 
 class ObservationAggregationFilterSerializer(ObservationFilterSerializer):
     period = serializers.CharField(required=False)
-    measurement_type = serializers.CharField(required=False)
 
     def validate(self, attrs):
         counter = attrs.get("counter")

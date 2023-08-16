@@ -76,7 +76,7 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         )
 
         queryset = Observation.objects.all()
-        counter = self.request.query_params.get("counter")
+        counter: list[str] = self.request.query_params.getlist("counter")
         start_time = self.request.query_params.get("startTime")
         end_time = self.request.query_params.get("endTime")
         source = self.request.query_params.get("source")
@@ -85,9 +85,10 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             "measurement_type": self.request.query_params.get("measurement_type"),
         }
         measurement_type = aggregation.get("measurement_type")
+        order = self.request.query_params.get("order")
 
-        if counter is not None:
-            queryset = queryset.filter(counter=counter)
+        if len(counter) > 0:
+            queryset = queryset.filter(counter__in=counter)
 
         if start_time is not None:
             queryset = queryset.filter(datetime__gte=start_time)
@@ -100,7 +101,17 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         if measurement_type is not None:
             queryset = queryset.filter(typeofmeasurement=measurement_type)
 
-        return queryset.order_by("datetime")
+        if (
+            order is not None
+            and order
+            in ObservationFilterSerializer().fields.get("order").choices.keys()
+            and order == "desc"
+        ):
+            queryset = queryset.order_by("-datetime")
+        else:
+            queryset = queryset.order_by("datetime")
+
+        return queryset
 
 
 class ObservationAggregationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -125,6 +136,7 @@ class ObservationAggregationViewSet(mixins.ListModelMixin, viewsets.GenericViewS
             "measurement_type": self.request.query_params.get("measurement_type"),
         }
         measurement_type = aggregation.get("measurement_type")
+        order = self.request.query_params.get("order")
 
         if all(aggregation.values()) and counter is not None:
             queryset = queryset.filter(counter=counter)
@@ -154,7 +166,18 @@ class ObservationAggregationViewSet(mixins.ListModelMixin, viewsets.GenericViewS
                 .annotate(period=Value(aggregation_period))
                 .order_by("start_time")
             )
-            return queryset.order_by("start_time")
+            if (
+                order is not None
+                and order
+                in ObservationAggregationFilterSerializer()
+                .fields.get("order")
+                .choices.keys()
+                and order == "desc"
+            ):
+                queryset = queryset.order_by("-start_time")
+            else:
+                queryset = queryset.order_by("start_time")
+            return queryset
 
         # Validation should raise ValidationError, so this is not expected to be returned.
         return queryset.none()
