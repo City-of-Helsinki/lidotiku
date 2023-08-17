@@ -5,9 +5,13 @@ from django.db.models import Sum, Avg
 from django.db.models.query import QuerySet
 from django.db.models.functions import Trunc
 from django.db.models.expressions import Value
-from django.contrib.gis.geos import Point
+from django.db import DatabaseError
+from django.core.exceptions import SuspiciousOperation, RequestAborted
+from django.contrib.gis.geos import Point, GEOSGeometry
+from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 from django.contrib.gis.measure import Distance as DistanceObject
+from django.contrib.gis.gdal.error import GDALException
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
@@ -60,6 +64,29 @@ class CounterViewSet(viewsets.ModelViewSet):
             )
 
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        try:
+            geojson_data = request.data.get("geometry")
+            if geojson_data:
+                geometry = GEOSGeometry(str(geojson_data))
+                counters = Counter.objects.filter(geom__intersects=geometry)
+                serializer = self.get_serializer(counters, many=True)
+                return Response(serializer.data, status=200)
+
+            return Response({"error": "Invalid GeoJSON data"}, status=400)
+        except (TypeError, ValueError) as error:
+            return Response({"error": f"Invalid GeoJSON data: {error}"}, status=400)
+        except (
+            GEOSException,
+            GDALException,
+            DatabaseError,
+            SuspiciousOperation,
+            RequestAborted,
+        ) as error:
+            return Response(
+                {"error": f"Unable to process request: {error}"}, status=500
+            )
 
 
 class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
