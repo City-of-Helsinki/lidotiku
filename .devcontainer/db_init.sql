@@ -135,7 +135,7 @@ CREATE INDEX IF NOT EXISTS infotripla_observations_id_datetime_idx ON lido.infot
 
 -- lido.vw_counters source
 CREATE OR REPLACE VIEW lido.vw_counters
-AS SELECT DISTINCT ON (ecocounter_counters.id) ecocounter_counters.id,
+AS SELECT ecocounter_counters.id,
     ecocounter_counters.name,
     ecocounter_counters.classifying,
     ecocounter_counters.longitude,
@@ -145,7 +145,7 @@ AS SELECT DISTINCT ON (ecocounter_counters.id) ecocounter_counters.id,
     ecocounter_counters.geom
    FROM lido.ecocounter_counters
 UNION ALL
- SELECT DISTINCT ON (infotripla_counters.id) infotripla_counters.id,
+ SELECT infotripla_counters.id,
     infotripla_counters.name,
     infotripla_counters.classifying,
     infotripla_counters.longitude,
@@ -155,7 +155,7 @@ UNION ALL
     infotripla_counters.geom
    FROM lido.infotripla_counters
 UNION ALL
- SELECT DISTINCT ON (m680_counters.id) m680_counters.id,
+ SELECT m680_counters.id,
     m680_counters.name,
     m680_counters.classifying,
     m680_counters.longitude,
@@ -165,7 +165,7 @@ UNION ALL
     m680_counters.geom
    FROM lido.m680_counters
 UNION ALL
- SELECT DISTINCT ON (marksman_counters.id) marksman_counters.id,
+ SELECT marksman_counters.id,
     marksman_counters.name,
     marksman_counters.classifying,
     marksman_counters.longitude,
