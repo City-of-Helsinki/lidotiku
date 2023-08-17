@@ -76,9 +76,9 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         )
 
         queryset = Observation.objects.all()
-        counter: list[str] = self.request.query_params.getlist("counter")
-        start_time = self.request.query_params.get("startTime")
-        end_time = self.request.query_params.get("endTime")
+        counter = self.request.query_params.get("counter")
+        start_time = self.request.query_params.get("start_time")
+        end_time = self.request.query_params.get("end_time")
         source = self.request.query_params.get("source")
         aggregation = {
             "period": self.request.query_params.get("period"),
