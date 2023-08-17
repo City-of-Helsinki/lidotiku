@@ -29,6 +29,7 @@ from .serializers import (
     ObservationAggregatedSerializer,
     ObservationAggregationFilterSerializer,
 )
+from .schemas import CounterSchema, ObservationSchema
 
 
 class LargeResultsSetPagination(PageNumberPagination):
@@ -37,13 +38,19 @@ class LargeResultsSetPagination(PageNumberPagination):
     max_page_size = 10000
 
 
-class CounterViewSet(viewsets.ModelViewSet):
+class CounterViewSet(
+    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
     """
     API endpoint for counters
     """
 
     pagination_class = None
     serializer_class = CounterSerializer
+    schema = CounterSchema()
 
     def get_queryset(self):
         queryset = Counter.objects.all()
@@ -100,6 +107,7 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     pagination_class = LargeResultsSetPagination
     serializer_class = ObservationSerializer
+    schema = ObservationSchema()
 
     def get_queryset(self):
         ObservationFilterSerializer(data=self.request.query_params).is_valid(

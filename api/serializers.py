@@ -112,7 +112,9 @@ class ObservationSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySeri
 
 
 class ObservationFilterSerializer(ReadOnlySerializer):
-    counter = serializers.ListField(required=False, child=serializers.IntegerField())
+    counter = serializers.ListField(
+        required=False, child=serializers.IntegerField(), label="Counter id"
+    )
     start_time = serializers.CharField(required=False)
     end_time = serializers.CharField(required=False)
     # pylint: disable=protected-access, no-member
