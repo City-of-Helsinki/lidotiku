@@ -50,7 +50,7 @@ class CounterViewSet(
 
     pagination_class = None
     serializer_class = CounterSerializer
-    schema = CounterSchema()
+    schema = CounterSchema(request_serializer=CounterFilterValidationSerializer)
 
     def get_queryset(self):
         queryset = Counter.objects.all()
@@ -107,7 +107,7 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     pagination_class = LargeResultsSetPagination
     serializer_class = ObservationSerializer
-    schema = ObservationSchema()
+    schema = ObservationSchema(request_serializer=ObservationFilterSerializer)
 
     def get_queryset(self):
         ObservationFilterSerializer(data=self.request.query_params).is_valid(
