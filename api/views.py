@@ -103,7 +103,7 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         )
 
         queryset = Observation.objects.all()
-        counter = self.request.query_params.get("counter")
+        counter: list[str] = self.request.query_params.getlist("counter")
         start_time = self.request.query_params.get("start_time")
         end_time = self.request.query_params.get("end_time")
         source = self.request.query_params.get("source")

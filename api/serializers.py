@@ -1,6 +1,7 @@
 # pylint: disable=abstract-method
 from rest_framework import serializers
 from django.contrib.gis.measure import Distance
+from django.core.exceptions import ValidationError
 from .models import Counter, Observation
 
 
