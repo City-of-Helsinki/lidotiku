@@ -1,1 +1,1 @@
-FROM hello-world:linux
+FROM crccheck/hello-world
