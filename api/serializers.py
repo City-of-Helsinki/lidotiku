@@ -151,6 +151,7 @@ class ObservationAggregatedSerializer(
 
 
 class ObservationAggregationFilterSerializer(ObservationFilterSerializer):
+    counter = serializers.IntegerField(required=True, label="Counter id")
     period = serializers.CharField(required=False)
 
     def validate(self, attrs):
