@@ -74,19 +74,7 @@ WSGI_APPLICATION = "lidotiku.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "NAME": env("DATABASE_NAME"),
-        "USER": env("DATABASE_USER"),
-        "PASSWORD": env("DATABASE_PASSWORD"),
-        "HOST": env("DATABASE_HOST"),
-        "PORT": env("DATABASE_PORT"),
-        "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "OPTIONS": {
-            "connect_timeout": "3",
-        },
-    }
-}
+DATABASES = {"default": env.db_url(engine="django.contrib.gis.db.backends.postgis")}
 
 
 # Internationalization
