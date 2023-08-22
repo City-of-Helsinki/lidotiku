@@ -2,4 +2,4 @@
 
 set -e
 
-gunicorn --bind 0.0.0.0:8000 lidotiku.wsgi
+gunicorn --bind 0.0.0.0:8080 lidotiku.wsgi

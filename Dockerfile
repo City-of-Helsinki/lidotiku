@@ -11,6 +11,6 @@ COPY . .
 
 USER nobody:0
 
-EXPOSE 8000
+EXPOSE 8080
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
