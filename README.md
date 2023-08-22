@@ -1,5 +1,17 @@
 # LIDO-TIKU API
 
+# Database
+
+**The database is not managed by Django!** Do not attempt to make writes to the default tables, nor change their schema.
+
+The data in the database is accessed with views. First create these views, Django will not do that as it is not managing the database. The create commands can be found in `.devcontainer/db_init.sql`.
+Ensure that the database user has access to these views, if there are issues on that end.
+For instance:
+```sql
+GRANT SELECT ON TABLE lido.vw_counters TO database_user;
+GRANT SELECT ON TABLE lido.vw_observations TO database_user;
+```
+
 # Local development
 
 ## Running the API locally
