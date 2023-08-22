@@ -14,7 +14,11 @@ from pathlib import Path
 import os
 import environ
 
-env = environ.Env(DEBUG=(bool, False))
+env = environ.Env(
+    DEBUG=(bool, False),
+    SECRET_KEY=(str, ""),
+    ALLOWED_HOSTS=(list, []),
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,9 +33,9 @@ if os.getenv("ENV") == "local":
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS: list[str] = []
+ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
 # Application definition
 
