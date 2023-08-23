@@ -106,3 +106,10 @@ ALTER TABLE lido.infotripla_counters ADD CONSTRAINT infotripla_counters_pk PRIMA
 ALTER TABLE lido.m680_counters ADD CONSTRAINT m680_counters_pk PRIMARY KEY (id);
 ALTER TABLE lido.marksman_counters ADD CONSTRAINT marksman_counters_pk PRIMARY KEY (id);
 ```
+
+## Typing
+
+To check typing run:
+`ENV=local mypy . --check-untyped-defs`
+
+This is to be automated later in the build process.
