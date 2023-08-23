@@ -1,6 +1,7 @@
 from itertools import groupby
 from datetime import datetime, timedelta
 from dataclasses import dataclass
+from typing import cast
 from django.db.models import Sum, Avg
 from django.db.models.query import QuerySet
 from django.db.models.functions import Trunc
@@ -15,6 +16,7 @@ from django.contrib.gis.gdal.error import GDALException
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.serializers import ChoiceField
 
 from .models import Counter, Observation, CounterWithLatestObservations
 from .serializers import (
@@ -56,7 +58,7 @@ class CounterViewSet(viewsets.ModelViewSet):
 
             self.serializer_class = CounterDistanceSerializer
             distance_object = DistanceObject(km=distance)
-            point = Point(x=float(latitude), y=float(longitude), srid=4326)
+            point = Point(x=latitude, y=longitude, srid=4326)
             queryset = (
                 queryset.annotate(distance=DistanceFunction("geom", point))
                 .filter(distance__lte=distance_object)
@@ -131,7 +133,10 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         if (
             order is not None
             and order
-            in ObservationFilterSerializer().fields.get("order").choices.keys()
+            in cast(
+                ChoiceField,
+                ObservationFilterSerializer().fields.get("order"),
+            ).choices.keys()
             and order == "desc"
         ):
             queryset = queryset.order_by("-datetime")
@@ -175,12 +180,12 @@ class ObservationAggregationViewSet(mixins.ListModelMixin, viewsets.GenericViewS
 
             aggregation_period = aggregation.get("period")
             if measurement_type == "speed":
-                aggregation_calc = Avg("value")
+                aggregation_calc: Avg | Sum = Avg("value")
             else:  # measurement_type == "count"
                 aggregation_calc = Sum("value")
 
             queryset = (
-                queryset.filter(typeofmeasurement=measurement_type)
+                queryset.filter(typeofmeasurement=measurement_type)  # type: ignore
                 .values("typeofmeasurement", "source")
                 .annotate(start_time=Trunc("datetime", kind=aggregation_period))
                 .values(
@@ -196,9 +201,10 @@ class ObservationAggregationViewSet(mixins.ListModelMixin, viewsets.GenericViewS
             if (
                 order is not None
                 and order
-                in ObservationAggregationFilterSerializer()
-                .fields.get("order")
-                .choices.keys()
+                in cast(
+                    ChoiceField,
+                    ObservationAggregationFilterSerializer().fields.get("order"),
+                ).choices.keys()
                 and order == "desc"
             ):
                 queryset = queryset.order_by("-start_time")

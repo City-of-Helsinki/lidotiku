@@ -56,7 +56,7 @@ class CounterDistanceSerializer(CounterSerializer):
         ]
 
     def get_distance(self, obj):
-        distance: Distance = getattr(obj, "distance", None)
+        distance: Distance | None = getattr(obj, "distance", None)
         return getattr(distance, "km", None)
 
 
@@ -119,7 +119,7 @@ class ObservationFilterSerializer(ReadOnlySerializer):
     source = serializers.ModelField(
         Observation()._meta.get_field("source"),
         required=False,
-    )
+    )  # type: ignore
     measurement_type = serializers.CharField(required=False)
     vehicle_type = serializers.CharField(required=False)
     order = serializers.ChoiceField(choices=["asc", "desc"], required=False)
