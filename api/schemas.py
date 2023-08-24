@@ -48,7 +48,7 @@ class BaseSchema(AutoSchema):
         for field_name, field in serializer.get_fields().items():
             extra_parameter = {
                 "name": f"{field_name}",
-                "required": False,
+                "required": getattr(field, "required", False),
                 "in": "query",
                 "description": field.label if field.label is not None else field_name,
                 "schema": type_mappings.get(field_name, {"type": "string"}),
