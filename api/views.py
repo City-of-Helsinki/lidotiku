@@ -58,7 +58,7 @@ class CounterViewSet(viewsets.ModelViewSet):
 
             self.serializer_class = CounterDistanceSerializer
             distance_object = DistanceObject(km=distance)
-            point = Point(x=latitude, y=longitude, srid=4326)
+            point = Point(x=float(latitude), y=float(longitude), srid=4326)
             queryset = (
                 queryset.annotate(distance=DistanceFunction("geom", point))
                 .filter(distance__lte=distance_object)
@@ -109,11 +109,7 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         start_time = self.request.query_params.get("start_time")
         end_time = self.request.query_params.get("end_time")
         source = self.request.query_params.get("source")
-        aggregation = {
-            "period": self.request.query_params.get("period"),
-            "measurement_type": self.request.query_params.get("measurement_type"),
-        }
-        measurement_type = aggregation.get("measurement_type")
+        measurement_type = self.request.query_params.get("measurement_type")
         order = self.request.query_params.get("order")
 
         if len(counter) > 0:
