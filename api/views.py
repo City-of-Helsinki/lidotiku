@@ -29,7 +29,7 @@ from .serializers import (
     ObservationAggregatedSerializer,
     ObservationAggregationFilterSerializer,
 )
-from .schemas import CounterSchema, ObservationSchema
+from .schemas import CounterSchema, ObservationSchema, ObservationAggregationSchema
 
 
 class LargeResultsSetPagination(PageNumberPagination):
@@ -159,6 +159,9 @@ class ObservationAggregationViewSet(mixins.ListModelMixin, viewsets.GenericViewS
 
     pagination_class = LargeResultsSetPagination
     serializer_class = ObservationAggregatedSerializer
+    schema = ObservationAggregationSchema(
+        request_serializer=ObservationAggregationFilterSerializer
+    )
 
     def get_queryset(self):
         ObservationAggregationFilterSerializer(data=self.request.query_params).is_valid(
