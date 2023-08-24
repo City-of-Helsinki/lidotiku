@@ -58,7 +58,9 @@ class CounterViewSet(viewsets.ModelViewSet):
 
             self.serializer_class = CounterDistanceSerializer
             distance_object = DistanceObject(km=distance)
-            point = Point(x=float(latitude), y=float(longitude), srid=4326)
+            point = Point(
+                x=float(latitude), y=float(longitude), srid=4326  # type: ignore
+            )
             queryset = (
                 queryset.annotate(distance=DistanceFunction("geom", point))
                 .filter(distance__lte=distance_object)
