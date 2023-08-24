@@ -2,3 +2,5 @@ django-stubs==4.2.3
 djangorestframework-stubs==3.14.2
 pytest-django==4.5.2
 pytest-cov==4.1.0
+PyYAML==6.0.1
+uritemplate==4.1.1
