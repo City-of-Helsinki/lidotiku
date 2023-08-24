@@ -13,7 +13,7 @@
                 "runserver"
             ],
             "env": {
-                "PGSERVICEFILE": "${workspaceFolder}/.pgservice.conf"
+                "ENV": "local"
             },
             "django": true,
             "justMyCode": true
