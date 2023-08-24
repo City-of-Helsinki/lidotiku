@@ -113,3 +113,17 @@ To check typing run:
 `ENV=local mypy . --check-untyped-defs`
 
 This is to be automated later in the build process.
+
+## Testing
+
+The project is configured with pytest (pytest-django).
+Since the project is not doing any database writes and does not manage the database, the test configuration has disabled the database completely.
+If one intends to run tests with a database, you need to handle the database creation - Django does not create the database for unmanaged models.
+
+To run the tests:
+
+`ENV=local pytest`
+
+To find which lines don't have test coverage:
+
+`ENV=local pytest --cov-config=.coveragerc --cov=api/ --cov-report term-missing`
