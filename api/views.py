@@ -17,6 +17,8 @@ from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.serializers import ChoiceField
+from rest_framework.settings import api_settings
+from rest_framework_csv.renderers import PaginatedCSVRenderer
 
 from .models import Counter, Observation, CounterWithLatestObservations
 from .serializers import (
@@ -283,6 +285,12 @@ def _group_counter_sensors_in_qs(queryset):
 
 class CountersWithLatestObservationsView(viewsets.ViewSet):
     pagination_class = None
+    # Remove CSV renderer as it does not work well with nested values
+    renderer_classes = tuple(
+        filter(
+            lambda r: r != PaginatedCSVRenderer, api_settings.DEFAULT_RENDERER_CLASSES
+        )
+    )
 
     def list(self, request):
         # itertools.groupby() requires sorted iterable
