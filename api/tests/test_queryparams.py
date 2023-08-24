@@ -107,6 +107,9 @@ def test_observation_aggregation_params(api_client):
 def test_readonly_models():
     with pytest.raises(NotImplementedError):
         Counter.objects.create(id=1, name="Test")
+    with pytest.raises(NotImplementedError):
+        counter = Counter()
+        counter.create(id=1, name="Test")
     counter = Counter(id=1, name="Test")
     with pytest.raises(NotImplementedError):
         counter.save()
