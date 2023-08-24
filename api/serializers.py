@@ -1,10 +1,10 @@
-# pylint: disable=abstract-method
 from rest_framework import serializers
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ValidationError
 from .models import Counter, Observation
 
 
+# pylint: disable=abstract-method
 class ReadOnlySerializer(serializers.Serializer):
     class Meta:
         read_only_fields = "__all__"
@@ -56,7 +56,7 @@ class CounterDistanceSerializer(CounterSerializer):
         ]
 
     def get_distance(self, obj):
-        distance: Distance = getattr(obj, "distance", None)
+        distance: Distance | None = getattr(obj, "distance", None)
         return getattr(distance, "km", None)
 
 
@@ -119,7 +119,7 @@ class ObservationFilterSerializer(ReadOnlySerializer):
     source = serializers.ModelField(
         Observation()._meta.get_field("source"),
         required=False,
-    )
+    )  # type: ignore
     measurement_type = serializers.CharField(required=False)
     vehicle_type = serializers.CharField(required=False)
     order = serializers.ChoiceField(choices=["asc", "desc"], required=False)
@@ -170,7 +170,9 @@ class ObservationAggregationFilterSerializer(ObservationFilterSerializer):
                 "period"
             ] = f"`{aggregation.get('period')}` not one of {valid_aggregates}"
         # When doing aggregation ensure required query params are set
-        if aggregation.get("period") and not all(aggregation.values()):
+        if any(
+            [aggregation.get("period"), aggregation.get("measurement_type")]
+        ) and not all(aggregation.values()):
             missing = [key for key, value in aggregation.items() if not value]
             validation_errors[
                 "aggregate_combination"

@@ -1,5 +1,17 @@
 # LIDO-TIKU API
 
+# Database
+
+**The database is not managed by Django!** Do not attempt to make writes to the default tables, nor change their schema.
+
+The data in the database is accessed with views. First create these views, Django will not do that as it is not managing the database. The create commands can be found in `.devcontainer/db_init.sql`.
+Ensure that the database user has access to these views, if there are issues on that end.
+For instance:
+```sql
+GRANT SELECT ON TABLE lido.vw_counters TO database_user;
+GRANT SELECT ON TABLE lido.vw_observations TO database_user;
+```
+
 # Local development
 
 ## Running the API locally
@@ -94,3 +106,24 @@ ALTER TABLE lido.infotripla_counters ADD CONSTRAINT infotripla_counters_pk PRIMA
 ALTER TABLE lido.m680_counters ADD CONSTRAINT m680_counters_pk PRIMARY KEY (id);
 ALTER TABLE lido.marksman_counters ADD CONSTRAINT marksman_counters_pk PRIMARY KEY (id);
 ```
+
+## Typing
+
+To check typing run:
+`ENV=local mypy . --check-untyped-defs`
+
+This is to be automated later in the build process.
+
+## Testing
+
+The project is configured with pytest (pytest-django).
+Since the project is not doing any database writes and does not manage the database, the test configuration has disabled the database completely.
+If one intends to run tests with a database, you need to handle the database creation - Django does not create the database for unmanaged models.
+
+To run the tests:
+
+`ENV=local pytest`
+
+To find which lines don't have test coverage:
+
+`ENV=local pytest --cov-config=.coveragerc --cov=api/ --cov-report term-missing`
