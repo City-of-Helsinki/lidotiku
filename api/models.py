@@ -2,18 +2,30 @@ from django.db import models
 from django.contrib.gis.db import models as gis_models
 
 
+# pylint: disable=abstract-method
 class ReadOnlyModel(models.Model):
     class Meta:
         abstract = True
 
     def save(self, *args, **kwargs):
-        pass
+        raise NotImplementedError(
+            "This is a read-only model and does not support saving objects."
+        )
+
+    def create(self, *args, **kwargs):
+        raise NotImplementedError(
+            "This is a read-only model and does not support creating objects."
+        )
 
     def update(self, *args, **kwargs):
-        pass
+        raise NotImplementedError(
+            "This is a read-only model and does not support updating objects."
+        )
 
     def delete(self, *args, **kwargs):
-        pass
+        raise NotImplementedError(
+            "This is a read-only model and does not support deleting objects."
+        )
 
 
 class Counter(ReadOnlyModel):
