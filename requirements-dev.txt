@@ -1,2 +1,3 @@
 django-stubs==4.2.3
 djangorestframework-stubs==3.14.2
+pytest-django==4.5.2
