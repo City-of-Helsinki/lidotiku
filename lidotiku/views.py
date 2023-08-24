@@ -1,10 +1,14 @@
+import os
+import json
 from typing import Tuple
+from pathlib import Path
 from django.http import JsonResponse, HttpRequest
 from django.db import connection, DatabaseError, Error
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured, AppRegistryNotReady
 from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_exempt
+from .settings import BASE_DIR
 
 
 def _app_is_ready() -> bool:
@@ -45,3 +49,19 @@ def readiness(_request: HttpRequest) -> JsonResponse:
         return JsonResponse({"status": "ready"}, status=200)
 
     return JsonResponse({"status": "not ready"}, status=503)
+
+
+@require_GET
+@csrf_exempt
+def openapi_schema(_request: HttpRequest) -> JsonResponse:
+    """
+    The schema is loaded from a file to avoid:
+    - To have to serve static files just for the schema
+    - To have to generate the schema dynamically
+    """
+    schema = json.loads(
+        Path(os.path.join(BASE_DIR, "openapi-schema.json")).read_text(encoding="utf8")
+    )
+    return JsonResponse(
+        schema, safe=False, headers={"Access-Control-Allow-Origin": "*"}
+    )

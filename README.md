@@ -11,6 +11,19 @@ For instance:
 GRANT SELECT ON TABLE lido.vw_counters TO database_user;
 GRANT SELECT ON TABLE lido.vw_observations TO database_user;
 ```
+# API documentation
+
+To generate OpenAPI Specification v3 schema:
+
+1. Install required packages for generation: `pip install pyyaml uritemplate`
+
+2. Generate the schema:
+- YAML: `./manage.py generateschema --file openapi-schema.yml`
+- JSON: `./manage.py generateschema --file openapi-schema.json --format openapi-json`
+
+3. (Optional) Run locally:
+- `docker run -p 80:8080 -e SWAGGER_JSON=/foo/openapi-schema.json -v /absolute/path/to/repo/:/foo swaggerapi/swagger-ui`
+- [http://localhost]()
 
 # Local development
 
