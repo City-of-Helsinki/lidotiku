@@ -59,10 +59,12 @@ class CounterViewSet(
             CounterFilterValidationSerializer(data=self.request.query_params).is_valid(
                 raise_exception=True
             )
-            latitude = self.request.query_params.get("latitude")
-            longitude = self.request.query_params.get("longitude")
-            distance = self.request.query_params.get("distance")
 
+        latitude = self.request.query_params.get("latitude")
+        longitude = self.request.query_params.get("longitude")
+        distance = self.request.query_params.get("distance")
+
+        if all([latitude, longitude, distance]):
             self.serializer_class = CounterDistanceSerializer
             distance_object = DistanceObject(km=distance)
             point = Point(
