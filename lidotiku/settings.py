@@ -13,11 +13,15 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 import environ
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 env = environ.Env(
     DEBUG=(bool, False),
     SECRET_KEY=(str, ""),
     ALLOWED_HOSTS=(list, []),
+    SENTRY_DSN=(str, ""),
+    SENTRY_ENVIRONMENT=(str, ""),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -133,3 +137,12 @@ LOGGING = {
         },
     },
 }
+
+if env("SENTRY_DSN"):
+    sentry_sdk.init(
+        dsn=env("SENTRY_DSN"),
+        environment=env("SENTRY_ENVIRONMENT"),
+        send_default_pii=False,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=0.1,
+    )
