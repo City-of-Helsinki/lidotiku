@@ -19,6 +19,7 @@ from . import views
 
 urlpatterns = [
     path("api/", include("api.urls")),
+    path("", views.health_check),
     path("healthz", views.health_check),
     path("readiness", views.readiness),
     path("openapi-schema.json", views.openapi_schema),
