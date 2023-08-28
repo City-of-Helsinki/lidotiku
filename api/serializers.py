@@ -84,9 +84,11 @@ class CounterFilterValidationSerializer(serializers.Serializer):
             missing_params = [
                 key for key, value in coordinate_parameters.items() if value is None
             ]
-            validation_errors[
-                "Missing parameters"
-            ] = f"Missing query argument(s): {', '.join(missing_params)}. Latitude, longitude and distance must all be provided"
+            validation_errors["Missing parameters"] = (
+                "Missing query argument(s): "
+                + f"{', '.join(missing_params)}. "
+                + "Latitude, longitude and distance must all be provided."
+            )
 
         if validation_errors:
             raise ValidationError(validation_errors)
