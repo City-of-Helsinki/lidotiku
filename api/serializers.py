@@ -153,7 +153,7 @@ class ObservationAggregatedSerializer(
 
 
 class ObservationAggregationFilterSerializer(ObservationFilterSerializer):
-    counter = serializers.IntegerField(required=True, label="Counter id")
+    counter = serializers.IntegerField(required=True, label="Counter id")  # type: ignore
     measurement_type = serializers.CharField(required=True)
     period = serializers.CharField(required=True)
 
