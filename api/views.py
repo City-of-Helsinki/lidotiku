@@ -291,7 +291,8 @@ class CountersWithLatestObservationsView(viewsets.ViewSet):
     # Remove CSV renderer as it does not work well with nested values
     renderer_classes = tuple(
         filter(
-            lambda r: r != PaginatedCSVRenderer, api_settings.DEFAULT_RENDERER_CLASSES
+            (lambda r: r != PaginatedCSVRenderer),  # type: ignore[arg-type]
+            api_settings.DEFAULT_RENDERER_CLASSES,
         )
     )
 
