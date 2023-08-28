@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from .models import Counter, Observation
 
 
-# pylint: disable=abstract-method
+# pylint: disable=abstract-method,too-few-public-methods
 class ReadOnlySerializer(serializers.Serializer):
     class Meta:
         read_only_fields = "__all__"

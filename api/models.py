@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.gis.db import models as gis_models
 
 
-# pylint: disable=abstract-method
+# pylint: disable=abstract-method,too-few-public-methods
 class ReadOnlyModel(models.Model):
     class Meta:
         abstract = True
