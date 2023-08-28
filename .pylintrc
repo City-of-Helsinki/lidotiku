@@ -1,0 +1,8 @@
+[pylint]
+disable=
+    missing-docstring, # Not generating docs out of the project
+    too-many-ancestors, # Some rest framework viewsets have many ancestors
+    too-few-public-methods, # Django model meta triggers this
+    no-member, # Due to django model not having 'objects' member
+ignore-paths=api/migrations
+suggestion-mode=yes
