@@ -7,7 +7,7 @@ from django.db.models.query import QuerySet
 from django.db.models.functions import Trunc
 from django.db.models.expressions import Value
 from django.db import DatabaseError
-from django.core.exceptions import SuspiciousOperation, RequestAborted
+from django.core.exceptions import SuspiciousOperation
 from django.contrib.gis.geos import Point, GEOSGeometry
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
@@ -84,15 +84,14 @@ class CounterViewSet(
         return queryset
 
     def create(self, request, *args, **kwargs):
+        geojson_data = request.data.get("geometry")
+        if not geojson_data:
+            return Response({"error": "Missing `geometry` key in body."}, status=400)
         try:
-            geojson_data = request.data.get("geometry")
-            if geojson_data:
-                geometry = GEOSGeometry(str(geojson_data))
-                counters = Counter.objects.filter(geom__intersects=geometry)
-                serializer = self.get_serializer(counters, many=True)
-                return Response(serializer.data, status=200)
-
-            return Response({"error": "Invalid GeoJSON data"}, status=400)
+            geometry = GEOSGeometry(str(geojson_data))
+            counters = Counter.objects.filter(geom__intersects=geometry)
+            serializer = self.get_serializer(counters, many=True)
+            return Response(serializer.data, status=200)
         except (TypeError, ValueError) as error:
             return Response({"error": f"Invalid GeoJSON data: {error}"}, status=400)
         except (
@@ -100,11 +99,8 @@ class CounterViewSet(
             GDALException,
             DatabaseError,
             SuspiciousOperation,
-            RequestAborted,
-        ) as error:
-            return Response(
-                {"error": f"Unable to process request: {error}"}, status=500
-            )
+        ):
+            return Response({"error": "Unable to process the request."}, status=500)
 
 
 class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
