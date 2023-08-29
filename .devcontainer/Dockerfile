@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/vscode/devcontainers/python:3.11-bookworm
 
 ENV PYTHONUNBUFFERED 1
 
-RUN apt-get update && apt-get -y install --no-install-recommends postgresql-client libgdal32
+RUN apt-get update && apt-get -y install --no-install-recommends postgresql-client gdal-bin
 
 # [Optional] If your requirements rarely change, uncomment this section to add them to the image.
 # COPY requirements.txt /tmp/pip-tmp/
