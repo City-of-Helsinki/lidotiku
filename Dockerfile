@@ -1,6 +1,6 @@
 FROM python:3.11-slim-bookworm
 
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get -y install --no-install-recommends libgdal32
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get -y install --no-install-recommends gdal-bin
 
 WORKDIR /usr/src/app
 
