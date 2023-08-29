@@ -1,0 +1,8 @@
+[pylint]
+disable=
+    missing-docstring, # Not generating docs out of the project
+ignore-paths=api/migrations
+suggestion-mode=yes
+good-names=
+    id,
+    g

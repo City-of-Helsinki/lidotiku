@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from .models import Counter, Observation
 
 
-# pylint: disable=abstract-method
+# pylint: disable=abstract-method,too-few-public-methods
 class ReadOnlySerializer(serializers.Serializer):
     class Meta:
         read_only_fields = "__all__"
@@ -84,9 +84,11 @@ class CounterFilterValidationSerializer(serializers.Serializer):
             missing_params = [
                 key for key, value in coordinate_parameters.items() if value is None
             ]
-            validation_errors[
-                "Missing parameters"
-            ] = f"Missing query argument(s): {', '.join(missing_params)}. Latitude, longitude and distance must all be provided"
+            validation_errors["Missing parameters"] = (
+                "Missing query argument(s): "
+                + f"{', '.join(missing_params)}. "
+                + "Latitude, longitude and distance must all be provided."
+            )
 
         if validation_errors:
             raise ValidationError(validation_errors)
@@ -151,7 +153,7 @@ class ObservationAggregatedSerializer(
 
 
 class ObservationAggregationFilterSerializer(ObservationFilterSerializer):
-    counter = serializers.IntegerField(required=True, label="Counter id")
+    counter = serializers.IntegerField(required=True, label="Counter id")  # type: ignore
     measurement_type = serializers.CharField(required=True)
     period = serializers.CharField(required=True)
 

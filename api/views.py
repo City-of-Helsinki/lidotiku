@@ -33,6 +33,8 @@ from .serializers import (
 )
 from .schemas import CounterSchema, ObservationSchema, ObservationAggregationSchema
 
+# pylint: disable=no-member
+
 
 class LargeResultsSetPagination(PageNumberPagination):
     page_size = 1000
@@ -40,6 +42,7 @@ class LargeResultsSetPagination(PageNumberPagination):
     max_page_size = 10000
 
 
+# pylint: disable-next=too-many-ancestors
 class CounterViewSet(
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
@@ -230,7 +233,7 @@ class ObservationAggregationViewSet(mixins.ListModelMixin, viewsets.GenericViewS
 
 
 @dataclass
-class ObservationData:
+class ObservationData:  # pylint: disable=too-many-instance-attributes
     id: int
     station_id: int
     name: str
@@ -288,11 +291,12 @@ class CountersWithLatestObservationsView(viewsets.ViewSet):
     # Remove CSV renderer as it does not work well with nested values
     renderer_classes = tuple(
         filter(
-            lambda r: r != PaginatedCSVRenderer, api_settings.DEFAULT_RENDERER_CLASSES
+            (lambda r: r != PaginatedCSVRenderer),  # type: ignore[arg-type]
+            api_settings.DEFAULT_RENDERER_CLASSES,
         )
     )
 
-    def list(self, request):
+    def list(self, _request):
         # itertools.groupby() requires sorted iterable
         queryset = CounterWithLatestObservations.objects.all().order_by("id")
         counters = _group_counter_sensors_in_qs(queryset)
