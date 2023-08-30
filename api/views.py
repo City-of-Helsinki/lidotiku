@@ -10,7 +10,6 @@ from django.core.exceptions import SuspiciousOperation
 from django.contrib.gis.geos import Point, GEOSGeometry
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
-from django.contrib.gis.measure import Distance as DistanceObject
 from django.contrib.gis.gdal.error import GDALException
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
@@ -28,7 +27,7 @@ from .serializers import (
     ObservationSerializer,
     ObservationAggregateSerializer,
 )
-from .filters import ObservationFilter, ObservationAggregateFilter
+from .filters import CounterFilter, ObservationFilter, ObservationAggregateFilter
 from .schemas import CounterSchema, ObservationAggregateSchema
 
 # pylint: disable=no-member
@@ -51,34 +50,40 @@ class CounterViewSet(
     API endpoint for counters
     """
 
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = CounterFilter
     pagination_class = None
     serializer_class = CounterSerializer
     schema = CounterSchema(request_serializer=CounterFilterValidationSerializer)
+    queryset = Counter.objects.all()
 
     def get_queryset(self):
-        queryset = Counter.objects.all()
+        try:
+            query_params = self.request.query_params
+        except AttributeError:
+            query_params = {}  # type: ignore
 
-        if len(self.request.query_params) > 0:
-            CounterFilterValidationSerializer(data=self.request.query_params).is_valid(
+        if len(query_params) > 0:
+            # Be aware that this is not a fact check, user can put any amount of
+            # query params in the request.
+            CounterFilterValidationSerializer(data=query_params).is_valid(
                 raise_exception=True
             )
 
-        latitude = self.request.query_params.get("latitude")
-        longitude = self.request.query_params.get("longitude")
-        distance = self.request.query_params.get("distance")
+        latitude = query_params.get("latitude")
+        longitude = query_params.get("longitude")
+        distance = query_params.get("distance")
+
+        queryset = self.queryset
 
         if all([latitude, longitude, distance]):
             self.serializer_class = CounterDistanceSerializer
-            distance_object = DistanceObject(km=distance)
             point = Point(
-                x=float(latitude), y=float(longitude), srid=4326  # type: ignore
+                x=float(longitude), y=float(latitude), srid=4326  # type: ignore
             )
-            queryset = (
-                queryset.annotate(distance=DistanceFunction("geom", point))
-                .filter(distance__lte=distance_object)
-                .order_by("distance")
-            )
-
+            queryset = self.queryset.annotate(distance=DistanceFunction("geom", point))
+            if "order" not in query_params:
+                queryset = queryset.order_by("distance")
         return queryset
 
     def create(self, request, *args, **kwargs):

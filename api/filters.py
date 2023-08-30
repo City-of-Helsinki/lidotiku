@@ -6,10 +6,33 @@ from django_filters.rest_framework import (
     DateFilter,
     OrderingFilter,
 )
+from django.contrib.gis.measure import Distance as DistanceObject
 
 
 class NumberInFilter(BaseInFilter, NumberFilter):
     pass
+
+
+class CounterFilter(FilterSet):
+    latitude = NumberFilter(label="Latitude")
+    longitude = NumberFilter(label="Longitude")
+    distance = NumberFilter(
+        method="distance_filter",
+        label="Distance in kilometers, how far can a counter be from the defined point.",
+    )
+
+    def distance_filter(self, _queryset, _name, _value):
+        query_params = self.request.query_params
+        latitude = query_params.get("latitude")
+        longitude = query_params.get("longitude")
+        distance = query_params.get("distance")
+
+        queryset = self.queryset
+        if all([latitude, longitude, distance]):
+            distance_object = DistanceObject(km=distance)
+            queryset = queryset.filter(distance__lte=distance_object)
+
+        return queryset
 
 
 class ObservationFilter(FilterSet):

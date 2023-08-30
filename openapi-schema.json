@@ -34,20 +34,20 @@
         "description": "API endpoint for counters",
         "parameters": [
           {
-            "name": "longitude",
+            "name": "latitude",
             "required": false,
             "in": "query",
-            "description": "longitude",
+            "description": "Latitude",
             "schema": {
               "type": "number",
               "format": "float"
             }
           },
           {
-            "name": "latitude",
+            "name": "longitude",
             "required": false,
             "in": "query",
-            "description": "latitude",
+            "description": "Longitude",
             "schema": {
               "type": "number",
               "format": "float"
@@ -57,7 +57,7 @@
             "name": "distance",
             "required": false,
             "in": "query",
-            "description": "distance",
+            "description": "Distance in kilometers, how far can a counter be from the defined point.",
             "schema": {
               "type": "number"
             }
@@ -135,6 +135,41 @@
                     }
                   }
                 }
+              },
+              "examples": {
+                "polygon": {
+                  "summary": "Query with GeoJSON Polygon",
+                  "value": {
+                    "type": "Feature",
+                    "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [
+                        [
+                          [
+                            24.5,
+                            60.2
+                          ],
+                          [
+                            24.5,
+                            60.9
+                          ],
+                          [
+                            24.8,
+                            60.9
+                          ],
+                          [
+                            24.8,
+                            60.2
+                          ],
+                          [
+                            24.5,
+                            60.2
+                          ]
+                        ]
+                      ]
+                    }
+                  }
+                }
               }
             },
             "application/x-www-form-urlencoded": {
@@ -150,20 +185,17 @@
           }
         },
         "responses": {
-          "201": {
+          "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Counter"
-                }
-              },
-              "text/csv": {
-                "schema": {
-                  "$ref": "#/components/schemas/Counter"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Counter"
+                  }
                 }
               }
-            },
-            "description": ""
+            }
           }
         },
         "tags": [
@@ -180,7 +212,34 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "description": "",
+            "description": "A unique value identifying this counter.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "latitude",
+            "required": false,
+            "in": "query",
+            "description": "Latitude",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "longitude",
+            "required": false,
+            "in": "query",
+            "description": "Longitude",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "distance",
+            "required": false,
+            "in": "query",
+            "description": "Distance in kilometers, how far can a counter be from the defined point.",
             "schema": {
               "type": "string"
             }
