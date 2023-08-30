@@ -11,9 +11,9 @@ router.register(
 router.register(r"counters", views.CounterViewSet, basename="counter")
 router.register(r"observations", views.ObservationViewSet, basename="observation")
 router.register(
-    r"observations/aggregation",
-    views.ObservationAggregationViewSet,
-    basename="observation-aggregation",
+    r"observations/aggregate",
+    views.ObservationAggregateViewSet,
+    basename="observation-aggregate",
 )
 
 
