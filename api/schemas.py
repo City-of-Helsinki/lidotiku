@@ -94,23 +94,6 @@ class CounterSchema(BaseSchema):
         return super().map_field(field)
 
 
-class ObservationSchema(BaseSchema):
-    def get_operation(self, path, method):
-        operation = super().get_operation(path, method)
-        if operation.get("operationId", "").startswith("list"):
-            serializer = self.get_request_serializer(path, method)
-            type_mappings = {
-                "counter": {"type": "integer"},
-                "start_time": {"type": "string", "format": "date-time"},
-                "end_time": {"type": "string", "format": "date-time"},
-                "measurement_type": {"type": "string"},
-                "order": {"type": "string", "enum": ["asc", "desc"]},
-            }
-            parameters = self._generate_query_parameters(serializer, type_mappings)
-            operation.get("parameters", [])[:0] = parameters
-        return operation
-
-
 class ObservationAggregateSchema(AutoSchema):
     def get_operation_id(self, path, method):
         # The operation id (or name) is generated from the model,

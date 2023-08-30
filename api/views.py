@@ -1,7 +1,6 @@
 from itertools import groupby
 from datetime import datetime, timedelta
 from dataclasses import dataclass
-from typing import cast
 from django.db.models import Sum, Avg
 from django.db.models.query import QuerySet
 from django.db.models.functions import Trunc
@@ -16,7 +15,6 @@ from django.contrib.gis.gdal.error import GDALException
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.serializers import ChoiceField
 from rest_framework.settings import api_settings
 from rest_framework_csv.renderers import PaginatedCSVRenderer
 from django_filters import rest_framework as filters
@@ -28,11 +26,10 @@ from .serializers import (
     CounterDistanceSerializer,
     CounterDataSerializer,
     ObservationSerializer,
-    ObservationFilterSerializer,
     ObservationAggregateSerializer,
 )
-from .filters import ObservationAggregateFilter
-from .schemas import CounterSchema, ObservationSchema, ObservationAggregateSchema
+from .filters import ObservationFilter, ObservationAggregateFilter
+from .schemas import CounterSchema, ObservationAggregateSchema
 
 # pylint: disable=no-member
 
@@ -109,50 +106,20 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     API endpoint for observations.
     """
 
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = ObservationFilter
     pagination_class = LargeResultsSetPagination
     serializer_class = ObservationSerializer
-    schema = ObservationSchema(request_serializer=ObservationFilterSerializer)
+    queryset = Observation.objects.all()
 
     def get_queryset(self):
-        ObservationFilterSerializer(data=self.request.query_params).is_valid(
-            raise_exception=True
-        )
-
-        queryset = Observation.objects.all()
-        counter: list[str] = self.request.query_params.getlist("counter")
-        start_time = self.request.query_params.get("start_time")
-        end_time = self.request.query_params.get("end_time")
-        source = self.request.query_params.get("source")
-        measurement_type = self.request.query_params.get("measurement_type")
-        order = self.request.query_params.get("order")
-
-        if len(counter) > 0:
-            queryset = queryset.filter(counter__in=counter)
-
-        if start_time is not None:
-            queryset = queryset.filter(datetime__gte=start_time)
-        if end_time is not None:
-            queryset = queryset.filter(datetime__lte=end_time)
-
-        if source is not None:
-            queryset = queryset.filter(source=source)
-
-        if measurement_type is not None:
-            queryset = queryset.filter(typeofmeasurement=measurement_type)
-
-        if (
-            order is not None
-            and order
-            in cast(
-                ChoiceField,
-                ObservationFilterSerializer().fields.get("order"),
-            ).choices.keys()
-            and order == "desc"
-        ):
-            queryset = queryset.order_by("-datetime")
-        else:
-            queryset = queryset.order_by("datetime")
-
+        queryset = self.queryset
+        try:  # Try-except required for schema generation to work with django-filter
+            filter_params = self.request.GET.copy()
+            if "order" not in filter_params:
+                queryset = queryset.order_by("datetime")
+        except AttributeError:
+            pass
         return queryset
 
 
@@ -169,11 +136,11 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
     schema = ObservationAggregateSchema()
 
     def get_queryset(self):
-        try:  # Required for schema generation to work with django-filter
+        try:  # Try-except required for schema generation to work with django-filter
             period = self.request.query_params.get("period")
         except AttributeError:
             period = None
-        try:  # Required for schema generation to work with django-filter
+        try:  # Try-except required for schema generation to work with django-filter
             measurement_type = self.request.query_params.get("measurement_type")
         except AttributeError:
             measurement_type = None
@@ -193,8 +160,13 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
             )
             .annotate(aggregated_value=aggregation_calc)
             .annotate(period=Value(period))
-            .order_by("start_time")
         )
+        try:  # Try-except required for schema generation to work with django-filter
+            filter_params = self.request.GET.copy()
+            if "order" not in filter_params:
+                queryset = queryset.order_by("start_time")
+        except AttributeError:
+            pass
         return queryset
 
 

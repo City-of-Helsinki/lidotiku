@@ -214,75 +214,6 @@
         "description": "API endpoint for observations.",
         "parameters": [
           {
-            "name": "counter",
-            "required": false,
-            "in": "query",
-            "description": "Counter id",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "start_time",
-            "required": false,
-            "in": "query",
-            "description": "start_time",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "end_time",
-            "required": false,
-            "in": "query",
-            "description": "end_time",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "source",
-            "required": false,
-            "in": "query",
-            "description": "source",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "measurement_type",
-            "required": false,
-            "in": "query",
-            "description": "measurement_type",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "vehicle_type",
-            "required": false,
-            "in": "query",
-            "description": "vehicle_type",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "order",
-            "required": false,
-            "in": "query",
-            "description": "order",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ]
-            }
-          },
-          {
             "name": "page",
             "required": false,
             "in": "query",
@@ -298,6 +229,77 @@
             "description": "Number of results to return per page.",
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "name": "counter",
+            "required": false,
+            "in": "query",
+            "description": "Counter id, the device(s) that produced the observations.             Separate values with commas if you intend to query with multiple counters.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start_date",
+            "required": false,
+            "in": "query",
+            "description": "Start date of measurement period.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "required": false,
+            "in": "query",
+            "description": "End date of measurement period.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "measurement_type",
+            "required": false,
+            "in": "query",
+            "description": "Type of measurement, often either `speed` or `count`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "speed",
+                "count"
+              ]
+            }
+          },
+          {
+            "name": "source",
+            "required": false,
+            "in": "query",
+            "description": "Data source. Please note taht choices might not be up to date.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "EcoCounter",
+                "FinTraffic",
+                "HEL LAM",
+                "InfoTripla",
+                "Marksman"
+              ]
+            }
+          },
+          {
+            "name": "order",
+            "required": false,
+            "in": "query",
+            "description": "Sort order for the results.             For example ascending = `datetime`, descending = `-datetime`.                Multiple filters can be combined by separating with comma.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "datetime",
+                "-datetime",
+                "counter",
+                "-counter"
+              ]
             }
           }
         ],
@@ -604,39 +606,6 @@
           "crs_epsg",
           "source"
         ]
-      },
-      "ObservationFilter": {
-        "type": "object",
-        "properties": {
-          "counter": {
-            "type": "array",
-            "items": {
-              "type": "integer"
-            }
-          },
-          "start_time": {
-            "type": "string"
-          },
-          "end_time": {
-            "type": "string"
-          },
-          "source": {
-            "type": "string"
-          },
-          "measurement_type": {
-            "type": "string"
-          },
-          "vehicle_type": {
-            "type": "string"
-          },
-          "order": {
-            "enum": [
-              "asc",
-              "desc"
-            ],
-            "type": "string"
-          }
-        }
       },
       "Observation": {
         "type": "object",
