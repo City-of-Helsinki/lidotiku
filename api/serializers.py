@@ -129,7 +129,7 @@ class ObservationFilterSerializer(ReadOnlySerializer):
     order = serializers.ChoiceField(choices=["asc", "desc"], required=False)
 
 
-class ObservationAggregatedSerializer(
+class ObservationAggregateSerializer(
     serializers.HyperlinkedModelSerializer, ReadOnlySerializer
 ):
     start_time = serializers.DateTimeField()
@@ -150,48 +150,6 @@ class ObservationAggregatedSerializer(
 
     def get_aggregated_value(self, obj):
         return obj.get("aggregated_value")
-
-
-class ObservationAggregationFilterSerializer(ObservationFilterSerializer):
-    counter = serializers.IntegerField(required=True, label="Counter id")  # type: ignore
-    measurement_type = serializers.CharField(required=True)
-    period = serializers.CharField(required=True)
-
-    def validate(self, attrs):
-        counter = attrs.get("counter")
-        aggregation = {
-            "period": attrs.get("period"),
-            "measurement_type": attrs.get("measurement_type"),
-            "counter": counter,
-        }
-        valid_aggregates = ["hour", "day", "month", "year"]
-        valid_measurement_types = ["speed", "count"]
-        validation_errors = {}
-
-        if (
-            aggregation.get("period")
-            and aggregation.get("period") not in valid_aggregates
-        ):
-            validation_errors[
-                "period"
-            ] = f"`{aggregation.get('period')}` not one of {valid_aggregates}"
-        # When doing aggregation ensure required query params are set
-        if any(
-            [aggregation.get("period"), aggregation.get("measurement_type")]
-        ) and not all(aggregation.values()):
-            missing = [key for key, value in aggregation.items() if not value]
-            validation_errors[
-                "aggregate_combination"
-            ] = f"Missing {missing} in aggregation request."
-
-        if aggregation.get("measurement_type") not in valid_measurement_types:
-            validation_errors[
-                "measurement_type"
-            ] = f"`{aggregation.get('measurement_type')}` not one of {valid_measurement_types}"
-        if validation_errors:
-            raise ValidationError(validation_errors)
-
-        return attrs
 
 
 class SensorSerializer(ReadOnlySerializer):

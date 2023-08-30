@@ -19,6 +19,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.serializers import ChoiceField
 from rest_framework.settings import api_settings
 from rest_framework_csv.renderers import PaginatedCSVRenderer
+from django_filters import rest_framework as filters
 
 from .models import Counter, Observation, CounterWithLatestObservations
 from .serializers import (
@@ -28,10 +29,10 @@ from .serializers import (
     CounterDataSerializer,
     ObservationSerializer,
     ObservationFilterSerializer,
-    ObservationAggregatedSerializer,
-    ObservationAggregationFilterSerializer,
+    ObservationAggregateSerializer,
 )
-from .schemas import CounterSchema, ObservationSchema, ObservationAggregationSchema
+from .filters import ObservationAggregateFilter
+from .schemas import CounterSchema, ObservationSchema, ObservationAggregateSchema
 
 # pylint: disable=no-member
 
@@ -155,77 +156,46 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         return queryset
 
 
-class ObservationAggregationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     API endpoint for observations aggregation.
     """
 
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = ObservationAggregateFilter
     pagination_class = LargeResultsSetPagination
-    serializer_class = ObservationAggregatedSerializer
-    schema = ObservationAggregationSchema(
-        request_serializer=ObservationAggregationFilterSerializer
-    )
+    serializer_class = ObservationAggregateSerializer
+    queryset = Observation.objects.all()
+    schema = ObservationAggregateSchema()
 
     def get_queryset(self):
-        ObservationAggregationFilterSerializer(data=self.request.query_params).is_valid(
-            raise_exception=True
-        )
+        try:  # Required for schema generation to work with django-filter
+            period = self.request.query_params.get("period")
+        except AttributeError:
+            period = None
+        try:  # Required for schema generation to work with django-filter
+            measurement_type = self.request.query_params.get("measurement_type")
+        except AttributeError:
+            measurement_type = None
 
-        queryset = Observation.objects.all()
-        counter = self.request.query_params.get("counter")
-        start_time = self.request.query_params.get("start_time")
-        end_time = self.request.query_params.get("end_time")
-        aggregation = {
-            "period": self.request.query_params.get("period"),
-            "measurement_type": self.request.query_params.get("measurement_type"),
-        }
-        measurement_type = aggregation.get("measurement_type")
-        order = self.request.query_params.get("order")
-
-        if all(aggregation.values()) and counter is not None:
-            queryset = queryset.filter(counter=counter)
-
-            if start_time is not None:
-                queryset = queryset.filter(datetime__gte=start_time)
-            if end_time is not None:
-                queryset = queryset.filter(datetime__lte=end_time)
-
-            aggregation_period = aggregation.get("period")
-            if measurement_type == "speed":
-                aggregation_calc: Avg | Sum = Avg("value")
-            else:  # measurement_type == "count"
-                aggregation_calc = Sum("value")
-
-            queryset = (
-                queryset.filter(typeofmeasurement=measurement_type)  # type: ignore
-                .values("typeofmeasurement", "source")
-                .annotate(start_time=Trunc("datetime", kind=aggregation_period))
-                .values(
-                    "start_time",
-                    "counter_id",
-                    "direction",
-                    "unit",
-                )
-                .annotate(aggregated_value=aggregation_calc)
-                .annotate(period=Value(aggregation_period))
-                .order_by("start_time")
+        if measurement_type == "speed":
+            aggregation_calc: Avg | Sum = Avg("value")
+        else:  # measurement_type == "count"
+            aggregation_calc = Sum("value")
+        queryset = (
+            self.queryset.values("typeofmeasurement", "source")
+            .annotate(start_time=Trunc("datetime", kind=period))
+            .values(
+                "start_time",
+                "counter_id",
+                "direction",
+                "unit",
             )
-            if (
-                order is not None
-                and order
-                in cast(
-                    ChoiceField,
-                    ObservationAggregationFilterSerializer().fields.get("order"),
-                ).choices.keys()
-                and order == "desc"
-            ):
-                queryset = queryset.order_by("-start_time")
-            else:
-                queryset = queryset.order_by("start_time")
-            return queryset
-
-        # Validation should raise ValidationError, so this is not expected to be returned.
-        return queryset.none()
+            .annotate(aggregated_value=aggregation_calc)
+            .annotate(period=Value(period))
+            .order_by("start_time")
+        )
+        return queryset
 
 
 @dataclass

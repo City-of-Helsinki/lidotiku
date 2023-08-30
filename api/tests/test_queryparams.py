@@ -75,7 +75,7 @@ def test_observation_params_multiple_counters(api_client):
 
 @pytest.mark.django_db
 def test_observation_aggregation_params(api_client):
-    url = reverse("observation-aggregation-list")
+    url = reverse("observation-aggregate-list")
     data = {"counter": "1", "period": "hour", "measurement_type": "count"}
     response = api_client.get(url, data=data)
     assert response.status_code == 200

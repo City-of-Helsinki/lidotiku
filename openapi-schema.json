@@ -73,6 +73,14 @@
                     "$ref": "#/components/schemas/Counter"
                   }
                 }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Counter"
+                  }
+                }
               }
             },
             "description": ""
@@ -148,6 +156,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/Counter"
                 }
+              },
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/Counter"
+                }
               }
             },
             "description": ""
@@ -177,6 +190,11 @@
           "200": {
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Counter"
+                }
+              },
+              "text/csv": {
                 "schema": {
                   "$ref": "#/components/schemas/Counter"
                 }
@@ -314,6 +332,35 @@
                     }
                   }
                 }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "example": 123
+                    },
+                    "next": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "uri",
+                      "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "uri",
+                      "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Observation"
+                      }
+                    }
+                  }
+                }
               }
             },
             "description": ""
@@ -324,89 +371,11 @@
         ]
       }
     },
-    "/api/observations/aggregation/": {
+    "/api/observations/aggregate/": {
       "get": {
-        "operationId": "listObservationAggregateds",
+        "operationId": "listObservationsAggregate",
         "description": "API endpoint for observations aggregation.",
         "parameters": [
-          {
-            "name": "counter",
-            "required": true,
-            "in": "query",
-            "description": "Counter id",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "start_time",
-            "required": false,
-            "in": "query",
-            "description": "start_time",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "end_time",
-            "required": false,
-            "in": "query",
-            "description": "end_time",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "source",
-            "required": false,
-            "in": "query",
-            "description": "source",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "measurement_type",
-            "required": true,
-            "in": "query",
-            "description": "measurement_type",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "vehicle_type",
-            "required": false,
-            "in": "query",
-            "description": "vehicle_type",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "order",
-            "required": false,
-            "in": "query",
-            "description": "order",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ]
-            }
-          },
-          {
-            "name": "period",
-            "required": true,
-            "in": "query",
-            "description": "period",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "page",
             "required": false,
@@ -423,6 +392,74 @@
             "description": "Number of results to return per page.",
             "schema": {
               "type": "integer"
+            }
+          },
+          {
+            "name": "counter",
+            "required": true,
+            "in": "query",
+            "description": "Counter id, aggregates observations of selected counter.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start_date",
+            "required": false,
+            "in": "query",
+            "description": "Start date of measurement period.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "required": false,
+            "in": "query",
+            "description": "End date of measurement period.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": true,
+            "in": "query",
+            "description": "Defines how long the aggregation period is.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "hour",
+                "day",
+                "month",
+                "year"
+              ]
+            }
+          },
+          {
+            "name": "measurement_type",
+            "required": true,
+            "in": "query",
+            "description": "Type of measurement, often either `speed` or `count`.             Determines whether to use sum or average for aggregation.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "speed",
+                "count"
+              ]
+            }
+          },
+          {
+            "name": "order",
+            "required": false,
+            "in": "query",
+            "description": "Sort order for the results. Ascending = `start_time`, descending = `-start_time`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "start_time",
+                "-start_time"
+              ]
             }
           }
         ],
@@ -452,7 +489,36 @@
                     "results": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/ObservationAggregated"
+                        "$ref": "#/components/schemas/ObservationAggregate"
+                      }
+                    }
+                  }
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "example": 123
+                    },
+                    "next": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "uri",
+                      "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "uri",
+                      "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ObservationAggregate"
                       }
                     }
                   }
@@ -630,45 +696,7 @@
           "counter"
         ]
       },
-      "ObservationAggregationFilter": {
-        "type": "object",
-        "properties": {
-          "counter": {
-            "type": "integer"
-          },
-          "start_time": {
-            "type": "string"
-          },
-          "end_time": {
-            "type": "string"
-          },
-          "source": {
-            "type": "string"
-          },
-          "measurement_type": {
-            "type": "string"
-          },
-          "vehicle_type": {
-            "type": "string"
-          },
-          "order": {
-            "enum": [
-              "asc",
-              "desc"
-            ],
-            "type": "string"
-          },
-          "period": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "counter",
-          "measurement_type",
-          "period"
-        ]
-      },
-      "ObservationAggregated": {
+      "ObservationAggregate": {
         "type": "object",
         "properties": {
           "period": {
