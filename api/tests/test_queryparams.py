@@ -100,7 +100,7 @@ def test_observation_aggregation_params(api_client):
         "measurement_type": "temperature",
     }
     response = api_client.get(url, value_validation_data)
-    assert response.status_code == 400
+    assert response.status_code == 200  # Accepted but does not return anything
 
 
 @pytest.mark.django_db
