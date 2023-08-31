@@ -142,6 +142,17 @@ class ObservationSchema(BaseSchema):
                     parameter["schema"] = type_mappings.get(name)
                 if name in ["start_date", "end_date"]:
                     parameter["examples"] = get_date_format_example(name)
+                if name == "counter":
+                    parameter["examples"] = {
+                        "counter_multiple": {
+                            "summary": "Multiple counters",
+                            "value": "1,23,79",
+                        },
+                        "single": {
+                            "summary": "Single counter",
+                            "value": "83",
+                        },
+                    }
 
         return operation
 

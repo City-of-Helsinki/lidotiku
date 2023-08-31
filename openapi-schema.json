@@ -298,6 +298,16 @@
             "schema": {
               "type": "integer",
               "format": "int64"
+            },
+            "examples": {
+              "counter_multiple": {
+                "summary": "Multiple counters",
+                "value": "1,23,79"
+              },
+              "single": {
+                "summary": "Single counter",
+                "value": "83"
+              }
             }
           },
           {
@@ -467,6 +477,16 @@
             "schema": {
               "type": "integer",
               "format": "int64"
+            },
+            "examples": {
+              "counter_multiple": {
+                "summary": "Multiple counters",
+                "value": "1,23,79"
+              },
+              "single": {
+                "summary": "Single counter",
+                "value": "83"
+              }
             }
           },
           {
