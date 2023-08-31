@@ -21,6 +21,42 @@ def test_counter_params(api_client):
 
 
 @pytest.mark.django_db
+def test_counter_coordinates(api_client):
+    url = reverse("counter-list")
+    # Zeroes are valid coordinates
+    data = {"longitude": 0.0, "latitude": 0.0, "distance": 0.0}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 200
+
+    # Test max values
+    data = {"longitude": 0.0, "latitude": 91.0, "distance": 0.0}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 400
+    assert "Ensure this value is less than or equal to 90." in response.data.get(
+        "latitude"
+    )
+    data = {"longitude": 181.0, "latitude": 0.0, "distance": 0.0}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 400
+    assert "Ensure this value is less than or equal to 180." in response.data.get(
+        "longitude"
+    )
+    # Test min values
+    data = {"longitude": 0.0, "latitude": -91.0, "distance": 0.0}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 400
+    assert "Ensure this value is greater than or equal to -90." in response.data.get(
+        "latitude"
+    )
+    data = {"longitude": -181.0, "latitude": 0.0, "distance": 0.0}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 400
+    assert "Ensure this value is greater than or equal to -180." in response.data.get(
+        "longitude"
+    )
+
+
+@pytest.mark.django_db
 def test_counter_post_geojson(api_client):
     url = reverse("counter-list")
     valid_geojson = {

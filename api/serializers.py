@@ -77,10 +77,8 @@ class CounterFilterValidationSerializer(serializers.Serializer):
         }
 
         validation_errors = {}
-
-        if any(coordinate_parameters.values()) and not all(
-            coordinate_parameters.values()
-        ):
+        none_values = [x is not None for x in coordinate_parameters.values()]
+        if any(none_values) and not all(none_values):
             missing_params = [
                 key for key, value in coordinate_parameters.items() if value is None
             ]

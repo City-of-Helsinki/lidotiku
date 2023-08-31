@@ -7,6 +7,7 @@ from django_filters.rest_framework import (
     OrderingFilter,
     CharFilter,
 )
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.gis.measure import Distance as DistanceObject
 
 
@@ -14,9 +15,58 @@ class NumberInFilter(BaseInFilter, NumberFilter):
     pass
 
 
+class NumberMaxMinFilter(NumberFilter):
+    def __init__(
+        self,
+        field_name=None,
+        lookup_expr=None,
+        *,
+        label=None,
+        method=None,
+        distinct=False,
+        exclude=False,
+        **kwargs
+    ):
+        super().__init__(
+            field_name=None,
+            lookup_expr=None,
+            label=None,
+            method=None,
+            distinct=False,
+            exclude=False,
+            **kwargs
+        )
+        min_value = kwargs.get("min_value")
+        max_value = kwargs.get("max_value")
+        if min_value is not None:
+            self.min_value = min_value
+        if max_value is not None:
+            self.max_value = max_value
+
+    def get_max_validator(self, max_value=1e50):
+        return MaxValueValidator(max_value)
+
+    def get_min_validator(self, min_value=-1e50):
+        return MinValueValidator(min_value)
+
+    @property
+    def field(self):
+        if not hasattr(self, "_field"):
+            field = super().field
+            max_validator = self.get_max_validator()
+            min_validator = self.get_min_validator()
+            if max_validator:
+                field.validators.append(max_validator)
+            if min_validator:
+                field.validators.append(min_validator)
+            # pylint: disable-next=attribute-defined-outside-init
+            self._field = field
+        return self._field
+
+
 class CounterFilter(FilterSet):
-    latitude = NumberFilter(label="Latitude")
-    longitude = NumberFilter(label="Longitude")
+    latitude = NumberMaxMinFilter(label="Latitude", min_value=-90, max_value=90)
+    longitude = NumberMaxMinFilter(label="Longitude", min_value=-180, max_value=180)
     distance = NumberFilter(
         method="distance_filter",
         label="Distance in kilometers, how far can a counter be from the defined point.",
