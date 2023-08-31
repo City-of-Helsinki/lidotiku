@@ -1,5 +1,8 @@
 # LIDO-TIKU API
 
+REST API for the City of Helsinki traffic observation data.
+Data is collected from multiple sources and different types of sensors that measure different types of traffic, for example counts on passing cars from certain directions or their average speed. The measurements can be of e.g. vehicles, pedestrians and bicycles.
+
 # Database
 
 **The database is not managed by Django!** Do not attempt to make writes to the default tables, nor change their schema.
