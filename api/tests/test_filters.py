@@ -1,6 +1,5 @@
 import pytest
 from django.urls import reverse
-from api.models import Counter  # pylint: disable=import-error
 
 
 @pytest.mark.django_db
@@ -103,18 +102,37 @@ def test_observation_aggregation_params(api_client):
     assert response.status_code == 200  # Accepted but does not return anything
 
 
+@pytest.mark.filterwarnings(
+    "ignore:DateTimeField Observation.datetime received a naive datetime"
+)
 @pytest.mark.django_db
-def test_readonly_models():
-    with pytest.raises(NotImplementedError):
-        Counter.objects.create(id=1, name="Test")
-    with pytest.raises(NotImplementedError):
-        counter = Counter()
-        counter.create(id=1, name="Test")
-    counter = Counter(id=1, name="Test")
-    with pytest.raises(NotImplementedError):
-        counter.save()
-    with pytest.raises(NotImplementedError):
-        counter = Counter(id=1, name="Test")
-        counter.update()
-    with pytest.raises(NotImplementedError):
-        counter.delete()
+def test_date_formats(api_client):
+    url = reverse("observation-list")
+    # Accepts naive dates without timezone, expect the default timezone
+    data = {"counter": "1", "start_date": "2023-01-31"}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 200
+    # Does not accept invalid dates
+    data = {"counter": "1", "start_date": "2023-01-32"}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 400
+    # Accepts leap year
+    data = {"counter": "1", "start_date": "2024-02-29"}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 200
+    # Does not accept non leap year
+    data = {"counter": "1", "start_date": "2023-02-29"}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 400
+    # Does not accept non dates
+    data = {"counter": "1", "start_date": "abc"}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 400
+    # Does not accept yyyy/mm/dd
+    data = {"counter": "1", "start_date": "2023/01/31"}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 400
+    # Does not accept dd-mm-yyyy
+    data = {"counter": "1", "start_date": "31-01-2023"}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 400
