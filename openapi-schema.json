@@ -31,7 +31,7 @@
     "/api/counters/": {
       "get": {
         "operationId": "listCounters",
-        "description": "API endpoint for counters",
+        "description": "Lists measurement devices or sensors which produce observational data.",
         "parameters": [
           {
             "name": "latitude",
@@ -92,7 +92,7 @@
       },
       "post": {
         "operationId": "createCounter",
-        "description": "API endpoint for counters",
+        "description": "Lists counters within the given GeoJSON polygon area.",
         "parameters": [],
         "requestBody": {
           "content": {
@@ -206,7 +206,7 @@
     "/api/counters/{id}/": {
       "get": {
         "operationId": "retrieveCounter",
-        "description": "API endpoint for counters",
+        "description": "Returns the information of a counter with the given identifier.",
         "parameters": [
           {
             "name": "id",
@@ -270,7 +270,7 @@
     "/api/observations/": {
       "get": {
         "operationId": "listObservations",
-        "description": "API endpoint for observations.",
+        "description": "Returns a paged and sorted list of observations produced by counters,\nmatching the given search criteria.",
         "parameters": [
           {
             "name": "page",
@@ -338,27 +338,16 @@
             "in": "query",
             "description": "Type of measurement, often either `speed` or `count`.",
             "schema": {
-              "type": "string",
-              "enum": [
-                "speed",
-                "count"
-              ]
+              "type": "string"
             }
           },
           {
             "name": "source",
             "required": false,
             "in": "query",
-            "description": "Data source. Please note taht choices might not be up to date.",
+            "description": "Data source.             Possible choices: EcoCounter, FinTraffic, HEL LAM, InfoTripla & Marksman.             Please note that the choices might not be up to date.",
             "schema": {
-              "type": "string",
-              "enum": [
-                "EcoCounter",
-                "FinTraffic",
-                "HEL LAM",
-                "InfoTripla",
-                "Marksman"
-              ]
+              "type": "string"
             }
           },
           {
@@ -450,7 +439,7 @@
     "/api/observations/aggregate/": {
       "get": {
         "operationId": "listObservationsAggregate",
-        "description": "API endpoint for observations aggregation.",
+        "description": "Returns a paged and sorted list of the observational data,\naggregated over the given period and matching the search criteria.",
         "parameters": [
           {
             "name": "page",
@@ -533,11 +522,7 @@
             "in": "query",
             "description": "Type of measurement, often either `speed` or `count`.             Determines whether to use sum or average for aggregation.",
             "schema": {
-              "type": "string",
-              "enum": [
-                "speed",
-                "count"
-              ]
+              "type": "string"
             }
           },
           {
