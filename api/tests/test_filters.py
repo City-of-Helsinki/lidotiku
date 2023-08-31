@@ -24,38 +24,29 @@ def test_counter_params(api_client):
 def test_counter_post_geojson(api_client):
     url = reverse("counter-list")
     valid_geojson = {
-        "type": "Feature",
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [
-                [[24.5, 60.2], [24.5, 60.9], [24.8, 60.9], [24.8, 60.2], [24.5, 60.2]]
-            ],
-        },
+        "type": "Polygon",
+        "coordinates": [
+            [[24.5, 60.2], [24.5, 60.9], [24.8, 60.9], [24.8, 60.2], [24.5, 60.2]]
+        ],
     }
     response = api_client.post(url, data=valid_geojson, format="json")
     assert response.status_code == 200
 
     invalid_geojson = {
-        "type": "Feature",
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [[[24.5, 60.2], [24.5, 60.9]]],
-        },
+        "type": "Polygon",
+        "coordinates": [[[24.5, 60.2], [24.5, 60.9]]],
     }
 
     response = api_client.post(url, data=invalid_geojson, format="json")
-    assert response.status_code == 500
+    assert response.status_code == 400
 
     invalid_random_json = {
-        "type": "P",
-        "geometry": {
-            "type": "Poin",
-            "coordina": [24.5, 60.2],
-        },
+        "type": "Poin",
+        "coordina": [24.5, 60.2],
     }
 
     response = api_client.post(url, data=invalid_random_json, format="json")
-    assert response.status_code == 500
+    assert response.status_code == 400
 
 
 @pytest.mark.django_db
