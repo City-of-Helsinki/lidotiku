@@ -296,7 +296,8 @@
             "in": "query",
             "description": "Counter id, the device(s) that produced the observations.             Separate values with commas if you intend to query with multiple counters.",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int64"
             }
           },
           {
@@ -305,7 +306,14 @@
             "in": "query",
             "description": "Start date of measurement period.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "date"
+            },
+            "examples": {
+              "start_date": {
+                "summary": "Date format",
+                "value": "2023-01-31"
+              }
             }
           },
           {
@@ -314,7 +322,14 @@
             "in": "query",
             "description": "End date of measurement period.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "date"
+            },
+            "examples": {
+              "end_date": {
+                "summary": "Date format",
+                "value": "2023-01-31"
+              }
             }
           },
           {
@@ -461,7 +476,8 @@
             "in": "query",
             "description": "Counter id, aggregates observations of selected counter.",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int64"
             }
           },
           {
@@ -470,7 +486,14 @@
             "in": "query",
             "description": "Start date of measurement period.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "date"
+            },
+            "examples": {
+              "start_date": {
+                "summary": "Date format",
+                "value": "2023-01-31"
+              }
             }
           },
           {
@@ -479,7 +502,14 @@
             "in": "query",
             "description": "End date of measurement period.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "date"
+            },
+            "examples": {
+              "end_date": {
+                "summary": "Date format",
+                "value": "2023-01-31"
+              }
             }
           },
           {

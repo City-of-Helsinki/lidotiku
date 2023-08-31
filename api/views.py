@@ -28,7 +28,7 @@ from .serializers import (
     ObservationAggregateSerializer,
 )
 from .filters import CounterFilter, ObservationFilter, ObservationAggregateFilter
-from .schemas import CounterSchema, ObservationAggregateSchema
+from .schemas import CounterSchema, ObservationSchema, ObservationAggregateSchema
 
 # pylint: disable=no-member
 
@@ -115,6 +115,7 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     filterset_class = ObservationFilter
     pagination_class = LargeResultsSetPagination
     serializer_class = ObservationSerializer
+    schema = ObservationSchema()
     queryset = Observation.objects.all()
 
     def get_queryset(self):
