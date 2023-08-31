@@ -61,15 +61,14 @@ def test_counter_post_geojson(api_client):
 @pytest.mark.django_db
 def test_observation_params_multiple_counters(api_client):
     url = reverse("observation-list")
-    data = {"counter": ["1", "123", "543"]}
-    counters_request = data["counter"]
+    # Accepts multiple values separated by commas
+    data = {"counter": "1,123,543"}
     response = api_client.get(url, data=data)
-
     assert response.status_code == 200
-    query_params = response.request.get("QUERY_STRING").split("&")
-    counters_response = [x.split("=")[1] for x in query_params]
-    assert all(counter in counters_request for counter in counters_response)
-    assert len(counters_request) == len(counters_response)
+    # Does not accept non numbers
+    data = {"counter": "1,s,543"}
+    response = api_client.get(url, data=data)
+    assert response.status_code == 400
 
 
 @pytest.mark.django_db
