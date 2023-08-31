@@ -5,6 +5,7 @@ from django_filters.rest_framework import (
     ChoiceFilter,
     DateFilter,
     OrderingFilter,
+    CharFilter,
 )
 from django.contrib.gis.measure import Distance as DistanceObject
 
@@ -53,24 +54,18 @@ class ObservationFilter(FilterSet):
         label="End date of measurement period.",
     )
 
-    measurement_type = ChoiceFilter(
+    measurement_type = CharFilter(
         field_name="typeofmeasurement",
-        lookup_expr="exact",
+        lookup_expr="iexact",
         label="Type of measurement, often either `speed` or `count`.",
-        choices=(("speed", "speed"), ("count", "count")),
     )
 
-    source = ChoiceFilter(
+    source = CharFilter(
         field_name="source",
         lookup_expr="iexact",
-        label="Data source. Please note taht choices might not be up to date.",
-        choices=(
-            ("EcoCounter", "EcoCounter"),
-            ("FinTraffic", "FinTraffic"),
-            ("HEL LAM", "HEL LAM"),
-            ("InfoTripla", "InfoTripla"),
-            ("Marksman", "Marksman"),
-        ),
+        label="Data source. \
+            Possible choices: EcoCounter, FinTraffic, HEL LAM, InfoTripla & Marksman. \
+            Please note that the choices might not be up to date.",
     )
 
     order = OrderingFilter(
@@ -114,13 +109,12 @@ class ObservationAggregateFilter(FilterSet):
             ("year", "year"),
         ),
     )
-    measurement_type = ChoiceFilter(
+    measurement_type = CharFilter(
         field_name="typeofmeasurement",
         required=True,
-        lookup_expr="exact",
+        lookup_expr="iexact",
         label="Type of measurement, often either `speed` or `count`. \
             Determines whether to use sum or average for aggregation.",
-        choices=(("speed", "speed"), ("count", "count")),
     )
 
     order = OrderingFilter(
