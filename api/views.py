@@ -90,19 +90,25 @@ class CounterViewSet(
         """
         Lists counters within the given GeoJSON polygon area.
         """
-        geojson_data = request.data.get("geometry")
+        geojson_data = request.data
         if not geojson_data:
-            return Response({"error": "Missing `geometry` key in body."}, status=400)
+            return Response(
+                {"error": "Missing GeoJSON polygon in the body."},
+                status=400,
+            )
         try:
             geometry = GEOSGeometry(str(geojson_data))
             counters = Counter.objects.filter(geom__intersects=geometry)
             serializer = self.get_serializer(counters, many=True)
             return Response(serializer.data, status=200)
-        except (TypeError, ValueError) as error:
-            return Response({"error": f"Invalid GeoJSON data: {error}"}, status=400)
         except (
+            TypeError,
+            ValueError,
             GEOSException,
             GDALException,
+        ) as error:
+            return Response({"error": f"Invalid GeoJSON data: {error}"}, status=400)
+        except (
             DatabaseError,
             SuspiciousOperation,
         ):

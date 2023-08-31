@@ -76,19 +76,16 @@ class CounterSchema(BaseSchema):
                 "polygon": {
                     "summary": "Query with GeoJSON Polygon",
                     "value": {
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Polygon",
-                            "coordinates": [
-                                [
-                                    [24.5, 60.2],
-                                    [24.5, 60.9],
-                                    [24.8, 60.9],
-                                    [24.8, 60.2],
-                                    [24.5, 60.2],
-                                ]
-                            ],
-                        },
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [24.5, 60.2],
+                                [24.5, 60.9],
+                                [24.8, 60.9],
+                                [24.8, 60.2],
+                                [24.5, 60.2],
+                            ]
+                        ],
                     },
                 }
             }
