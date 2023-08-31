@@ -28,7 +28,7 @@ from .serializers import (
     ObservationAggregateSerializer,
 )
 from .filters import CounterFilter, ObservationFilter, ObservationAggregateFilter
-from .schemas import CounterSchema, ObservationAggregateSchema
+from .schemas import CounterSchema, ObservationSchema, ObservationAggregateSchema
 
 # pylint: disable=no-member
 
@@ -47,7 +47,7 @@ class CounterViewSet(
     viewsets.GenericViewSet,
 ):
     """
-    API endpoint for counters
+    Lists measurement devices or sensors which produce observational data.
     """
 
     filter_backends = (filters.DjangoFilterBackend,)
@@ -87,6 +87,9 @@ class CounterViewSet(
         return queryset
 
     def create(self, request, *args, **kwargs):
+        """
+        Lists counters within the given GeoJSON polygon area.
+        """
         geojson_data = request.data.get("geometry")
         if not geojson_data:
             return Response({"error": "Missing `geometry` key in body."}, status=400)
@@ -105,16 +108,26 @@ class CounterViewSet(
         ):
             return Response({"error": "Unable to process the request."}, status=500)
 
+    # pylint: disable-next=useless-parent-delegation
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Returns the information of a counter with the given identifier.
+        """
+        # The comment above is used to define a description for apidocs.
+        return super().retrieve(request, *args, **kwargs)
+
 
 class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
-    API endpoint for observations.
+    Returns a paged and sorted list of observations produced by counters,
+    matching the given search criteria.
     """
 
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = ObservationFilter
     pagination_class = LargeResultsSetPagination
     serializer_class = ObservationSerializer
+    schema = ObservationSchema()
     queryset = Observation.objects.all()
 
     def get_queryset(self):
@@ -130,7 +143,8 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
-    API endpoint for observations aggregation.
+    Returns a paged and sorted list of the observational data,
+    aggregated over the given period and matching the search criteria.
     """
 
     filter_backends = (filters.DjangoFilterBackend,)
