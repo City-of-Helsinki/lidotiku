@@ -5,29 +5,6 @@
     "version": ""
   },
   "paths": {
-    "/api/counters/data/": {
-      "get": {
-        "operationId": "listCountersWithLatestObservations",
-        "description": "",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {}
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "tags": [
-          "api"
-        ]
-      }
-    },
     "/api/counters/": {
       "get": {
         "operationId": "listCounters",
@@ -37,7 +14,7 @@
             "name": "latitude",
             "required": false,
             "in": "query",
-            "description": "Latitude",
+            "description": "latitude",
             "schema": {
               "type": "number",
               "format": "float"
@@ -47,7 +24,7 @@
             "name": "longitude",
             "required": false,
             "in": "query",
-            "description": "Longitude",
+            "description": "longitude",
             "schema": {
               "type": "number",
               "format": "float"
@@ -218,7 +195,7 @@
             "name": "latitude",
             "required": false,
             "in": "query",
-            "description": "Latitude",
+            "description": "latitude",
             "schema": {
               "type": "string"
             }
@@ -227,7 +204,7 @@
             "name": "longitude",
             "required": false,
             "in": "query",
-            "description": "Longitude",
+            "description": "longitude",
             "schema": {
               "type": "string"
             }
