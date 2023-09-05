@@ -15,6 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
+from rest_framework.schemas import get_schema_view
+from djangorestframework_camel_case.render import CamelCaseJSONRenderer
+from api.schemas import LidoSchemaGenerator
 from . import views
 
 urlpatterns = [
@@ -22,5 +25,13 @@ urlpatterns = [
     path("", views.health_check),
     path("healthz", views.health_check),
     path("readiness", views.readiness),
-    path("openapi-schema.json", views.openapi_schema),
+    path(
+        "openapi-schema.json",
+        get_schema_view(
+            generator_class=LidoSchemaGenerator,  # Customize inputs in the schema generator
+            renderer_classes=(CamelCaseJSONRenderer,),
+            public=True,
+        ),
+    ),
+    path("swagger", views.swagger_ui),
 ]

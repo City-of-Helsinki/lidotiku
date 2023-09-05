@@ -16,17 +16,15 @@ GRANT SELECT ON TABLE lido.vw_observations TO database_user;
 ```
 # API documentation
 
-To generate OpenAPI Specification v3 schema:
+OpenAPIv3 spec documentation is generated dynamically.
 
-1. Install required packages for generation: `pip install pyyaml uritemplate`
+To access it you can view `/openapi-schema.json`.
 
-2. Generate the schema:
-- YAML: `./manage.py generateschema --file openapi-schema.yml`
-- JSON: `./manage.py generateschema --file openapi-schema.json --format openapi-json`
+Static file can also be generated:
+- JSON: `ENV=local ./manage.py generateschema --file openapi-schema.json --format openapi-json --generator_class api.schemas.LidoSchemaGenerator`
+- YAML: `ENV=local ./manage.py generateschema --file openapi-schema.yml --generator_class api.schemas.LidoSchemaGenerator`
 
-3. (Optional) Run locally:
-- `docker run -p 80:8080 -e SWAGGER_JSON=/foo/openapi-schema.json -v /absolute/path/to/repo/:/foo swaggerapi/swagger-ui`
-- [http://localhost]()
+To view the docs in swagger-ui you can use `/swagger` to access. Optionally you can load it to some other swagger-ui with the url for `/openapi-schema.json`
 
 # Local development
 

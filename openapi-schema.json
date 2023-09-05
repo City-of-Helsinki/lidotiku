@@ -1,8 +1,13 @@
 {
   "openapi": "3.0.2",
   "info": {
-    "title": "",
-    "version": ""
+    "title": "LIDO-TIKU API",
+    "version": "0.1",
+    "description": "API for accessing traffic measurement data of the city of Helsinki",
+    "license": {
+      "name": "MIT License",
+      "identifier": "MIT"
+    }
   },
   "paths": {
     "/api/counters/": {
