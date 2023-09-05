@@ -16,7 +16,7 @@ from django_filters import rest_framework as filters
 
 from .models import Counter, Observation
 from .serializers import (
-    CounterSerializer,
+    CounterFeatureCollectionSerializer,
     CounterFilterValidationSerializer,
     CounterDistanceSerializer,
     ObservationSerializer,
@@ -48,7 +48,7 @@ class CounterViewSet(
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = CounterFilter
     pagination_class = None
-    serializer_class = CounterSerializer
+    serializer_class = CounterFeatureCollectionSerializer
     schema = CounterSchema(request_serializer=CounterFilterValidationSerializer)
     queryset = Counter.objects.all()
 
@@ -80,6 +80,28 @@ class CounterViewSet(
             if "order" not in query_params:
                 queryset = queryset.order_by("distance")
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        data = {"type": "FeatureCollection", "features": []}
+        features: list = data.get("features", [])
+        for counter in queryset:
+            features.append(
+                {
+                    "type": "Feature",
+                    "id": counter.id,
+                    "geometry": counter.geom or None,
+                    "properties": {
+                        "id": getattr(counter, "id", None),
+                        "name": getattr(counter, "name", ""),
+                        "source": getattr(counter, "source", ""),
+                        "crs_epsg": getattr(counter, "crs_epsg", ""),
+                    },
+                }
+            )
+
+        serializer = self.get_serializer(data=data)
+        return Response(serializer.initial_data)
 
     def create(self, request, *args, **kwargs):
         """
@@ -188,16 +210,3 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
         except AttributeError:
             pass
         return queryset
-
-
-@dataclass
-class ObservationData:  # pylint: disable=too-many-instance-attributes
-    id: int
-    station_id: int
-    name: str
-    short_name: str
-    time_window_start: datetime
-    time_window_end: datetime
-    measured_time: int
-    value: str
-    unit: str

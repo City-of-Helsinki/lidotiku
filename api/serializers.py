@@ -25,12 +25,18 @@ class ReadOnlySerializer(serializers.Serializer):
         )
 
 
-class CounterSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializer):
-    geometry = serializers.SerializerMethodField()
+class CounterPropertiesSerializer(ReadOnlySerializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    crs_epsg = serializers.CharField()
+    source = serializers.CharField()
 
-    class Meta:
-        model = Counter
-        fields = ["id", "name", "classifying", "crs_epsg", "source", "geometry"]
+
+class CounterSerializer(ReadOnlySerializer):
+    id = serializers.IntegerField()
+    type = serializers.CharField(default="Feature")
+    geometry = serializers.SerializerMethodField()
+    properties = CounterPropertiesSerializer()
 
     def get_geometry(self, obj):
         return {"type": "Point", "coordinates": [obj.geom.x, obj.geom.y]}
@@ -38,6 +44,11 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializ
     def to_representation(self, instance):
         data = super().to_representation(instance)
         return data
+
+
+class CounterFeatureCollectionSerializer(ReadOnlySerializer):
+    type = serializers.CharField(default="FeatureCollection")
+    features = CounterSerializer(many=True)
 
 
 class CounterDistanceSerializer(CounterSerializer):

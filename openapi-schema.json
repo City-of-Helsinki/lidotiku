@@ -47,7 +47,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Counter"
+                    "$ref": "#/components/schemas/CounterFeatureCollection"
                   }
                 }
               },
@@ -55,7 +55,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Counter"
+                    "$ref": "#/components/schemas/CounterFeatureCollection"
                   }
                 }
               }
@@ -224,12 +224,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Counter"
+                  "$ref": "#/components/schemas/CounterFeatureCollection"
                 }
               },
               "text/csv": {
                 "schema": {
-                  "$ref": "#/components/schemas/Counter"
+                  "$ref": "#/components/schemas/CounterFeatureCollection"
                 }
               }
             },
@@ -620,59 +620,79 @@
           }
         }
       },
-      "Counter": {
+      "CounterFeatureCollection": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "maximum": 2147483647,
-            "minimum": -2147483648
-          },
-          "name": {
+          "type": {
             "type": "string",
-            "maxLength": 32
+            "default": "FeatureCollection"
           },
-          "classifying": {
-            "type": "boolean"
-          },
-          "crs_epsg": {
-            "type": "integer",
-            "maximum": 9223372036854775807,
-            "minimum": -9223372036854775808,
-            "format": "int64"
-          },
-          "source": {
-            "type": "string",
-            "maxLength": 32
-          },
-          "geometry": {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "Point"
-                ]
-              },
-              "coordinates": {
-                "type": "array",
-                "minItems": 2,
-                "maxItems": 2,
-                "items": {
-                  "type": "number",
-                  "format": "float"
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "string",
+                  "default": "Feature"
+                },
+                "geometry": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Point"
+                      ]
+                    },
+                    "coordinates": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number",
+                        "format": "float"
+                      }
+                    }
+                  },
+                  "readOnly": true
+                },
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "crs_epsg": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "crs_epsg",
+                    "source"
+                  ]
                 }
-              }
-            },
-            "readOnly": true
+              },
+              "required": [
+                "id",
+                "properties"
+              ]
+            }
           }
         },
         "required": [
-          "id",
-          "name",
-          "classifying",
-          "crs_epsg",
-          "source"
+          "features"
         ]
       },
       "Observation": {
