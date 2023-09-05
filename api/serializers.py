@@ -111,22 +111,6 @@ class ObservationSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySeri
         ]
 
 
-class ObservationFilterSerializer(ReadOnlySerializer):
-    counter = serializers.ListField(
-        required=False, child=serializers.IntegerField(), label="Counter id"
-    )
-    start_time = serializers.CharField(required=False)
-    end_time = serializers.CharField(required=False)
-    # pylint: disable=protected-access, no-member
-    source = serializers.ModelField(
-        Observation()._meta.get_field("source"),
-        required=False,
-    )  # type: ignore
-    measurement_type = serializers.CharField(required=False)
-    vehicle_type = serializers.CharField(required=False)
-    order = serializers.ChoiceField(choices=["asc", "desc"], required=False)
-
-
 class ObservationAggregateSerializer(
     serializers.HyperlinkedModelSerializer, ReadOnlySerializer
 ):
@@ -148,27 +132,3 @@ class ObservationAggregateSerializer(
 
     def get_aggregated_value(self, obj):
         return obj.get("aggregated_value")
-
-
-class SensorSerializer(ReadOnlySerializer):
-    id = serializers.IntegerField()
-    station_id = serializers.IntegerField()
-    name = serializers.CharField()
-    short_name = serializers.CharField()
-    time_window_start = serializers.DateTimeField()
-    time_window_end = serializers.DateTimeField()
-    measured_time = serializers.DateTimeField()
-    value = serializers.IntegerField(allow_null=True)
-    unit = serializers.CharField()
-
-
-class CountersValuesSerializer(ReadOnlySerializer):
-    id = serializers.IntegerField()
-    tms_number = serializers.IntegerField()
-    data_updated_time = serializers.DateTimeField()
-    sensor_values = SensorSerializer(many=True)
-
-
-class CounterDataSerializer(ReadOnlySerializer):
-    data_updated_time = serializers.DateTimeField()
-    stations = CountersValuesSerializer(many=True)
