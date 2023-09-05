@@ -64,21 +64,3 @@ class Observation(ReadOnlyModel):
     vehicletype = models.CharField(max_length=32)
     datetime = models.DateTimeField(db_index=True)
     source = models.CharField(max_length=32)
-
-
-class CounterWithLatestObservations(ReadOnlyModel):
-    """Database View"""
-
-    class Meta:
-        managed = False
-        db_table = '"lido"."vw_counters_with_latest_sensor_observations"'
-
-    id = models.BigIntegerField(primary_key=True)
-    short_name = models.CharField(db_column="measurementtypeshortname")
-    source = models.CharField()
-    measurement_type = models.CharField(db_column="measurementtypename")
-    measured_time = models.DateTimeField(db_column="datetime")
-    phenomenondurationseconds = models.IntegerField()
-    unit = models.CharField()
-    value = models.IntegerField()
-    counter_updated_at = models.DateField()

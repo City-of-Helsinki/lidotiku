@@ -1,8 +1,6 @@
-from itertools import groupby
-from datetime import datetime, timedelta
+from datetime import datetime
 from dataclasses import dataclass
 from django.db.models import Sum, Avg
-from django.db.models.query import QuerySet
 from django.db.models.functions import Trunc
 from django.db.models.expressions import Value
 from django.db import DatabaseError
@@ -14,16 +12,13 @@ from django.contrib.gis.gdal.error import GDALException
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.settings import api_settings
-from rest_framework_csv.renderers import PaginatedCSVRenderer
 from django_filters import rest_framework as filters
 
-from .models import Counter, Observation, CounterWithLatestObservations
+from .models import Counter, Observation
 from .serializers import (
     CounterSerializer,
     CounterFilterValidationSerializer,
     CounterDistanceSerializer,
-    CounterDataSerializer,
     ObservationSerializer,
     ObservationAggregateSerializer,
 )
@@ -206,72 +201,3 @@ class ObservationData:  # pylint: disable=too-many-instance-attributes
     measured_time: int
     value: str
     unit: str
-
-
-@dataclass
-class CountersWithObservations:
-    data_updated_time: datetime | None
-    stations: QuerySet[CounterWithLatestObservations]
-
-
-def _group_counter_sensors_in_qs(queryset):
-    counter_groups = []
-    # Group counters (sensors) due to LEFT JOIN in query with sensors returning multiple
-    for _k, g in groupby(queryset):
-        counter_groups.append(list(g))
-
-    counters = []
-    # Merges multiple counter rows by putting "duplicate" sensor rows in sensor_values
-    for sensors in counter_groups:
-        counter = sensors[0]
-        duration_delta = timedelta(
-            seconds=getattr(counter, "phenomenondurationseconds", 0)
-        )
-        measured_time = getattr(counter, "measured_time")
-        time_window_start = (measured_time - duration_delta) if measured_time else None
-        counter.sensor_values = [
-            ObservationData(
-                id=sensor.id,
-                station_id=sensor.id,
-                name=getattr(sensor, "measurement_type"),
-                short_name=getattr(sensor, "short_name"),
-                time_window_start=time_window_start,
-                time_window_end=measured_time,
-                measured_time=measured_time,
-                value=getattr(sensor, "value"),
-                unit=getattr(sensor, "unit"),
-            )
-            for sensor in sensors
-        ]
-        counter.tms_number = counter.id
-        counter.data_updated_time = counter.counter_updated_at
-        counters.append(counter)
-    return counters
-
-
-class CountersWithLatestObservationsView(viewsets.ViewSet):
-    pagination_class = None
-    # Remove CSV renderer as it does not work well with nested values
-    renderer_classes = tuple(
-        filter(
-            (lambda r: r != PaginatedCSVRenderer),  # type: ignore[arg-type]
-            api_settings.DEFAULT_RENDERER_CLASSES,
-        )
-    )
-
-    def list(self, _request):
-        # itertools.groupby() requires sorted iterable
-        queryset = CounterWithLatestObservations.objects.all().order_by("id")
-        counters = _group_counter_sensors_in_qs(queryset)
-
-        latest_updated_at = getattr(
-            Observation.objects.latest("datetime"),
-            "datetime",
-            None,
-        )
-        data = CountersWithObservations(
-            data_updated_time=latest_updated_at, stations=counters
-        )
-        serializer = CounterDataSerializer(data)
-
-        return Response(serializer.data)
