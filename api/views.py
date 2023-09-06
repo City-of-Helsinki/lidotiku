@@ -21,6 +21,7 @@ from .serializers import (
     CounterDistanceSerializer,
     ObservationSerializer,
     ObservationAggregateSerializer,
+    CounterFeatureCollectionSerializer,
 )
 from .filters import CounterFilter, ObservationFilter, ObservationAggregateFilter
 from .schemas import CounterSchema, ObservationSchema, ObservationAggregateSchema
@@ -48,7 +49,7 @@ class CounterViewSet(
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = CounterFilter
     pagination_class = None
-    serializer_class = CounterSerializer
+    serializer_class = CounterFeatureCollectionSerializer
     schema = CounterSchema(request_serializer=CounterFilterValidationSerializer)
     queryset = Counter.objects.all()
 
@@ -94,9 +95,10 @@ class CounterViewSet(
         try:
             geometry = GEOSGeometry(str(geojson_data))
             counters = Counter.objects.filter(geom__intersects=geometry)
-            serializer = self.get_serializer(counters, many=True)
-            data = {"type": "FeatureCollection", "features": serializer.data}
-            return Response(data, status=200)
+            serializer = self.get_serializer(
+                {"type": "FeatureCollection", "features": counters}
+            )
+            return Response(serializer.data, status=200)
         except (
             TypeError,
             ValueError,
@@ -116,13 +118,15 @@ class CounterViewSet(
         Returns the information of a counter with the given identifier.
         """
         # The comment above is used to define a description for apidocs.
+        self.serializer_class = CounterSerializer
         return super().retrieve(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        data = {"type": "FeatureCollection", "features": serializer.data}
-        return Response(data, status=200)
+        serializer = self.get_serializer(
+            {"type": "FeatureCollection", "features": queryset}
+        )
+        return Response(serializer.data, status=200)
 
 
 class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

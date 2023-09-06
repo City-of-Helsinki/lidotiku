@@ -50,6 +50,11 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializ
         return data
 
 
+class CounterFeatureCollectionSerializer(ReadOnlySerializer):
+    type = serializers.CharField(default="FeatureCollection")
+    features = CounterSerializer(many=True)
+
+
 class CounterDistanceSerializer(CounterSerializer):
     distance = serializers.SerializerMethodField()
 
