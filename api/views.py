@@ -92,8 +92,8 @@ class CounterViewSet(
                 status=400,
             )
         try:
-            geometry = GEOSGeometry(str(geojson_data))
-            counters = Counter.objects.filter(geom__intersects=geometry)
+            geometry = GEOSGeometry(str(geojson_data), srid=4326)
+            counters = Counter.objects.filter(geom__within=geometry)
             serializer = self.get_serializer(counters, many=True)
             return Response(serializer.data, status=200)
         except (
