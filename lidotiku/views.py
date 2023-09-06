@@ -1,14 +1,11 @@
 import os
-import json
 from typing import Tuple
-from pathlib import Path
-from django.http import JsonResponse, HttpRequest
+from django.http import JsonResponse, HttpRequest, HttpResponse
 from django.db import connection, DatabaseError, Error
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured, AppRegistryNotReady
 from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_exempt
-from .settings import BASE_DIR
 
 
 def _app_is_ready() -> bool:
@@ -53,15 +50,42 @@ def readiness(_request: HttpRequest) -> JsonResponse:
 
 @require_GET
 @csrf_exempt
-def openapi_schema(_request: HttpRequest) -> JsonResponse:
-    """
-    The schema is loaded from a file to avoid:
-    - To have to serve static files just for the schema
-    - To have to generate the schema dynamically
-    """
-    schema = json.loads(
-        Path(os.path.join(BASE_DIR, "openapi-schema.json")).read_text(encoding="utf8")
+def swagger_ui(_request: HttpRequest):
+    url = os.getenv("HOST", "localhost:8000")
+    # pylint: disable=line-too-long
+    html = (
+        """
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+          name="description"
+          content="SwaggerUI"
+        />
+        <title>SwaggerUI</title>
+        <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui.css" />
+      </head>
+      <body>
+      <div id="swagger-ui"></div>
+      <script src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-bundle.js" crossorigin></script>
+      <script src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-standalone-preset.js" crossorigin></script>
+      <script>
+        window.onload = () => {
+          window.ui = SwaggerUIBundle({"""
+        + f"url: '{'http' if 'localhost' in url else 'https'}://{url}/openapi-schema.json',"
+        + """
+            dom_id: '#swagger-ui',
+            presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIStandalonePreset
+            ],
+            layout: "StandaloneLayout",
+          });
+        };
+      </script>
+      </body>
+    </html>"""
     )
-    return JsonResponse(
-        schema, safe=False, headers={"Access-Control-Allow-Origin": "*"}
-    )
+    return HttpResponse(html)

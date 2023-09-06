@@ -1,4 +1,6 @@
-from rest_framework.schemas.openapi import AutoSchema
+import os
+from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
+
 
 GEOJSON_POLYGON_JSONSCHEMA = {
     "$schema": "http://json-schema.org/draft-07/schema#",
@@ -36,6 +38,41 @@ def get_date_format_example(field_name):
             "value": "2023-01-31",
         }
     }
+
+
+class LidoSchemaGenerator(SchemaGenerator):
+    def __init__(
+        self,
+        title=None,
+        url=None,
+        description=None,
+        patterns=None,
+        urlconf=None,
+        version=None,
+    ):
+        title = "LIDO-TIKU API"
+        url = "/"
+        description = (
+            "API for accessing traffic measurement data of the city of Helsinki"
+        )
+        version = os.getenv("VERSION", "0.1")
+
+        super().__init__(
+            title=title,
+            url=url,
+            description=description,
+            patterns=patterns,
+            urlconf=urlconf,
+            version=version,
+        )
+        self.license = {"name": "MIT License", "identifier": "MIT"}
+
+    def get_info(self):
+        info = super().get_info()
+        # Adds license which is missing from SchemaGenerator
+        if self.license is not None:
+            info["license"] = self.license
+        return info
 
 
 class BaseSchema(AutoSchema):

@@ -1,6 +1,7 @@
 [pylint]
 disable=
     missing-docstring, # Not generating docs out of the project
+    too-many-arguments,
 ignore-paths=api/migrations
 suggestion-mode=yes
 good-names=
