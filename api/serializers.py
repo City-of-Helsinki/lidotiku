@@ -27,13 +27,23 @@ class ReadOnlySerializer(serializers.Serializer):
 
 class CounterSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializer):
     geometry = serializers.SerializerMethodField()
+    properties = serializers.SerializerMethodField()
+    type = serializers.CharField(default="Feature")
 
     class Meta:
         model = Counter
-        fields = ["id", "name", "classifying", "crs_epsg", "source", "geometry"]
+        fields = ["type", "id", "geometry", "properties"]
 
     def get_geometry(self, obj):
         return {"type": "Point", "coordinates": [obj.geom.x, obj.geom.y]}
+
+    def get_properties(self, obj):
+        return {
+            "id": obj.id,
+            "name": obj.name,
+            "source": obj.source,
+            "crs_epsg": obj.crs_epsg,
+        }
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
