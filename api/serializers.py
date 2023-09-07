@@ -42,6 +42,7 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializ
             "id": obj.id,
             "name": obj.name,
             "source": obj.source,
+            "classifying": obj.classifying,
             "crs_epsg": obj.crs_epsg,
         }
 
@@ -52,22 +53,25 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializ
 
 class CounterDistanceSerializer(CounterSerializer):
     distance = serializers.SerializerMethodField()
+    properties = serializers.SerializerMethodField()
 
     class Meta:
         model = Counter
-        fields = [
-            "id",
-            "name",
-            "classifying",
-            "crs_epsg",
-            "source",
-            "geometry",
-            "distance",
-        ]
+        fields = ["id", "geometry", "distance", "properties"]
 
     def get_distance(self, obj):
         distance: Distance | None = getattr(obj, "distance", None)
         return getattr(distance, "km", None)
+
+    def get_properties(self, obj):
+        return {
+            "id": obj.id,
+            "name": obj.name,
+            "source": obj.source,
+            "classifying": obj.classifying,
+            "crs_epsg": obj.crs_epsg,
+            "distance": self.get_distance(obj),
+        }
 
 
 class CounterFilterValidationSerializer(serializers.Serializer):
