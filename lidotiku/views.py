@@ -1,11 +1,12 @@
 import os
 from typing import Tuple
-from django.http import JsonResponse, HttpRequest, HttpResponse
-from django.db import connection, DatabaseError, Error
+
 from django.apps import apps
-from django.core.exceptions import ImproperlyConfigured, AppRegistryNotReady
-from django.views.decorators.http import require_GET
+from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
+from django.db import DatabaseError, Error, connection
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET
 
 
 def _app_is_ready() -> bool:
