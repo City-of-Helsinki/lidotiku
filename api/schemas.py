@@ -1,6 +1,6 @@
 import os
-from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
 
+from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
 
 GEOJSON_POLYGON_JSONSCHEMA = {
     "$schema": "http://json-schema.org/draft-07/schema#",
