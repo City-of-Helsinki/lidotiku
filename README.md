@@ -90,3 +90,7 @@ To run the tests:
 To find which lines don't have test coverage:
 
 `ENV=local pytest --cov-config=.coveragerc --cov=api/ --cov-report term-missing`
+
+## Availability checks 
+
+The availability of the API can be checked via the `/readiness` and `/healthz` endpoints. 
