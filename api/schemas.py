@@ -50,12 +50,12 @@ class LidoSchemaGenerator(SchemaGenerator):
         urlconf=None,
         version=None,
     ):
-        title = "LIDO-TIKU API"
-        url = "/"
-        description = (
+        title = title or "LIDO-TIKU API"
+        url = url or "/"
+        description = description or (
             "API for accessing traffic measurement data of the city of Helsinki"
         )
-        version = os.getenv("VERSION", "0.1")
+        version = version or os.getenv("VERSION", "0.1")
 
         super().__init__(
             title=title,
