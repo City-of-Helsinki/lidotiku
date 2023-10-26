@@ -1,29 +1,30 @@
-from datetime import datetime
 from dataclasses import dataclass
-from django.db.models import Sum, Avg
-from django.db.models.functions import Trunc
-from django.db.models.expressions import Value
-from django.db import DatabaseError
-from django.core.exceptions import SuspiciousOperation
-from django.contrib.gis.geos import Point, GEOSGeometry
-from django.contrib.gis.geos.error import GEOSException
+from datetime import datetime
+
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 from django.contrib.gis.gdal.error import GDALException
-from rest_framework import viewsets, mixins
-from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
+from django.contrib.gis.geos import GEOSGeometry, Point
+from django.contrib.gis.geos.error import GEOSException
+from django.core.exceptions import SuspiciousOperation
+from django.db import DatabaseError
+from django.db.models import Avg, Sum
+from django.db.models.expressions import Value
+from django.db.models.functions import Trunc
 from django_filters import rest_framework as filters
+from rest_framework import mixins, viewsets
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
+from .filters import CounterFilter, ObservationAggregateFilter, ObservationFilter
 from .models import Counter, Observation
+from .schemas import CounterSchema, ObservationAggregateSchema, ObservationSchema
 from .serializers import (
-    CounterSerializer,
-    CounterFilterValidationSerializer,
     CounterDistanceSerializer,
-    ObservationSerializer,
+    CounterFilterValidationSerializer,
+    CounterSerializer,
     ObservationAggregateSerializer,
+    ObservationSerializer,
 )
-from .filters import CounterFilter, ObservationFilter, ObservationAggregateFilter
-from .schemas import CounterSchema, ObservationSchema, ObservationAggregateSchema
 
 # pylint: disable=no-member
 

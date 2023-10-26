@@ -1,4 +1,5 @@
 import pytest
+
 from api.models import Counter  # pylint: disable=import-error
 
 
