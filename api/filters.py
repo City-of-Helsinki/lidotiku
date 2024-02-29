@@ -1,14 +1,11 @@
+from datetime import datetime
+
 from django.contrib.gis.measure import Distance as DistanceObject
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django_filters.rest_framework import (
-    BaseInFilter,
-    CharFilter,
-    ChoiceFilter,
-    DateFilter,
-    FilterSet,
-    NumberFilter,
-    OrderingFilter,
-)
+from django.utils.timezone import make_aware
+from django_filters.rest_framework import (BaseInFilter, CharFilter,
+                                           ChoiceFilter, DateFilter, FilterSet,
+                                           NumberFilter, OrderingFilter)
 
 
 class NumberInFilter(BaseInFilter, NumberFilter):
@@ -25,7 +22,7 @@ class NumberMaxMinFilter(NumberFilter):
         method=None,
         distinct=False,
         exclude=False,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(
             field_name=None,
@@ -34,7 +31,7 @@ class NumberMaxMinFilter(NumberFilter):
             method=None,
             distinct=False,
             exclude=False,
-            **kwargs
+            **kwargs,
         )
         min_value = kwargs.get("min_value")
         max_value = kwargs.get("max_value")
@@ -62,6 +59,12 @@ class NumberMaxMinFilter(NumberFilter):
             # pylint: disable-next=attribute-defined-outside-init
             self._field = field
         return self._field
+
+
+def filter_end_date(queryset, name, value):
+    # Make end_date inclusive until end of day
+    end_date = make_aware(datetime.combine(value, datetime.max.time()))
+    return queryset.filter(**{f"{name}__lte": end_date})
 
 
 class CounterFilter(FilterSet):
@@ -100,7 +103,7 @@ class ObservationFilter(FilterSet):
     )
     end_date = DateFilter(
         field_name="datetime",
-        lookup_expr="lte",
+        method=filter_end_date,
         label="End date of measurement period.",
     )
 
@@ -144,7 +147,7 @@ class ObservationAggregateFilter(FilterSet):
     )
     end_date = DateFilter(
         field_name="start_time",
-        lookup_expr="lte",
+        method=filter_end_date,
         label="End date of measurement period.",
     )
     period = ChoiceFilter(
