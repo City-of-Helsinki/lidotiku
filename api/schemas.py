@@ -92,6 +92,20 @@ class BaseSchema(AutoSchema):
             return self.request_serializer()
         return super().get_serializer(path, method)
 
+    def get_operation(self, path, method):
+        operation = super().get_operation(path, method)
+        if method == "GET":
+            parameters = operation.get("parameters", [])
+            parameters.append(
+                {
+                    "name": "format",
+                    "in": "query",
+                    "description": "Output format",
+                    "schema": {"type": "string", "enum": ["json", "api", "csv"]},
+                }
+            )
+        return operation
+
 
 class CounterSchema(BaseSchema):
     def get_operation(self, path, method):

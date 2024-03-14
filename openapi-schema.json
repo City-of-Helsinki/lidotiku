@@ -17,6 +17,24 @@
         "description": "Lists measurement devices or sensors which produce observational data.",
         "parameters": [
           {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "A page number within the paginated result set.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "description": "Number of results to return per page.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
             "name": "latitude",
             "required": false,
             "in": "query",
@@ -44,6 +62,19 @@
             "schema": {
               "type": "number"
             }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Output format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "api",
+                "csv"
+              ]
+            }
           }
         ],
         "responses": {
@@ -51,17 +82,59 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Counter"
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "example": 123
+                    },
+                    "next": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "uri",
+                      "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "uri",
+                      "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Counter"
+                      }
+                    }
                   }
                 }
               },
               "text/csv": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Counter"
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "example": 123
+                    },
+                    "next": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "uri",
+                      "example": "http://api.example.org/accounts/?page=4"
+                    },
+                    "previous": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "uri",
+                      "example": "http://api.example.org/accounts/?page=2"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Counter"
+                      }
+                    }
                   }
                 }
               }
@@ -223,6 +296,19 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Output format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "api",
+                "csv"
+              ]
+            }
           }
         ],
         "responses": {
@@ -352,6 +438,19 @@
                 "-datetime",
                 "counter",
                 "-counter"
+              ]
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Output format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "api",
+                "csv"
               ]
             }
           }
@@ -535,6 +634,19 @@
               "enum": [
                 "start_time",
                 "-start_time"
+              ]
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Output format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "api",
+                "csv"
               ]
             }
           }
