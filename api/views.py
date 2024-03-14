@@ -35,6 +35,12 @@ class LargeResultsSetPagination(PageNumberPagination):
     max_page_size = 10000
 
 
+class SmallResultsSetPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = "page_size"
+    max_page_size = 1000
+
+
 # pylint: disable-next=too-many-ancestors
 class CounterViewSet(
     mixins.RetrieveModelMixin,
@@ -48,7 +54,7 @@ class CounterViewSet(
 
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = CounterFilter
-    pagination_class = None
+    pagination_class = SmallResultsSetPagination
     serializer_class = CounterSerializer
     schema = CounterSchema(request_serializer=CounterFilterValidationSerializer)
     queryset = Counter.objects.all()
@@ -121,7 +127,7 @@ class CounterViewSet(
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(self.paginate_queryset(queryset), many=True)
         data = {"type": "FeatureCollection", "features": serializer.data}
         return Response(data, status=200)
 
