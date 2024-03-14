@@ -3,10 +3,11 @@
   "info": {
     "title": "LIDO-TIKU API",
     "version": "0.1",
-    "description": "API for accessing traffic measurement data of the city of Helsinki",
+    "description": "API for accessing traffic measurement data of the city of Helsinki. The measurement data is updated daily and hourly and consists of count and speed observations derived from sensor devices (counters) of different types (data sources), across different measurement intervals according the type of the sensor; typically 15 minutes. The sources include for example induction loops and pedestrian counters.\nThe city of Helsinki traffic open data made available from the LIDO-TIKU API is licensed under the Creative Commons 4.0 BY license according to the JHS-189 recommendation for public authorities in Finland. The license grants the right to use and distribute the data if the following attribution is included:\nSource: City of Helsinki, https://lidotiku.api.hel.fi/api/ , licence CC 4.0 BY: http://creativecommons.org/licenses/by/4.0/",
+    "summary": "API for accessing traffic measurement data of the city of Helsinki.",
     "license": {
-      "name": "MIT License",
-      "identifier": "MIT"
+      "name": "Creative Commons 4.0 BY",
+      "identifier": "CC-BY-4.0"
     }
   },
   "paths": {
@@ -628,27 +629,14 @@
       "Counter": {
         "type": "object",
         "properties": {
+          "type": {
+            "type": "string",
+            "default": "Feature"
+          },
           "id": {
             "type": "integer",
             "maximum": 2147483647,
             "minimum": -2147483648
-          },
-          "name": {
-            "type": "string",
-            "maxLength": 32
-          },
-          "classifying": {
-            "type": "boolean"
-          },
-          "crs_epsg": {
-            "type": "integer",
-            "maximum": 9223372036854775807,
-            "minimum": -9223372036854775808,
-            "format": "int64"
-          },
-          "source": {
-            "type": "string",
-            "maxLength": 32
           },
           "geometry": {
             "type": "object",
@@ -670,14 +658,14 @@
               }
             },
             "readOnly": true
+          },
+          "properties": {
+            "type": "string",
+            "readOnly": true
           }
         },
         "required": [
-          "id",
-          "name",
-          "classifying",
-          "crs_epsg",
-          "source"
+          "id"
         ]
       },
       "Observation": {
