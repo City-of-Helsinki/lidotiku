@@ -12,8 +12,9 @@ from django.db.models.expressions import Value
 from django.db.models.functions import Trunc
 from django_filters import rest_framework as filters
 from rest_framework import mixins, viewsets
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import PageNumberPagination, CursorPagination
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .filters import CounterFilter, ObservationAggregateFilter, ObservationFilter
 from .models import Counter, Observation
@@ -39,6 +40,27 @@ class SmallResultsSetPagination(PageNumberPagination):
     page_size = 100
     page_size_query_param = "page_size"
     max_page_size = 1000
+
+
+class ObservationsCursorPagination(CursorPagination):
+    page_size = 1000
+    page_size_query_param = "page_size"
+    ordering = ["counter_id", "-datetime"]
+    max_page_size = 10000
+
+    def get_schema_operation_parameters(self, view: APIView) -> list:
+        parameters = super().get_schema_operation_parameters(view)
+
+        page_parameter = {
+            "name": "page",
+            "required": False,
+            "in": "query",
+            "description": "A page number within the paginated result set. If this parameter is set, it supercedes the cursor parameter and results will be returned as numbered pages.",
+            "schema": {"type": "integer"},
+        }
+
+        parameters.append(page_parameter)
+        return parameters
 
 
 # pylint: disable-next=too-many-ancestors
@@ -140,7 +162,7 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = ObservationFilter
-    pagination_class = LargeResultsSetPagination
+    pagination_class = ObservationsCursorPagination
     serializer_class = ObservationSerializer
     schema = ObservationSchema()
     queryset = Observation.objects.all()
@@ -153,6 +175,9 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 queryset = queryset.order_by("datetime")
         except AttributeError:
             pass
+
+        if "page" in self.request.query_params:
+            self.pagination_class = LargeResultsSetPagination
         return queryset
 
 
@@ -164,7 +189,7 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
 
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = ObservationAggregateFilter
-    pagination_class = LargeResultsSetPagination
+    pagination_class = ObservationsCursorPagination
     serializer_class = ObservationAggregateSerializer
     queryset = Observation.objects.all()
     schema = ObservationAggregateSchema()
@@ -183,6 +208,10 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
             aggregation_calc: Avg | Sum = Avg("value")
         else:  # measurement_type == "count"
             aggregation_calc = Sum("value")
+
+        if "page" in self.request.query_params:
+            self.pagination_class = LargeResultsSetPagination
+
         queryset = (
             self.queryset.values("typeofmeasurement", "source")
             .annotate(start_time=Trunc("datetime", kind=period))
