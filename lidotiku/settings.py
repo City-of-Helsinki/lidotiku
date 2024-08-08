@@ -23,6 +23,7 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, []),
     SENTRY_DSN=(str, ""),
     SENTRY_ENVIRONMENT=(str, ""),
+    SECURE_PROXY_SSL_HEADER=(str, None),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,6 +43,7 @@ DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
+SECURE_PROXY_SSL_HEADER = env("SECURE_PROXY_SSL_HEADER")
 
 # Application definition
 
@@ -65,8 +67,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = "lidotiku.urls"
 
 CORS_ALLOW_ALL_ORIGINS = True
-
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 TEMPLATES = [
     {
