@@ -23,7 +23,7 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, []),
     SENTRY_DSN=(str, ""),
     SENTRY_ENVIRONMENT=(str, ""),
-    SECURE_PROXY_SSL_HEADER=(str, None),
+    SECURE_PROXY_SSL_HEADER=(tuple, None),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
