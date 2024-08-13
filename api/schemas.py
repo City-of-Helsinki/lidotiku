@@ -111,6 +111,19 @@ class CounterSchema(BaseSchema):
     def get_operation(self, path, method):
         operation = super().get_operation(path, method)
         if method == "GET" and operation.get("operationId", "").startswith("list"):
+            result_schema = operation["responses"]["200"]["content"][
+                "application/json"
+            ]["schema"]["properties"]["results"]
+            feature_collection = {
+                "type": "object",
+                "properties": {
+                    "type": {"type": "string", "example": "FeatureCollection"},
+                    "features": {"type": "array", "items": result_schema["items"]},
+                },
+            }
+            operation["responses"]["200"]["content"]["application/json"]["schema"][
+                "properties"
+            ]["results"] = feature_collection
             # Fixes OpenAPI types (defaults to string)
             type_mappings = {
                 "latitude": {"type": "number", "format": "float"},
