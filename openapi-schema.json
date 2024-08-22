@@ -101,9 +101,18 @@
                       "example": "http://api.example.org/accounts/?page=2"
                     },
                     "results": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Counter"
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "FeatureCollection"
+                        },
+                        "features": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Counter"
+                          }
+                        }
                       }
                     }
                   }
@@ -130,9 +139,18 @@
                       "example": "http://api.example.org/accounts/?page=2"
                     },
                     "results": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Counter"
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "FeatureCollection"
+                        },
+                        "features": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Counter"
+                          }
+                        }
                       }
                     }
                   }
@@ -339,12 +357,12 @@
         "description": "Returns a paged and sorted list of observations produced by counters,\nmatching the given search criteria.",
         "parameters": [
           {
-            "name": "page",
+            "name": "cursor",
             "required": false,
             "in": "query",
-            "description": "A page number within the paginated result set.",
+            "description": "The pagination cursor value.",
             "schema": {
-              "type": "integer"
+              "type": "string"
             }
           },
           {
@@ -352,6 +370,15 @@
             "required": false,
             "in": "query",
             "description": "Number of results to return per page.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "A page number within the paginated result set. If this parameter is set, it supercedes the cursor parameter and results will be returned as numbered pages.",
             "schema": {
               "type": "integer"
             }
@@ -462,21 +489,13 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "count": {
-                      "type": "integer",
-                      "example": 123
-                    },
                     "next": {
                       "type": "string",
-                      "nullable": true,
-                      "format": "uri",
-                      "example": "http://api.example.org/accounts/?page=4"
+                      "nullable": true
                     },
                     "previous": {
                       "type": "string",
-                      "nullable": true,
-                      "format": "uri",
-                      "example": "http://api.example.org/accounts/?page=2"
+                      "nullable": true
                     },
                     "results": {
                       "type": "array",
@@ -491,21 +510,13 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "count": {
-                      "type": "integer",
-                      "example": 123
-                    },
                     "next": {
                       "type": "string",
-                      "nullable": true,
-                      "format": "uri",
-                      "example": "http://api.example.org/accounts/?page=4"
+                      "nullable": true
                     },
                     "previous": {
                       "type": "string",
-                      "nullable": true,
-                      "format": "uri",
-                      "example": "http://api.example.org/accounts/?page=2"
+                      "nullable": true
                     },
                     "results": {
                       "type": "array",
@@ -531,12 +542,12 @@
         "description": "Returns a paged and sorted list of the observational data,\naggregated over the given period and matching the search criteria.",
         "parameters": [
           {
-            "name": "page",
+            "name": "cursor",
             "required": false,
             "in": "query",
-            "description": "A page number within the paginated result set.",
+            "description": "The pagination cursor value.",
             "schema": {
-              "type": "integer"
+              "type": "string"
             }
           },
           {
@@ -544,6 +555,15 @@
             "required": false,
             "in": "query",
             "description": "Number of results to return per page.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "A page number within the paginated result set. If this parameter is set, it supercedes the cursor parameter and results will be returned as numbered pages.",
             "schema": {
               "type": "integer"
             }
@@ -658,21 +678,13 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "count": {
-                      "type": "integer",
-                      "example": 123
-                    },
                     "next": {
                       "type": "string",
-                      "nullable": true,
-                      "format": "uri",
-                      "example": "http://api.example.org/accounts/?page=4"
+                      "nullable": true
                     },
                     "previous": {
                       "type": "string",
-                      "nullable": true,
-                      "format": "uri",
-                      "example": "http://api.example.org/accounts/?page=2"
+                      "nullable": true
                     },
                     "results": {
                       "type": "array",
@@ -687,21 +699,13 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "count": {
-                      "type": "integer",
-                      "example": 123
-                    },
                     "next": {
                       "type": "string",
-                      "nullable": true,
-                      "format": "uri",
-                      "example": "http://api.example.org/accounts/?page=4"
+                      "nullable": true
                     },
                     "previous": {
                       "type": "string",
-                      "nullable": true,
-                      "format": "uri",
-                      "example": "http://api.example.org/accounts/?page=2"
+                      "nullable": true
                     },
                     "results": {
                       "type": "array",
