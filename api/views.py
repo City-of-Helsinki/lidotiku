@@ -7,7 +7,7 @@ from django.contrib.gis.geos import GEOSGeometry, Point
 from django.contrib.gis.geos.error import GEOSException
 from django.core.exceptions import SuspiciousOperation
 from django.db import DatabaseError
-from django.db.models import Avg, Sum
+from django.db.models import Avg, Sum, F
 from django.db.models.expressions import Value
 from django.db.models.functions import Trunc
 from django_filters import rest_framework as filters
@@ -17,15 +17,26 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.utils.urls import replace_query_param
 
-from .filters import CounterFilter, ObservationAggregateFilter, ObservationFilter
-from .models import Counter, Observation
-from .schemas import CounterSchema, ObservationAggregateSchema, ObservationSchema
+from .filters import (
+    CounterFilter,
+    ObservationAggregateFilter,
+    ObservationFilter,
+    DatasourceFilter,
+)
+from .models import Counter, Observation, Datasource
+from .schemas import (
+    CounterSchema,
+    ObservationAggregateSchema,
+    ObservationSchema,
+    DatasourceSchema,
+)
 from .serializers import (
     CounterDistanceSerializer,
     CounterFilterValidationSerializer,
     CounterSerializer,
     ObservationAggregateSerializer,
     ObservationSerializer,
+    DatasourceSerializer,
 )
 
 # pylint: disable=no-member
@@ -281,6 +292,31 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
                 queryset = queryset.order_by("start_time")
         except AttributeError:
             pass
+        return queryset
+
+
+class DatasourcesViewSet(
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    """
+    Lists the traffic data sources for which counters and observations exist.
+    """
+
+    queryset = Datasource.objects.all()
+    serializer_class = DatasourceSerializer
+    filterset_class = DatasourceFilter
+    schema = DatasourceSchema()
+    filter_backends = (filters.DjangoFilterBackend,)
+    pagination_class = None
+
+    def get_queryset(self):
+        queryset = self.queryset
+        try:  # Try-except required for schema generation to work with django-filter
+            language = self.request.query_params.get("language", "en")
+        except AttributeError:
+            language = "en"
+
+        queryset = queryset.annotate(description=F(f"description_{language}"))
         return queryset
 
 

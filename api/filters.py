@@ -3,9 +3,16 @@ from datetime import datetime
 from django.contrib.gis.measure import Distance as DistanceObject
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.timezone import make_aware
-from django_filters.rest_framework import (BaseInFilter, CharFilter,
-                                           ChoiceFilter, DateFilter, FilterSet,
-                                           NumberFilter, OrderingFilter)
+from django_filters.rest_framework import (
+    BaseInFilter,
+    CharFilter,
+    ChoiceFilter,
+    DateFilter,
+    FilterSet,
+    NumberFilter,
+    OrderingFilter,
+)
+from django.db.models import F
 
 
 class NumberInFilter(BaseInFilter, NumberFilter):
@@ -176,4 +183,19 @@ class ObservationAggregateFilter(FilterSet):
             "start_time": "Start time of observation to sort the results by.",
         },
         label="Sort order for the results. Ascending = `start_time`, descending = `-start_time`.",
+    )
+
+
+def filter_languages(queryset, name, value):
+    queryset = queryset.annotate(description=F(f"description_{value}"))
+    return queryset
+
+
+class DatasourceFilter(FilterSet):
+    language = ChoiceFilter(
+        field_name="language",
+        required=False,
+        method=filter_languages,
+        label="Determines the descriptions' language",
+        choices=(("en", "English"), ("fi", "Finnish"), ("sv", "Swedish")),
     )

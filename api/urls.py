@@ -11,6 +11,7 @@ router.register(
     views.ObservationAggregateViewSet,
     basename="observation-aggregate",
 )
+router.register(r"metadata/sources", views.DatasourcesViewSet, basename="sources")
 
 
 urlpatterns = [

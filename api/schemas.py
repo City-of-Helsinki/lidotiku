@@ -1,6 +1,7 @@
 import os
 
 from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
+from .models import Datasource
 
 GEOJSON_POLYGON_JSONSCHEMA = {
     "$schema": "http://json-schema.org/draft-07/schema#",
@@ -231,3 +232,21 @@ class ObservationAggregateSchema(ObservationSchema):
         operation_id = super().get_operation_id(path, method)
         operation_id = f"{operation_id}Aggregate"
         return operation_id
+
+
+class DatasourceSchema(BaseSchema):
+    def get_path_parameters(self, path: str, method: str):
+        parameters = super().get_path_parameters(path, method)
+        datasource_names = Datasource.objects.values_list("name", flat=True)
+        return [
+            (
+                {**parameter, "schema": {"type": "string", "enum": datasource_names}}
+                if parameter["name"] == "name"
+                else parameter
+            )
+            for parameter in parameters
+        ]
+
+    def get_operation(self, path, method):
+        operation = super().get_operation(path, method)
+        return operation
