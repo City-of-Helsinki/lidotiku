@@ -1,7 +1,7 @@
 import os
 
 from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
-from .models import Datasource
+from .utils import sources_enum_parameter
 
 GEOJSON_POLYGON_JSONSCHEMA = {
     "$schema": "http://json-schema.org/draft-07/schema#",
@@ -109,6 +109,10 @@ class BaseSchema(AutoSchema):
 
 
 class CounterSchema(BaseSchema):
+    def get_filter_parameters(self, path: str, method: str):
+        parameters = super().get_filter_parameters(path, method)
+        return sources_enum_parameter(parameters, "source")
+
     def get_operation(self, path, method):
         operation = super().get_operation(path, method)
         if method == "GET" and operation.get("operationId", "").startswith("list"):
@@ -193,6 +197,10 @@ class CounterSchema(BaseSchema):
 
 
 class ObservationSchema(BaseSchema):
+    def get_filter_parameters(self, path: str, method: str):
+        parameters = super().get_filter_parameters(path, method)
+        return sources_enum_parameter(parameters, "source")
+
     def get_operation(self, path, method):
         operation = super().get_operation(path, method)
         if method == "GET" and operation.get("operationId", "").startswith("list"):
@@ -202,7 +210,6 @@ class ObservationSchema(BaseSchema):
                 "end_date": {"type": "string", "format": "date"},
                 "counter": {"type": "integer", "format": "int64"},
             }
-
             parameters = operation.get("parameters", [])
             for parameter in parameters:
                 name = parameter["name"]
@@ -221,7 +228,6 @@ class ObservationSchema(BaseSchema):
                             "value": "83",
                         },
                     }
-
         return operation
 
 
@@ -237,15 +243,7 @@ class ObservationAggregateSchema(ObservationSchema):
 class DatasourceSchema(BaseSchema):
     def get_path_parameters(self, path: str, method: str):
         parameters = super().get_path_parameters(path, method)
-        datasource_names = Datasource.objects.values_list("name", flat=True)
-        return [
-            (
-                {**parameter, "schema": {"type": "string", "enum": datasource_names}}
-                if parameter["name"] == "name"
-                else parameter
-            )
-            for parameter in parameters
-        ]
+        return sources_enum_parameter(parameters, "name")
 
     def get_operation(self, path, method):
         operation = super().get_operation(path, method)
