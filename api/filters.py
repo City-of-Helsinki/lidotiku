@@ -77,6 +77,7 @@ def filter_end_date(queryset, name, value):
 class CounterFilter(FilterSet):
     latitude = NumberMaxMinFilter(label="Latitude", min_value=-90, max_value=90)
     longitude = NumberMaxMinFilter(label="Longitude", min_value=-180, max_value=180)
+    source = CharFilter(field_name="source", lookup_expr="iexact", label="Data source.")
     distance = NumberFilter(
         method="distance_filter",
         label="Distance in kilometers, how far can a counter be from the defined point.",
@@ -120,13 +121,7 @@ class ObservationFilter(FilterSet):
         label="Type of measurement, often either `speed` or `count`.",
     )
 
-    source = CharFilter(
-        field_name="source",
-        lookup_expr="iexact",
-        label="Data source. \
-            Possible choices: EcoCounter, FinTraffic, HEL LAM, InfoTripla & Marksman. \
-            Please note that the choices might not be up to date.",
-    )
+    source = CharFilter(field_name="source", lookup_expr="iexact", label="Data source.")
 
     order = OrderingFilter(
         fields=(("datetime", "datetime"), ("counter", "counter")),
