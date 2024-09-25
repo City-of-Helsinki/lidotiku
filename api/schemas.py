@@ -115,6 +115,11 @@ class CounterSchema(BaseSchema):
 
     def get_operation(self, path, method):
         operation = super().get_operation(path, method)
+        # This could be accomplished with drf-spectatular on the View with @extend_schema(parameters=[]) on the retrieve function
+        if self.view.action == "retrieve":
+            operation["parameters"] = [
+                param for param in operation["parameters"] if param.get("name") == "id"
+            ]
         if method == "GET" and operation.get("operationId", "").startswith("list"):
             result_schema = operation["responses"]["200"]["content"][
                 "application/json"
