@@ -77,11 +77,11 @@ def filter_end_date(queryset, name, value):
 class CounterFilter(FilterSet):
     latitude = NumberMaxMinFilter(label="Latitude", min_value=-90, max_value=90)
     longitude = NumberMaxMinFilter(label="Longitude", min_value=-180, max_value=180)
-    source = CharFilter(field_name="source", lookup_expr="iexact", label="Data source.")
     distance = NumberFilter(
         method="distance_filter",
         label="Distance in kilometers, how far can a counter be from the defined point.",
     )
+    source = CharFilter(field_name="source", lookup_expr="iexact", label="Data source.")
 
     def distance_filter(self, _queryset, _name, _value):
         query_params = self.request.query_params
