@@ -15,7 +15,7 @@ from rest_framework import mixins, viewsets
 from rest_framework.pagination import PageNumberPagination, CursorPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.utils.urls import replace_query_param
+from rest_framework.utils.urls import replace_query_param, remove_query_param
 
 from .filters import (
     CounterFilter,
@@ -48,14 +48,19 @@ class LargeResultsSetPagination(PageNumberPagination):
     max_page_size = 10000
 
     def get_previous_link(self) -> str | None:
+        previous_link = super().get_previous_link()
         if not self.page.has_previous():
             return None
         if self.page.previous_page_number() == 1:
-            return replace_query_param(
-                super().get_previous_link(), self.page_query_param, 1
-            )
+            previous_link = replace_query_param(previous_link, self.page_query_param, 1)
+        if "page" in self.request.query_params:
+            previous_link = remove_query_param(previous_link, "cursor")
+        return previous_link
 
-        return super().get_previous_link()
+    def get_next_link(self) -> str | None:
+        if "page" in self.request.query_params:
+            return remove_query_param(super().get_next_link(), "cursor")
+        return super().get_next_link()
 
 
 class SmallResultsSetPagination(PageNumberPagination):
