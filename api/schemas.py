@@ -1,6 +1,7 @@
 import os
 
 from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
+from .utils import sources_enum_parameter
 
 GEOJSON_POLYGON_JSONSCHEMA = {
     "$schema": "http://json-schema.org/draft-07/schema#",
@@ -108,8 +109,17 @@ class BaseSchema(AutoSchema):
 
 
 class CounterSchema(BaseSchema):
+    def get_filter_parameters(self, path: str, method: str):
+        parameters = super().get_filter_parameters(path, method)
+        return sources_enum_parameter(parameters, "source")
+
     def get_operation(self, path, method):
         operation = super().get_operation(path, method)
+        # This could be accomplished with drf-spectatular on the View with @extend_schema(parameters=[]) on the retrieve function
+        if self.view.action == "retrieve":
+            operation["parameters"] = [
+                param for param in operation["parameters"] if param.get("name") == "id"
+            ]
         if method == "GET" and operation.get("operationId", "").startswith("list"):
             result_schema = operation["responses"]["200"]["content"][
                 "application/json"
@@ -192,6 +202,10 @@ class CounterSchema(BaseSchema):
 
 
 class ObservationSchema(BaseSchema):
+    def get_filter_parameters(self, path: str, method: str):
+        parameters = super().get_filter_parameters(path, method)
+        return sources_enum_parameter(parameters, "source")
+
     def get_operation(self, path, method):
         operation = super().get_operation(path, method)
         if method == "GET" and operation.get("operationId", "").startswith("list"):
@@ -201,7 +215,6 @@ class ObservationSchema(BaseSchema):
                 "end_date": {"type": "string", "format": "date"},
                 "counter": {"type": "integer", "format": "int64"},
             }
-
             parameters = operation.get("parameters", [])
             for parameter in parameters:
                 name = parameter["name"]
@@ -220,7 +233,6 @@ class ObservationSchema(BaseSchema):
                             "value": "83",
                         },
                     }
-
         return operation
 
 
@@ -231,3 +243,13 @@ class ObservationAggregateSchema(ObservationSchema):
         operation_id = super().get_operation_id(path, method)
         operation_id = f"{operation_id}Aggregate"
         return operation_id
+
+
+class DatasourceSchema(BaseSchema):
+    def get_path_parameters(self, path: str, method: str):
+        parameters = super().get_path_parameters(path, method)
+        return sources_enum_parameter(parameters, "name")
+
+    def get_operation(self, path, method):
+        operation = super().get_operation(path, method)
+        return operation

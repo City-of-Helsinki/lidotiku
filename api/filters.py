@@ -3,9 +3,16 @@ from datetime import datetime
 from django.contrib.gis.measure import Distance as DistanceObject
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.timezone import make_aware
-from django_filters.rest_framework import (BaseInFilter, CharFilter,
-                                           ChoiceFilter, DateFilter, FilterSet,
-                                           NumberFilter, OrderingFilter)
+from django_filters.rest_framework import (
+    BaseInFilter,
+    CharFilter,
+    ChoiceFilter,
+    DateFilter,
+    FilterSet,
+    NumberFilter,
+    OrderingFilter,
+)
+from django.db.models import F
 
 
 class NumberInFilter(BaseInFilter, NumberFilter):
@@ -74,6 +81,7 @@ class CounterFilter(FilterSet):
         method="distance_filter",
         label="Distance in kilometers, how far can a counter be from the defined point.",
     )
+    source = CharFilter(field_name="source", lookup_expr="iexact", label="Data source.")
 
     def distance_filter(self, _queryset, _name, _value):
         query_params = self.request.query_params
@@ -113,13 +121,7 @@ class ObservationFilter(FilterSet):
         label="Type of measurement, often either `speed` or `count`.",
     )
 
-    source = CharFilter(
-        field_name="source",
-        lookup_expr="iexact",
-        label="Data source. \
-            Possible choices: EcoCounter, FinTraffic, HEL LAM, InfoTripla & Marksman. \
-            Please note that the choices might not be up to date.",
-    )
+    source = CharFilter(field_name="source", lookup_expr="iexact", label="Data source.")
 
     order = OrderingFilter(
         fields=(("datetime", "datetime"), ("counter", "counter")),
@@ -176,4 +178,19 @@ class ObservationAggregateFilter(FilterSet):
             "start_time": "Start time of observation to sort the results by.",
         },
         label="Sort order for the results. Ascending = `start_time`, descending = `-start_time`.",
+    )
+
+
+def filter_languages(queryset, name, value):
+    queryset = queryset.annotate(description=F(f"description_{value}"))
+    return queryset
+
+
+class DatasourceFilter(FilterSet):
+    language = ChoiceFilter(
+        field_name="language",
+        required=False,
+        method=filter_languages,
+        label="Determines the descriptions' language",
+        choices=(("en", "English"), ("fi", "Finnish"), ("sv", "Swedish")),
     )

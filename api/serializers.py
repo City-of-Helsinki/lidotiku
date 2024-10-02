@@ -2,7 +2,7 @@ from django.contrib.gis.measure import Distance
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
-from .models import Counter, Observation
+from .models import Counter, Observation, Datasource
 
 
 # pylint: disable=abstract-method,too-few-public-methods
@@ -147,3 +147,20 @@ class ObservationAggregateSerializer(
 
     def get_aggregated_value(self, obj):
         return obj.get("aggregated_value")
+
+
+class DatasourceSerializer(serializers.ModelSerializer):
+    name = serializers.CharField()
+    license = serializers.CharField()
+    description = serializers.SerializerMethodField()
+
+    def get_description(self, obj):
+        return getattr(obj, "description", None)
+
+    class Meta:
+        model = Datasource
+        fields = [
+            "name",
+            "license",
+            "description",
+        ]

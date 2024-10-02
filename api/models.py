@@ -64,3 +64,15 @@ class Observation(ReadOnlyModel):
     vehicletype = models.CharField(max_length=32)
     datetime = models.DateTimeField(db_index=True)
     source = models.CharField(max_length=32)
+
+
+class Datasource(ReadOnlyModel):
+    class Meta:
+        managed = False
+        db_table = '"lido"."data_sources"'
+
+    name = models.CharField(primary_key=True, max_length=32)
+    description_fi = models.CharField(max_length=255)
+    description_sv = models.CharField(max_length=255)
+    description_en = models.CharField(max_length=255)
+    license = models.CharField(max_length=32)
