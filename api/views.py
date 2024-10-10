@@ -38,6 +38,7 @@ from .serializers import (
     ObservationSerializer,
     DatasourceSerializer,
 )
+from rest_framework_csv import renderers
 
 # pylint: disable=no-member
 
@@ -111,12 +112,22 @@ class ObservationAggregateCursorPagination(CursorPagination):
         return parameters
 
 
+# Selects CSVRenderer explicitly for CSV retrieve action instead of deferring to defaults because Django selects unsupported PaginatedCSVRenderer
+class BaseCSVRetrieveViewSet(viewsets.GenericViewSet):
+    def get_renderers(self):
+        format = self.request.query_params.get("format")
+        if format == "csv" and self.action == "retrieve":
+            return [renderers.CSVRenderer()]
+        else:
+            return super().get_renderers()
+
+
 # pylint: disable-next=too-many-ancestors
 class CounterViewSet(
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
-    viewsets.GenericViewSet,
+    BaseCSVRetrieveViewSet,
 ):
     """
     Lists measurement devices or sensors which produce observational data.
@@ -301,7 +312,7 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
 
 
 class DatasourcesViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, BaseCSVRetrieveViewSet
 ):
     """
     Lists the traffic data sources for which counters and observations exist.
