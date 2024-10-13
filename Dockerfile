@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm
+FROM container-registry.platta-net.hel.fi/devops/python:3.11-slim-bookworm
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get -y install --no-install-recommends gdal-bin
 

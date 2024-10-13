@@ -34,6 +34,7 @@ class Counter(ReadOnlyModel):
     class Meta:
         managed = False
         db_table = '"lido"."vw_counters"'
+        ordering = ["id", "source"]
 
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=32)
