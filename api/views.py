@@ -140,7 +140,7 @@ class CounterViewSet(
     pagination_class = SmallResultsSetPagination
     serializer_class = CounterSerializer
     schema = CounterSchema(request_serializer=CounterFilterValidationSerializer)
-    queryset = Counter.objects.all
+    queryset = Counter.objects.all()
     # Replace default DRF PaginatedCSVRenderer with custom renderer which maps the data from features object
     renderer_classes = [
         renderer
