@@ -38,6 +38,8 @@ from .serializers import (
     ObservationSerializer,
     DatasourceSerializer,
 )
+from .renderers import FeaturesPaginatedCSVRenderer
+from rest_framework.settings import api_settings
 from rest_framework_csv import renderers
 
 # pylint: disable=no-member
@@ -138,7 +140,13 @@ class CounterViewSet(
     pagination_class = SmallResultsSetPagination
     serializer_class = CounterSerializer
     schema = CounterSchema(request_serializer=CounterFilterValidationSerializer)
-    queryset = Counter.objects.all()
+    queryset = Counter.objects.all
+    # Replace default DRF PaginatedCSVRenderer with custom renderer which maps the data from features object
+    renderer_classes = [
+        renderer
+        for renderer in api_settings.DEFAULT_RENDERER_CLASSES
+        if renderer != "rest_framework_csv.renderers.PaginatedCSVRenderer"
+    ] + [FeaturesPaginatedCSVRenderer]
 
     def get_queryset(self):
         try:
