@@ -38,6 +38,7 @@ from .serializers import (
     ObservationSerializer,
     DatasourceSerializer,
 )
+from .utils import counter_alias_map
 
 # pylint: disable=no-member
 
@@ -229,14 +230,24 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         if "page" in self.request.query_params:
             self.pagination_class = LargeResultsSetPagination
 
-        # TODO: add support for counter ordering
         elif "order" in self.request.query_params:
-            self.pagination_class.ordering = [
-                self.request.query_params.get("order"),
-                "counter_id",
-                "typeofmeasurement",
-                "direction",
+            fixed_orderings = ["typeofmeasurement", "direction"]
+
+            order_params = self.request.query_params.get("order").split(",")
+            # provided
+            order_params = [
+                counter_alias_map.get(param) if "counter" in param else param
+                for param in order_params
             ]
+
+            secondary_ordering = []
+            if "counter" in order_params[0]:
+                secondary_ordering = ["-datetime"]
+            elif "datetime" in order_params[0]:
+                secondary_ordering = ["counter_id"]
+            self.pagination_class.ordering = (
+                order_params + secondary_ordering + fixed_orderings
+            )
 
         return queryset
 

@@ -12,3 +12,9 @@ def sources_enum_parameter(parameters, parameter_name):
         )
         for parameter in parameters
     ]
+
+
+counter_alias_map = {
+    "counter": "counter_id",
+    "-counter": "-counter_id",
+}

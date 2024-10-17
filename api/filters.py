@@ -124,10 +124,10 @@ class ObservationFilter(FilterSet):
     source = CharFilter(field_name="source", lookup_expr="iexact", label="Data source.")
 
     order = OrderingFilter(
-        fields=(("datetime", "datetime"), ("counter", "counter")),
+        fields=(("datetime", "datetime"), ("counter_id", "counter")),
         field_labels={
             "datetime": "Datetime of observation to sort the results by.",
-            "counter": "Counter",
+            "counter_id": "Counter",
         },
         label="Sort order for the results. \
             For example ascending = `datetime`, descending = `-datetime`.\
