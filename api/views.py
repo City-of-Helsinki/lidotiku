@@ -39,7 +39,7 @@ from .serializers import (
     DatasourceSerializer,
 )
 from .renderers import FeaturesPaginatedCSVRenderer
-from rest_framework_csv import renderers
+from rest_framework_csv.renderers import CSVRenderer
 from djangorestframework_camel_case.render import (
     CamelCaseJSONRenderer,
     CamelCaseBrowsableAPIRenderer,
@@ -122,7 +122,7 @@ class BaseCSVRetrieveViewSet(viewsets.GenericViewSet):
     def get_renderers(self):
         format = self.request.query_params.get("format")
         if format == "csv" and self.action == "retrieve":
-            return [renderers.CSVRenderer()]
+            return [CSVRenderer()]
         else:
             return super().get_renderers()
 
