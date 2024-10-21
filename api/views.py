@@ -38,6 +38,12 @@ from .serializers import (
     ObservationSerializer,
     DatasourceSerializer,
 )
+from .renderers import FeaturesPaginatedCSVRenderer
+from rest_framework_csv.renderers import CSVRenderer
+from djangorestframework_camel_case.render import (
+    CamelCaseJSONRenderer,
+    CamelCaseBrowsableAPIRenderer,
+)
 
 # pylint: disable=no-member
 
@@ -111,12 +117,22 @@ class ObservationAggregateCursorPagination(CursorPagination):
         return parameters
 
 
+# Selects CSVRenderer explicitly for CSV retrieve action instead of deferring to defaults because Django selects unsupported PaginatedCSVRenderer
+class BaseCSVRetrieveViewSet(viewsets.GenericViewSet):
+    def get_renderers(self):
+        format = self.request.query_params.get("format")
+        if format == "csv" and self.action == "retrieve":
+            return [CSVRenderer()]
+        else:
+            return super().get_renderers()
+
+
 # pylint: disable-next=too-many-ancestors
 class CounterViewSet(
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
-    viewsets.GenericViewSet,
+    BaseCSVRetrieveViewSet,
 ):
     """
     Lists measurement devices or sensors which produce observational data.
@@ -128,6 +144,12 @@ class CounterViewSet(
     serializer_class = CounterSerializer
     schema = CounterSchema(request_serializer=CounterFilterValidationSerializer)
     queryset = Counter.objects.all()
+    # Defining renderers explicitly to replace default PaginatedCSVRenderer with FeaturesPaginatedCSVRenderer which maps the data from features object
+    renderer_classes = [
+        CamelCaseJSONRenderer,
+        CamelCaseBrowsableAPIRenderer,
+        FeaturesPaginatedCSVRenderer,
+    ]
 
     def get_queryset(self):
         try:
@@ -301,7 +323,7 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
 
 
 class DatasourcesViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, BaseCSVRetrieveViewSet
 ):
     """
     Lists the traffic data sources for which counters and observations exist.
