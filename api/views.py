@@ -65,6 +65,8 @@ class LargeResultsSetPagination(PageNumberPagination):
         return previous_link
 
     def get_next_link(self) -> str | None:
+        if not self.page.has_next():
+            return None
         if "page" in self.request.query_params:
             return remove_query_param(super().get_next_link(), "cursor")
         return super().get_next_link()
