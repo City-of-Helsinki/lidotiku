@@ -2,7 +2,11 @@ import operator
 from functools import reduce
 
 from django.db.models.query import Q
-from rest_framework.pagination import CursorPagination, PageNumberPagination
+from rest_framework.pagination import (
+    CursorPagination,
+    PageNumberPagination,
+    _reverse_ordering,
+)
 from rest_framework.utils import json
 from rest_framework.utils.urls import remove_query_param, replace_query_param
 from rest_framework.views import APIView
@@ -58,7 +62,7 @@ class CompoundCursorPagination(CursorPagination):
 
         # Cursor pagination always enforces an ordering.
         if reverse:
-            queryset = queryset.order_by(*self._reverse_ordering(self.ordering))
+            queryset = queryset.order_by(*_reverse_ordering(self.ordering))
         else:
             queryset = queryset.order_by(*self.ordering)
 
