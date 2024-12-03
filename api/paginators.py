@@ -69,7 +69,6 @@ class CompoundCursorPagination(CursorPagination):
         # If we have a cursor with a fixed position then filter by that.
         if current_position is not None:
             current_position_list = json.loads(current_position)
-            print(f"List defining the position {current_position_list}")
 
             q_objects_equals = {}
             q_objects_compare = {}
