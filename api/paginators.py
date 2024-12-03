@@ -213,8 +213,8 @@ class ObservationsCursorPagination(CompoundCursorPagination):
         "-datetime",
         "counter_id",
         "typeofmeasurement",
-        "direction",
         "vehicletype",
+        "direction",
     ]
     max_page_size = 10000
 
