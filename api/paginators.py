@@ -190,12 +190,6 @@ class CompoundCursorPagination(CursorPagination):
         if isinstance(ordering, str):
             ordering = (ordering,)
 
-        pk_name = queryset.model._meta.pk.name
-
-        # Always include a unique key to order by
-        if not {"-{}".format(pk_name), pk_name, "pk", "-pk"} & set(ordering):
-            ordering = tuple(ordering) + (pk_name,)
-
         return tuple(ordering)
 
     def _get_position_from_instance(self, instance, ordering):
