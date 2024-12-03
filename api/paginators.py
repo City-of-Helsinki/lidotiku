@@ -235,7 +235,7 @@ class ObservationsCursorPagination(CompoundCursorPagination):
     def get_ordering(self, request, queryset, view):
         ordering = super().get_ordering(request, queryset, view)
         if "order" in request.query_params:
-            fixed_orderings = ["typeofmeasurement", "direction", "vehicletype"]
+            fixed_orderings = ["typeofmeasurement", "vehicletype", "direction"]
 
             order_params = request.query_params.get("order").split(",")
             order_params = [
