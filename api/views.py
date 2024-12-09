@@ -177,7 +177,7 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         try:  # Try-except required for schema generation to work with django-filter
             filter_params = self.request.GET.copy()
             if "order" not in filter_params:
-                queryset = queryset.order_by("datetime")
+                queryset = queryset.order_by("-datetime")
         except AttributeError:
             pass
 
@@ -240,7 +240,7 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
         try:  # Try-except required for schema generation to work with django-filter
             filter_params = self.request.GET.copy()
             if "order" not in filter_params:
-                queryset = queryset.order_by("start_time")
+                queryset = queryset.order_by("-start_time")
         except AttributeError:
             pass
         return queryset
