@@ -143,12 +143,12 @@ class ObservationAggregateFilter(FilterSet):
         label="Counter id, aggregates observations of selected counter.",
     )
     start_date = DateFilter(
-        field_name="start_time",
+        field_name="datetime",
         lookup_expr="gte",
         label="Start date of measurement period.",
     )
     end_date = DateFilter(
-        field_name="start_time",
+        field_name="datetime",
         method=filter_end_date,
         label="End date of measurement period.",
     )
