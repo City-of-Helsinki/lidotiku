@@ -43,8 +43,14 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializ
             "id": obj.id,
             "name": obj.name,
             "source": obj.source,
+            "source_id": obj.source_id,
             "classifying": obj.classifying,
             "crs_epsg": obj.crs_epsg,
+            # Municipality codes stored in database as integers but correct format includes a leading zero
+            "municipality_code": f"0{obj.municipality_code}",
+            "data_received": obj.data_received,
+            "first_stored_observation": obj.first_stored_observation,
+            "last_stored_observation": obj.last_stored_observation,
         }
 
     def to_representation(self, instance):
