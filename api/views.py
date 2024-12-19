@@ -219,13 +219,6 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
         if "page" in self.request.query_params:
             self.pagination_class = LargeResultsSetPagination
 
-        elif "order" in self.request.query_params:
-            self.pagination_class.ordering = [
-                self.request.query_params.get("order"),
-                "counter_id",
-                "direction",
-            ]
-
         queryset = (
             self.queryset.values("typeofmeasurement", "source")
             .annotate(
