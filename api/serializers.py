@@ -39,6 +39,7 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializ
         return {"type": "Point", "coordinates": [obj.geom.x, obj.geom.y]}
 
     def get_properties(self, obj):
+        datetime_serializer = serializers.DateTimeField()
         return {
             "id": obj.id,
             "name": obj.name,
@@ -49,8 +50,12 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializ
             # Municipality codes stored in database as integers but correct format includes a leading zero
             "municipality_code": f"0{obj.municipality_code}",
             "data_received": obj.data_received,
-            "first_stored_observation": obj.first_stored_observation,
-            "last_stored_observation": obj.last_stored_observation,
+            "first_stored_observation": datetime_serializer.to_representation(
+                obj.first_stored_observation
+            ),
+            "last_stored_obs": datetime_serializer.to_representation(
+                obj.last_stored_observation
+            ),
         }
 
     def to_representation(self, instance):
