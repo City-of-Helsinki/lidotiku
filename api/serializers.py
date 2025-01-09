@@ -1,3 +1,4 @@
+import pytz
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
@@ -110,6 +111,10 @@ class CounterFilterValidationSerializer(serializers.Serializer):
 
 
 class ObservationSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializer):
+    datetime = serializers.DateTimeField(
+        default_timezone=pytz.timezone("Europe/Helsinki")
+    )
+
     class Meta:
         model = Observation
         fields = [
@@ -129,7 +134,9 @@ class ObservationSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySeri
 class ObservationAggregateSerializer(
     serializers.HyperlinkedModelSerializer, ReadOnlySerializer
 ):
-    start_time = serializers.DateTimeField()
+    start_time = serializers.DateTimeField(
+        default_timezone=pytz.timezone("Europe/Helsinki")
+    )
     aggregated_value = serializers.SerializerMethodField()
     period = serializers.CharField()
     unit = serializers.CharField()

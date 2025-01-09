@@ -96,11 +96,9 @@ DATABASES = {"default": env.db_url(engine="django.contrib.gis.db.backends.postgi
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "Europe/Helsinki"
-
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

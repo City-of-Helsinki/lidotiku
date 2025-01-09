@@ -184,7 +184,6 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
         if "page" in self.request.query_params:
             self.pagination_class = LargeResultsSetPagination
-
         return queryset
 
 
@@ -221,9 +220,7 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
 
         queryset = (
             self.queryset.values("typeofmeasurement", "source")
-            .annotate(
-                start_time=Trunc("datetime", kind=period, tzinfo=pytz.timezone("UTC"))
-            )
+            .annotate(start_time=Trunc("datetime", kind=period))
             .values(
                 "start_time",
                 "counter_id",
