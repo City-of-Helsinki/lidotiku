@@ -85,7 +85,7 @@ class CounterFilter(FilterSet):
     municipality_code = NumberInFilter(
         field_name="municipality_code",
         lookup_expr="in",
-        label="Municipality code, leading zero is optional.",
+        label="Finnish municipality code of counter location (e.g. 091 for Helsinki, 092 for Vantaa, and 049 for Espoo), leading zero is optional. See further [Kuntanumero](https://fi.wikipedia.org/wiki/Kuntanumero).",
     )
 
     def distance_filter(self, _queryset, _name, _value):
