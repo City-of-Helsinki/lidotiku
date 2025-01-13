@@ -53,7 +53,7 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializ
             "first_stored_observation": datetime_serializer.to_representation(
                 obj.first_stored_observation
             ),
-            "last_stored_obs": datetime_serializer.to_representation(
+            "last_stored_observation": datetime_serializer.to_representation(
                 obj.last_stored_observation
             ),
         }
