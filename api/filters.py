@@ -82,6 +82,11 @@ class CounterFilter(FilterSet):
         label="Distance in kilometers, how far can a counter be from the defined point.",
     )
     source = CharFilter(field_name="source", lookup_expr="iexact", label="Data source.")
+    municipality_code = NumberInFilter(
+        field_name="municipality_code",
+        lookup_expr="in",
+        label="Finnish municipality code of counter location (e.g. 091 for Helsinki, 092 for Vantaa, and 049 for Espoo), leading zero is optional. See further [Kuntanumero](https://fi.wikipedia.org/wiki/Kuntanumero).",
+    )
 
     def distance_filter(self, _queryset, _name, _value):
         query_params = self.request.query_params
@@ -143,12 +148,12 @@ class ObservationAggregateFilter(FilterSet):
         label="Counter id, aggregates observations of selected counter.",
     )
     start_date = DateFilter(
-        field_name="start_time",
+        field_name="datetime",
         lookup_expr="gte",
         label="Start date of measurement period.",
     )
     end_date = DateFilter(
-        field_name="start_time",
+        field_name="datetime",
         method=filter_end_date,
         label="End date of measurement period.",
     )

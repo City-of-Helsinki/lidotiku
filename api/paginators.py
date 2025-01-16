@@ -188,7 +188,6 @@ class CompoundCursorPagination(CursorPagination):
 
         if isinstance(ordering, str):
             ordering = (ordering,)
-
         return tuple(ordering)
 
     def _get_position_from_instance(self, instance, ordering):
@@ -202,7 +201,6 @@ class CompoundCursorPagination(CursorPagination):
                 attr = getattr(instance, field_name)
 
             fields.append(str(attr))
-
         return json.dumps(fields)
 
 
@@ -271,3 +269,10 @@ class ObservationAggregateCursorPagination(CompoundCursorPagination):
 
         parameters.append(page_parameter)
         return parameters
+
+    def get_ordering(self, request, queryset, view):
+        ordering = super().get_ordering(request, queryset, view)
+        if "order" in request.query_params:
+            fixed_orderings = ["counter_id", "direction"]
+            ordering = [request.query_params.get("order")] + fixed_orderings
+        return ordering
