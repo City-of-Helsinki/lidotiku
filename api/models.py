@@ -44,6 +44,11 @@ class Counter(ReadOnlyModel):
     crs_epsg = models.BigIntegerField()
     source = models.CharField(max_length=32)
     geom = gis_models.PointField()
+    source_id = models.IntegerField()
+    municipality_code = models.IntegerField()
+    data_received = models.BooleanField()
+    first_stored_observation = models.DateTimeField()
+    last_stored_observation = models.DateTimeField()
 
 
 class Observation(ReadOnlyModel):

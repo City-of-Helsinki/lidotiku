@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+import pytz
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.geos import GEOSGeometry, Point
@@ -212,10 +213,12 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
             aggregation_calc: Avg | Sum = Avg("value")
         else:  # measurement_type == "count"
             aggregation_calc = Sum("value")
-
+            
         queryset = (
             self.queryset.values("typeofmeasurement", "source")
-            .annotate(start_time=Trunc("datetime", kind=period))
+            .annotate(
+                start_time=Trunc("datetime", kind=period, tzinfo=pytz.timezone("UTC"))
+            )
             .values(
                 "start_time",
                 "counter_id",
