@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-import pytz
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.geos import GEOSGeometry, Point
@@ -40,7 +39,6 @@ from .paginators import (
     SmallResultsSetPagination,
     LargeResultsSetPagination,
     ObservationsCursorPagination,
-    ObservationAggregateCursorPagination,
 )
 from .renderers import FeaturesPaginatedCSVRenderer
 from rest_framework_csv.renderers import CSVRenderer
@@ -195,7 +193,7 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
 
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = ObservationAggregateFilter
-    pagination_class = ObservationAggregateCursorPagination
+    pagination_class = LargeResultsSetPagination
     serializer_class = ObservationAggregateSerializer
     queryset = Observation.objects.all()
     schema = ObservationAggregateSchema()
@@ -214,9 +212,6 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
             aggregation_calc: Avg | Sum = Avg("value")
         else:  # measurement_type == "count"
             aggregation_calc = Sum("value")
-
-        if "page" in self.request.query_params:
-            self.pagination_class = LargeResultsSetPagination
 
         queryset = (
             self.queryset.values("typeofmeasurement", "source")
