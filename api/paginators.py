@@ -248,31 +248,3 @@ class ObservationsCursorPagination(CompoundCursorPagination):
                 secondary_ordering = ["counter_id"]
             ordering = order_params + secondary_ordering + fixed_orderings
         return ordering
-
-
-class ObservationAggregateCursorPagination(CompoundCursorPagination):
-    page_size = 1000
-    page_size_query_param = "page_size"
-    ordering = ["-start_time", "counter_id", "direction"]
-    max_page_size = 10000
-
-    def get_schema_operation_parameters(self, view: APIView) -> list:
-        parameters = super().get_schema_operation_parameters(view)
-
-        page_parameter = {
-            "name": "page",
-            "required": False,
-            "in": "query",
-            "description": "A page number within the paginated result set. If this parameter is set, it supercedes the cursor parameter and results will be returned as numbered pages.",
-            "schema": {"type": "integer"},
-        }
-
-        parameters.append(page_parameter)
-        return parameters
-
-    def get_ordering(self, request, queryset, view):
-        ordering = super().get_ordering(request, queryset, view)
-        if "order" in request.query_params:
-            fixed_orderings = ["counter_id", "direction"]
-            ordering = [request.query_params.get("order")] + fixed_orderings
-        return ordering
