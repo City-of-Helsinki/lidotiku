@@ -111,9 +111,7 @@ class CounterFilterValidationSerializer(serializers.Serializer):
 
 
 class ObservationSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializer):
-    datetime = serializers.DateTimeField(
-        default_timezone=pytz.timezone("Europe/Helsinki")
-    )
+    datetime = serializers.DateTimeField()
 
     class Meta:
         model = Observation
@@ -134,9 +132,7 @@ class ObservationSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySeri
 class ObservationAggregateSerializer(
     serializers.HyperlinkedModelSerializer, ReadOnlySerializer
 ):
-    start_time = serializers.DateTimeField(
-        default_timezone=pytz.timezone("Europe/Helsinki")
-    )
+    start_time = serializers.DateTimeField()
     aggregated_value = serializers.SerializerMethodField()
     period = serializers.CharField()
     unit = serializers.CharField()
