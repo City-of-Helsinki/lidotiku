@@ -239,7 +239,7 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
         return queryset
 
 
-class DatasourcesViewSet(
+class DatasourceViewSet(
     mixins.ListModelMixin, mixins.RetrieveModelMixin, BaseCSVRetrieveViewSet
 ):
     """
