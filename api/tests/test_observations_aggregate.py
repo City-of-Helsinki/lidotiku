@@ -4,7 +4,8 @@ import pytest
 import pytz
 from django.db.models import Count
 from django.urls import reverse
-from django.utils.timezone import make_aware
+from django.db.models.functions import TruncDate
+from datetime import datetime
 
 from api.models import Counter, Observation
 
@@ -17,13 +18,16 @@ def aggregate_observation_parameters():
         .first()
     )
     datetimes = list(
-        Observation.objects.order_by("datetime")
-        .filter(counter_id=counter.id)
-        .values_list("datetime", flat=True)[:10000]
+        Observation.objects.filter(counter_id=counter.id)
+        .annotate(date=TruncDate("datetime"))
+        .values_list("date", flat=True)
+        .order_by("date")
+        .distinct()[:10]
     )
+    # Don't use the edge dates to ensure first and last hours of a given date both start/end date are included
     return {
-        "start_date": datetimes[0].date(),
-        "end_date": datetimes[-1].date(),
+        "start_date": str(datetimes[1]),
+        "end_date": str(datetimes[-2]),
         "counter": counter.id,
         "measurement_type": "count",
     }
@@ -39,31 +43,23 @@ def test_observations_aggregate_date_filter(
     url = reverse("observation-aggregate-list")
     response = api_client.get(
         url,
-        {
-            **aggregate_observation_parameters,
-            "period": "hour",
-        },
+        {**aggregate_observation_parameters, "period": "hour", "order": "start_time"},
     )
     first_datetime = datetime.fromisoformat(response.data["results"][0]["start_time"])
-    start_datetime = make_aware(
-        datetime.combine(
-            aggregate_observation_parameters["start_date"], datetime.min.time()
-        ),
-        timezone=pytz.timezone("Europe/Helsinki"),
-    )
-    assert first_datetime >= start_datetime
+    start_date = datetime.fromisoformat(aggregate_observation_parameters["start_date"])
+    start_datetime = pytz.timezone("Europe/Helsinki").localize(start_date)
+    assert first_datetime == start_datetime
 
     while response.data["next"]:
         next_response = api_client.get(response.data["next"])
         response = next_response
     last_datetime = datetime.fromisoformat(response.data["results"][-1]["start_time"])
-    end_datetime = make_aware(
-        datetime.combine(
-            aggregate_observation_parameters["end_date"], datetime.max.time()
-        ),
-        timezone=pytz.timezone("Europe/Helsinki"),
+    end_date = datetime.fromisoformat(aggregate_observation_parameters["end_date"])
+    # With the hour period aggregation we expect the last start_time to be 23:00 as it includes 23:00 to 23:59
+    end_datetime = pytz.timezone("Europe/Helsinki").localize(end_date) + timedelta(
+        hours=23
     )
-    assert last_datetime <= end_datetime
+    assert last_datetime == end_datetime
 
 
 # Page contents do not overlap at datetime boundaries.
@@ -167,8 +163,6 @@ def test_reverse_ordering(api_client):
 
 
 # Multiple counter id
-
-
 @pytest.mark.filterwarnings(
     "ignore:DateTimeField Observation.datetime received a naive datetime"
 )
