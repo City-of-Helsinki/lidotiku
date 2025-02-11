@@ -213,7 +213,7 @@ class ObservationSchema(BaseSchema):
             type_mappings = {
                 "start_date": {"type": "string", "format": "date"},
                 "end_date": {"type": "string", "format": "date"},
-                "counter": {"type": "integer", "format": "int64"},
+                "counter": {"type": "array", "format": "int64"},
             }
             parameters = operation.get("parameters", [])
             for parameter in parameters:
