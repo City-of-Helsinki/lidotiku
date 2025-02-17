@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-import pytz
 from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.geos import GEOSGeometry, Point
@@ -14,6 +13,8 @@ from django.db.models.functions import Trunc
 from django_filters import rest_framework as filters
 from rest_framework import mixins, viewsets
 from rest_framework.response import Response
+from django.core.exceptions import FieldError
+from rest_framework.exceptions import ValidationError
 
 from .filters import (
     CounterFilter,
@@ -213,12 +214,10 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
             aggregation_calc: Avg | Sum = Avg("value")
         else:  # measurement_type == "count"
             aggregation_calc = Sum("value")
-            
+
         queryset = (
             self.queryset.values("typeofmeasurement", "source")
-            .annotate(
-                start_time=Trunc("datetime", kind=period, tzinfo=pytz.timezone("UTC"))
-            )
+            .annotate(start_time=Trunc("datetime", kind=period))
             .values(
                 "start_time",
                 "counter_id",
@@ -237,7 +236,7 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
         return queryset
 
 
-class DatasourcesViewSet(
+class DatasourceViewSet(
     mixins.ListModelMixin, mixins.RetrieveModelMixin, BaseCSVRetrieveViewSet
 ):
     """
@@ -255,11 +254,17 @@ class DatasourcesViewSet(
         queryset = self.queryset
         try:  # Try-except required for schema generation to work with django-filter
             language = self.request.query_params.get("language", "en")
+            queryset = queryset.annotate(description=F(f"description_{language}"))
         except AttributeError:
             language = "en"
-
-        queryset = queryset.annotate(description=F(f"description_{language}"))
-        return queryset
+        except FieldError:
+            raise ValidationError(
+                detail={
+                    "language": f"Select a valid choice. {language} is not one of the available choices."
+                },
+                code="invalid_choice",
+            )
+        return queryset.order_by("name")
 
 
 @dataclass
