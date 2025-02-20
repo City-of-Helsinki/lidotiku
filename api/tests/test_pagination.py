@@ -1,5 +1,5 @@
 import math
-import random
+import secrets
 
 import pytest
 from django.db.models import Count
@@ -133,15 +133,11 @@ def test_observations_cursor_both_order_parameters(api_client):
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["datetime"] <= next_observation["datetime"]
-        if current_observation["datetime"] == next_observation["datetime"]:
-            assert current_observation["counter"] <= current_observation["counter"]
 
     response = api_client.get(url, {"order": "counter,-datetime"})
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["counter_id"] >= next_observation["counter_id"]
-        if current_observation["counter_id"] == next_observation["counter_id"]:
-            assert current_observation["datetime"] >= current_observation["datetime"]
 
 
 # PageNumber pagination: response includes an accurate total count
@@ -163,15 +159,11 @@ def test_observations_both_order_parameters(api_client):
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["datetime"] <= next_observation["datetime"]
-        if current_observation["datetime"] == next_observation["datetime"]:
-            assert current_observation["counter"] <= current_observation["counter"]
 
     response = api_client.get(url, {"order": "counter,-datetime", "page": "3"})
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["counter_id"] >= next_observation["counter_id"]
-        if current_observation["counter_id"] == next_observation["counter_id"]:
-            assert current_observation["datetime"] >= current_observation["datetime"]
 
 
 @pytest.mark.django_db
@@ -243,7 +235,8 @@ def test_page_size_zero(api_client):
 def test_provided_page_size(api_client):
     url = reverse("counter-list")
     max_page_size = CounterViewSet.pagination_class().max_page_size
-    random_page_size = random.randint(1, max_page_size - 1)
+    # Secrets randbelow returns an int in the range [0, exclusive_upper_bound]
+    random_page_size = secrets.randbelow(max_page_size) + 1
     response = api_client.get(url, {"page_size": random_page_size})
     assert len(response.data["results"]["features"]) == random_page_size
     second_page_url = response.data["next"]
