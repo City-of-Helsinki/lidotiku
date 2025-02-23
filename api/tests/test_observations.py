@@ -14,7 +14,7 @@ from api.models import Counter, Datasource, Observation
 def observation_parameters():
     counter = (
         Counter.objects.annotate(observation_count=Count("observation"))
-        .filter(observation_count__gte=10000)
+        .filter(observation_count__gte=100)
         .first()
     )
     datetimes = list(
@@ -47,9 +47,12 @@ def test_date_range_filter(api_client, observation_parameters):
     )
     assert first_datetime >= start_datetime
 
-    while response.data["next"]:
-        next_response = api_client.get(response.data["next"])
-        response = next_response
+    while response:
+        next_url = response.data["next"]
+        if not next_url:
+            break
+        response = api_client.get(next_url)
+
     last_datetime = datetime.fromisoformat(response.data["results"][-1]["datetime"])
     end_datetime = make_aware(
         datetime.combine(observation_parameters["end_date"], datetime.max.time())
@@ -67,8 +70,13 @@ def test_multiple_counter_filter(api_client):
     )
     response = api_client.get(url, {"counter": counter_ids})
 
-    for observation in response.data["results"]:
-        assert (observation["counter_id"]) in counter_ids
+    while response:
+        for observation in response.data["results"]:
+            assert (observation["counter_id"]) in counter_ids
+        next_url = response.data["next"]
+        if not next_url:
+            break
+        response = api_client.get(next_url)
 
 
 @pytest.mark.django_db
@@ -76,23 +84,17 @@ def test_source_filter(api_client):
     url = reverse("observation-list")
     datasource_name = Datasource.objects.values_list("name", flat=True)[0]
     response = api_client.get(
-        url, {"source": datasource_name, "page": 1, "page_size": 1000}
+        url, {"source": datasource_name, "page": 1, "page_size": 100}
     )
-    total_count = response.data["count"]
-    total_pages = math.ceil(total_count / 1000)
 
-    # Only check 10 pages for speed, there may be a large count of pages
-    page_interval = total_pages // (10)
-    i = 1
-    while i <= total_pages:
-        response = api_client.get(
-            url,
-            {"source": datasource_name, "page": i, "page_size": 1000},
-        )
+    while response:
         response_observations = response.data["results"]
         for observation in response_observations:
             assert observation["source"] == datasource_name
-        i += page_interval
+        next_url = response.data["next"]
+        if not next_url:
+            break
+        response = api_client.get(next_url)
 
 
 @pytest.mark.django_db
@@ -114,19 +116,15 @@ def test_source_and_counter_filter(api_client):
     valid_counters_response = api_client.get(
         url, {"source": datasource_name, "counter": valid_counter_ids, "page": 1}
     )
-    total_count = valid_counters_response.data["count"]
-    total_pages = math.ceil(total_count / 1000)
-    page_interval = total_pages // (10)
 
-    i = page_interval
-    while i <= total_pages:
+    while valid_counters_response:
         for observation in valid_counters_response.data["results"]:
             assert observation["source"] == datasource_name
             assert observation["counter_id"] in valid_counter_ids
-        valid_counters_response = api_client.get(
-            url, {"source": datasource_name, "counter": valid_counter_ids, "page": i}
-        )
-        i += page_interval
+        next_url = valid_counters_response.data["next"]
+        if not next_url:
+            break
+        valid_counters_response = api_client.get(next_url)
 
     invalid_counter_ids_response = api_client.get(
         url, {"source": datasource_name, "counter": invalid_counter_ids}

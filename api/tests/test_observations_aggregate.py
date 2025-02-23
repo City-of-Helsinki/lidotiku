@@ -11,10 +11,10 @@ from api.models import Counter, Observation
 
 
 @pytest.fixture()
-def aggregate_observation_parameters():
+def single_counter_parameters():
     counter = (
         Counter.objects.annotate(observation_count=Count("observation"))
-        .filter(observation_count__gte=10000)
+        .filter(observation_count__gte=100)
         .first()
     )
     datetimes = list(
@@ -33,28 +33,48 @@ def aggregate_observation_parameters():
     }
 
 
+@pytest.fixture()
+def min_date():
+    return str(
+        Observation.objects.annotate(date=TruncDate("datetime"))
+        .values_list("date", flat=True)
+        .order_by("date")
+        .first()
+    )
+
+
+@pytest.fixture()
+def max_date():
+    return str(
+        Observation.objects.annotate(date=TruncDate("datetime"))
+        .values_list("date", flat=True)
+        .order_by("-date")
+        .first()
+    )
+
+
 @pytest.mark.filterwarnings(
     "ignore:DateTimeField Observation.datetime received a naive datetime"
 )
 @pytest.mark.django_db
-def test_observations_aggregate_date_filter(
-    api_client, aggregate_observation_parameters
-):
+def test_observations_aggregate_date_filter(api_client, single_counter_parameters):
     url = reverse("observation-aggregate-list")
     response = api_client.get(
         url,
-        {**aggregate_observation_parameters, "period": "hour", "order": "start_time"},
+        {**single_counter_parameters, "period": "hour", "order": "start_time"},
     )
     first_datetime = datetime.fromisoformat(response.data["results"][0]["start_time"])
-    start_date = datetime.fromisoformat(aggregate_observation_parameters["start_date"])
+    start_date = datetime.fromisoformat(single_counter_parameters["start_date"])
     start_datetime = pytz.timezone("Europe/Helsinki").localize(start_date)
     assert first_datetime == start_datetime
 
-    while response.data["next"]:
-        next_response = api_client.get(response.data["next"])
-        response = next_response
+    while response:
+        next_url = response.data["next"]
+        if not next_url:
+            break
+        response = api_client.get(next_url)
     last_datetime = datetime.fromisoformat(response.data["results"][-1]["start_time"])
-    end_date = datetime.fromisoformat(aggregate_observation_parameters["end_date"])
+    end_date = datetime.fromisoformat(single_counter_parameters["end_date"])
     # With the hour period aggregation we expect the last start_time to be 23:00 as it includes 23:00 to 23:59
     end_datetime = pytz.timezone("Europe/Helsinki").localize(end_date) + timedelta(
         hours=23
@@ -67,20 +87,19 @@ def test_observations_aggregate_date_filter(
     "ignore:DateTimeField Observation.datetime received a naive datetime"
 )
 @pytest.mark.django_db
-def test_datetime_no_overlap(api_client, aggregate_observation_parameters):
+def test_datetime_no_overlap(api_client, single_counter_parameters):
     url = reverse("observation-aggregate-list")
     response = api_client.get(
         url,
         {
-            **aggregate_observation_parameters,
+            **single_counter_parameters,
             "period": "hour",
             "order": "start_time",
             "page": 1,
-            "page_size": 3,
         },
     )
 
-    while response.data["next"]:
+    while response:
         for current_observation, next_observation in zip(
             response.data["results"], response.data["results"][1:]
         ):
@@ -97,7 +116,10 @@ def test_datetime_no_overlap(api_client, aggregate_observation_parameters):
         last_current_page_datetime = datetime.fromisoformat(
             response.data["results"][-1]["start_time"]
         )
-        response = api_client.get(response.data["next"])
+        next_url = response.data["next"]
+        if not next_url:
+            break
+        response = api_client.get(next_url)
         first_next_page_datetime = datetime.fromisoformat(
             response.data["results"][0]["start_time"]
         )
@@ -106,60 +128,58 @@ def test_datetime_no_overlap(api_client, aggregate_observation_parameters):
         )
 
 
-# Ordering works and defaults to -datetime,(counter_id,direction)
+# Ordering works and defaults to -datetime
 @pytest.mark.filterwarnings(
     "ignore:DateTimeField Observation.datetime received a naive datetime"
 )
 @pytest.mark.django_db
-def test_default_ordering(api_client):
+def test_default_ordering(api_client, single_counter_parameters):
     url = reverse("observation-aggregate-list")
     response = api_client.get(
         url,
         {
-            "start_date": "2023-02-01",
-            "end_date": "2023-02-04",
+            **single_counter_parameters,
             "period": "hour",
-            "measurement_type": "count",
-            "counter": 1,
             "page": 1,
-            "page_size": 3,
         },
     )
 
-    while response.data["next"]:
+    while response:
         for current_observation, next_observation in zip(
             response.data["results"], response.data["results"][1:]
         ):
             assert current_observation["start_time"] > next_observation["start_time"]
-        response = api_client.get(response.data["next"])
+        next_url = response.data["next"]
+        if not next_url:
+            break
+        response = api_client.get(next_url)
 
 
 @pytest.mark.filterwarnings(
     "ignore:DateTimeField Observation.datetime received a naive datetime"
 )
 @pytest.mark.django_db
-def test_reverse_ordering(api_client):
+def test_reverse_ordering(api_client, single_counter_parameters):
     url = reverse("observation-aggregate-list")
     response = api_client.get(
         url,
         {
-            "start_date": "2023-02-01",
-            "end_date": "2023-02-04",
+            **single_counter_parameters,
             "period": "hour",
-            "measurement_type": "count",
-            "counter": 1,
             "page": 1,
-            "page_size": 3,
             "order": "start_time",
         },
     )
 
-    while response.data["next"]:
+    while response:
         for current_observation, next_observation in zip(
             response.data["results"], response.data["results"][1:]
         ):
             assert current_observation["start_time"] < next_observation["start_time"]
-        response = api_client.get(response.data["next"])
+        next_url = response.data["next"]
+        if not next_url:
+            break
+        response = api_client.get(next_url)
 
 
 # Multiple counter id
@@ -167,7 +187,7 @@ def test_reverse_ordering(api_client):
     "ignore:DateTimeField Observation.datetime received a naive datetime"
 )
 @pytest.mark.django_db
-def test_multiple_counters(api_client):
+def test_multiple_counters(api_client, min_date, max_date):
     url = reverse("observation-aggregate-list")
     valid_counter_ids = (
         Counter.objects.filter(observation__isnull=False)
@@ -177,18 +197,20 @@ def test_multiple_counters(api_client):
     response = api_client.get(
         url,
         {
-            "start_date": "2023-02-01",
-            "end_date": "2023-02-04",
-            "period": "hour",
+            "start_date": min_date,
+            "end_date": max_date,
             "measurement_type": "count",
+            "period": "hour",
             "counter": valid_counter_ids,
             "page": 1,
-            "page_size": 3,
             "order": "start_time",
         },
     )
 
-    while response.data["next"]:
+    while response:
         for observation in response.data["results"]:
             assert observation["counter_id"] in valid_counter_ids
-        response = api_client.get(response.data["next"])
+        next_url = response.data["next"]
+        if not next_url:
+            break
+        response = api_client.get(next_url)
