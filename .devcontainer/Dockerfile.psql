@@ -3,15 +3,16 @@ FROM postgres:14.8-bookworm
 RUN apt-get update \
       && apt-cache showpkg postgresql-14-postgis-3 \
       && apt-get install -y --no-install-recommends \
-           # ca-certificates: for accessing remote raster files;
-           #   fix: https://github.com/postgis/docker-postgis/issues/307
-           ca-certificates \
-           \
-           postgresql-14-postgis-3 \
-           postgresql-14-postgis-3-scripts \
+      # ca-certificates: for accessing remote raster files;
+      #   fix: https://github.com/postgis/docker-postgis/issues/307
+      ca-certificates \
+      \
+      postgresql-14-postgis-3 \
+      postgresql-14-postgis-3-scripts \
       && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
 COPY ./db_init.sql /docker-entrypoint-initdb.d/
+COPY ./lido_test_backup.sql /docker-entrypoint-initdb.d/
