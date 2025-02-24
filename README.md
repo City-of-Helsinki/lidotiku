@@ -10,10 +10,12 @@ Data is collected from multiple sources and different types of sensors that meas
 The data in the database is accessed with views. First create these views, Django will not do that as it is not managing the database. The create commands can be found in `.devcontainer/db_init.sql`.
 Ensure that the database user has access to these views, if there are issues on that end.
 For instance:
+
 ```sql
 GRANT SELECT ON TABLE lido.vw_counters TO database_user;
 GRANT SELECT ON TABLE lido.vw_observations TO database_user;
 ```
+
 # API documentation
 
 OpenAPIv3 spec documentation is generated dynamically.
@@ -21,6 +23,7 @@ OpenAPIv3 spec documentation is generated dynamically.
 To access it you can view `/openapi-schema.json`.
 
 Static file can also be generated:
+
 - JSON: `ENV=local ./manage.py generateschema --file openapi-schema.json --format openapi-json --generator_class api.schemas.LidoSchemaGenerator`
 - YAML: `ENV=local ./manage.py generateschema --file openapi-schema.yml --generator_class api.schemas.LidoSchemaGenerator`
 
@@ -56,10 +59,12 @@ LIDO-TIKU utilizes PostgreSQL with **PostGIS** extension, it will be needed.
 
 Prerequisites: You need the psql tooling `psql` and `pg_dump`. Get them one way or another, or run these commands inside the database container. E.g. for debian based distributions: `apt install postgresql-client`
 
+The database can be populated with a full dump from the LIDO database, or the locally available `lido_test_backup.sql` which contains a limited sample from the full database.
+It is recommended to use the sample if running tests for performance reasons.
+
 1. Initialize the database schema, tables, indexes, views etc.:
 
 `psql --dbname=postgres --username=postgres --host=localhost --port=5431 < .devcontainer/db_init.sql`
-
 
 2. Take a dump from the database (replace host in the following script):
 
@@ -69,6 +74,8 @@ Prerequisites: You need the psql tooling `psql` and `pg_dump`. Get them one way 
 
 `psql --dbname=postgres --username=postgres --host=localhost --port=5431 < /tmp/pgdump/lido_backup_2023-08-01T13\:41.sql`
 
+2.  OR use the sample:
+    `psql --dbname=postgres --username=postgres --host=localhost --port=5431 < .devcontainer/lido_test_backup.sql`
 
 ## Typing
 
@@ -80,8 +87,7 @@ This is to be automated later in the build process.
 ## Testing
 
 The project is configured with pytest (pytest-django).
-Since the project is not doing any database writes and does not manage the database, the test configuration has disabled the database completely.
-If one intends to run tests with a database, you need to handle the database creation - Django does not create the database for unmanaged models.
+Use a database that has been configured with `db_init.sql` and `lido_test_backup.sql`
 
 To run the tests:
 
@@ -91,6 +97,6 @@ To find which lines don't have test coverage:
 
 `ENV=local pytest --cov-config=.coveragerc --cov=api/ --cov-report term-missing`
 
-## Availability checks 
+## Availability checks
 
-The availability of the API can be checked via the `/readiness` and `/healthz` endpoints. 
+The availability of the API can be checked via the `/readiness` and `/healthz` endpoints.
