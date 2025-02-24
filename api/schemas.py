@@ -1,6 +1,7 @@
 import os
 
 from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
+
 from .utils import sources_enum_parameter
 
 GEOJSON_POLYGON_JSONSCHEMA = {
