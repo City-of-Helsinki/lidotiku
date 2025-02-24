@@ -5,49 +5,32 @@ from django.contrib.gis.db.models.functions import Distance as DistanceFunction
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.contrib.gis.geos.error import GEOSException
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import FieldError, SuspiciousOperation
 from django.db import DatabaseError
-from django.db.models import Avg, Sum, F
+from django.db.models import Avg, F, Sum
 from django.db.models.expressions import Value
 from django.db.models.functions import Trunc
 from django_filters import rest_framework as filters
-from rest_framework import mixins, viewsets
-from rest_framework.response import Response
-from django.core.exceptions import FieldError
-from rest_framework.exceptions import ValidationError
-
-from .filters import (
-    CounterFilter,
-    ObservationAggregateFilter,
-    ObservationFilter,
-    DatasourceFilter,
-)
-from .models import Counter, Observation, Datasource
-from .schemas import (
-    CounterSchema,
-    ObservationAggregateSchema,
-    ObservationSchema,
-    DatasourceSchema,
-)
-from .serializers import (
-    CounterDistanceSerializer,
-    CounterFilterValidationSerializer,
-    CounterSerializer,
-    ObservationAggregateSerializer,
-    ObservationSerializer,
-    DatasourceSerializer,
-)
-from .paginators import (
-    SmallResultsSetPagination,
-    LargeResultsSetPagination,
-    ObservationsCursorPagination,
-)
-from .renderers import FeaturesPaginatedCSVRenderer
-from rest_framework_csv.renderers import CSVRenderer
 from djangorestframework_camel_case.render import (
-    CamelCaseJSONRenderer,
-    CamelCaseBrowsableAPIRenderer,
-)
+    CamelCaseBrowsableAPIRenderer, CamelCaseJSONRenderer)
+from rest_framework import mixins, viewsets
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework_csv.renderers import CSVRenderer
+
+from .filters import (CounterFilter, DatasourceFilter,
+                      ObservationAggregateFilter, ObservationFilter)
+from .models import Counter, Datasource, Observation
+from .paginators import (LargeResultsSetPagination,
+                         ObservationsCursorPagination,
+                         SmallResultsSetPagination)
+from .renderers import FeaturesPaginatedCSVRenderer
+from .schemas import (CounterSchema, DatasourceSchema,
+                      ObservationAggregateSchema, ObservationSchema)
+from .serializers import (CounterDistanceSerializer,
+                          CounterFilterValidationSerializer, CounterSerializer,
+                          DatasourceSerializer, ObservationAggregateSerializer,
+                          ObservationSerializer)
 
 
 # pylint: disable=no-member

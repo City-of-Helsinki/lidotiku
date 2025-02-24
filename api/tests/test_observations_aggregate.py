@@ -3,9 +3,8 @@ from datetime import datetime, timedelta
 import pytest
 import pytz
 from django.db.models import Count
-from django.urls import reverse
 from django.db.models.functions import TruncDate
-from datetime import datetime
+from django.urls import reverse
 
 from api.models import Counter, Observation
 

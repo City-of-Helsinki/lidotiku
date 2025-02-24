@@ -1,9 +1,10 @@
 import pytest
-from django.urls import reverse
-from django.contrib.gis.geos import GEOSGeometry, Point
 from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import GEOSGeometry, Point
+from django.urls import reverse
 from geopy.distance import geodesic
-from api.models import Datasource, Counter
+
+from api.models import Counter, Datasource
 from api.views import CounterViewSet
 
 

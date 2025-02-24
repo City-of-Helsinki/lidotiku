@@ -2,11 +2,8 @@ import operator
 from functools import reduce
 
 from django.db.models.query import Q
-from rest_framework.pagination import (
-    CursorPagination,
-    PageNumberPagination,
-    _reverse_ordering,
-)
+from rest_framework.pagination import (CursorPagination, PageNumberPagination,
+                                       _reverse_ordering)
 from rest_framework.utils import json
 from rest_framework.utils.urls import remove_query_param, replace_query_param
 from rest_framework.views import APIView
