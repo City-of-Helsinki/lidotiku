@@ -50,10 +50,10 @@ def test_coordinates_distance(api_client, middle_counter):
                 )
                 <= 2.0
             )
-        if response.data["next"]:
-            response = api_client.get(response.data["next"])
-        else:
+        next_url = response.data["next"]
+        if not next_url:
             break
+        response = api_client.get(next_url)
 
 
 # Zero distance should only return the exact counter whose coordinates given as parameters
@@ -92,10 +92,10 @@ def test_single_source_filter(api_client):
         for counter in counters:
             assert counter["properties"]["source"] == datasource_name
 
-        if response.data["next"]:
-            response = api_client.get(response.data["next"])
-        else:
+        next_url = response.data["next"]
+        if not next_url:
             break
+        response = api_client.get(next_url)
 
 
 @pytest.mark.django_db
@@ -115,10 +115,10 @@ def test_multiple_source_filter(api_client):
         for counter in counters:
             assert counter["properties"]["source"] in datasource_names_subset
 
-        if response.data["next"]:
-            response = api_client.get(response.data["next"])
-        else:
+        next_url = response.data["next"]
+        if not next_url:
             break
+        response = api_client.get(next_url)
 
 
 @pytest.mark.django_db
@@ -151,10 +151,10 @@ def test_single_source_multiple_counters_distance_filter(api_client, middle_coun
             )
             assert counter["properties"]["source"] == middle_counter.source
 
-        if response.data["next"]:
-            response = api_client.get(response.data["next"])
-        else:
+        next_url = response.data["next"]
+        if not next_url:
             break
+        response = api_client.get(next_url)
 
 
 @pytest.mark.django_db
@@ -189,10 +189,10 @@ def test_multple_source_multiple_counters_distance_filter(api_client, middle_cou
             )
             assert counter["properties"]["source"] in datasource_names_subset
 
-        if response.data["next"]:
-            response = api_client.get(response.data["next"])
-        else:
+        next_url = response.data["next"]
+        if not next_url:
             break
+        response = api_client.get(next_url)
 
 
 # Returned counters should be within the provided GeoJSON area

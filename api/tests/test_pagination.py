@@ -13,7 +13,7 @@ from api.views import CounterViewSet
 def observation_parameters():
     counter = (
         Counter.objects.annotate(observation_count=Count("observation"))
-        .filter(observation_count__gte=10000)
+        .filter(observation_count__gte=100)
         .first()
     )
     datetimes = list(
