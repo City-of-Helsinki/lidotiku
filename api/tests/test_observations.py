@@ -69,6 +69,7 @@ def test_multiple_counter_filter(api_client):
         .values_list("id", flat=True)[:5]
     )
     response = api_client.get(url, {"counter": counter_ids})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
 
     while response:
         for observation in response.data["results"]:
@@ -86,6 +87,7 @@ def test_source_filter(api_client):
     response = api_client.get(
         url, {"source": datasource_name, "page": 1, "page_size": 100}
     )
+    assert response.status_code == 200 and len(response.data["results"]) > 0
 
     while response:
         response_observations = response.data["results"]
@@ -115,6 +117,10 @@ def test_source_and_counter_filter(api_client):
 
     valid_counters_response = api_client.get(
         url, {"source": datasource_name, "counter": valid_counter_ids, "page": 1}
+    )
+    assert (
+        valid_counters_response.status_code == 200
+        and len(valid_counters_response.data["results"]) > 0
     )
 
     while valid_counters_response:
