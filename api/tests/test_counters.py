@@ -34,6 +34,7 @@ def test_coordinates_distance(api_client, middle_counter):
         "page_size": CounterViewSet.pagination_class().max_page_size,
     }
     response = api_client.get(url, query_point_params)
+    assert response.status_code == 200 and len(response.data["results"]) > 0
 
     while response:
         counters = response.data["results"]["features"]
@@ -87,6 +88,7 @@ def test_single_source_filter(api_client):
             "page_size": CounterViewSet.pagination_class().max_page_size,
         },
     )
+    assert response.status_code == 200 and len(response.data["results"]) > 0
     while response:
         counters = response.data["results"]["features"]
         for counter in counters:
@@ -110,6 +112,7 @@ def test_multiple_source_filter(api_client):
             "page_size": CounterViewSet.pagination_class().max_page_size,
         },
     )
+    assert response.status_code == 200 and len(response.data["results"]) > 0
     while response:
         counters = response.data["results"]["features"]
         for counter in counters:
@@ -134,6 +137,7 @@ def test_single_source_multiple_counters_distance_filter(api_client, middle_coun
             "page_size": CounterViewSet.pagination_class().max_page_size,
         },
     )
+    assert response.status_code == 200 and len(response.data["results"]) > 0
     while response:
         counters = response.data["results"]["features"]
         for counter in counters:
@@ -172,6 +176,7 @@ def test_multple_source_multiple_counters_distance_filter(api_client, middle_cou
             "page_size": CounterViewSet.pagination_class().max_page_size,
         },
     )
+    assert response.status_code == 200 and len(response.data["results"]) > 0
     while response:
         response_counters = response.data["results"]["features"]
         for counter in response_counters:

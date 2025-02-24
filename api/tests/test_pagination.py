@@ -68,6 +68,10 @@ def test_page_number_parameter(api_client, observation_parameters):
 def test_observations_default_ordering(api_client):
     url = reverse("observation-list")
     page_num_response = api_client.get(url)
+    assert (
+        page_num_response.status_code == 200
+        and len(page_num_response.data["results"]) > 0
+    )
 
     observations = page_num_response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
@@ -84,11 +88,14 @@ def test_observations_default_ordering(api_client):
 def test_observations_reverse_ordering(api_client):
     url = reverse("observation-list")
     response = api_client.get(url, {"order": "datetime"})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
+
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["datetime"] <= next_observation["datetime"]
 
     response = api_client.get(url, {"order": "datetime", "page": "1"})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["datetime"] <= next_observation["datetime"]
@@ -99,11 +106,14 @@ def test_observations_reverse_ordering(api_client):
 def test_observations_counter_ordering(api_client):
     url = reverse("observation-list")
     response = api_client.get(url, {"order": "counter"})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
+
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["counter_id"] <= next_observation["counter_id"]
 
     response = api_client.get(url, {"order": "counter", "page": "1"})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["counter_id"] <= next_observation["counter_id"]
@@ -114,11 +124,13 @@ def test_observations_counter_ordering(api_client):
 def test_observations_counter_reverse_ordering(api_client):
     url = reverse("observation-list")
     response = api_client.get(url, {"order": "-counter"})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["counter_id"] >= next_observation["counter_id"]
 
     response = api_client.get(url, {"order": "-counter", "page": "1"})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["counter_id"] >= next_observation["counter_id"]
@@ -130,11 +142,14 @@ def test_observations_cursor_both_order_parameters(api_client):
     # Cursor pagination
     url = reverse("observation-list")
     response = api_client.get(url, {"order": "datetime,-counter"})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
+
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["datetime"] <= next_observation["datetime"]
 
     response = api_client.get(url, {"order": "counter,-datetime"})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["counter_id"] >= next_observation["counter_id"]
@@ -145,6 +160,7 @@ def test_observations_cursor_both_order_parameters(api_client):
 def test_page_number_pagination_total_count(api_client):
     url = reverse("observation-list")
     response = api_client.get(url, {"page": 1, "page_size": 1000})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
     total_count = response.data["count"]
     final_page_response = api_client.get(url, {"page": math.ceil(total_count / 1000)})
     assert (final_page_response.data["next"]) == None
@@ -156,11 +172,13 @@ def test_observations_both_order_parameters(api_client):
     # Cursor pagination
     url = reverse("observation-list")
     response = api_client.get(url, {"order": "datetime,-counter", "page": "3"})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["datetime"] <= next_observation["datetime"]
 
     response = api_client.get(url, {"order": "counter,-datetime", "page": "3"})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
     observations = response.data["results"]
     for current_observation, next_observation in zip(observations, observations[1:]):
         assert current_observation["counter_id"] >= next_observation["counter_id"]
@@ -174,12 +192,20 @@ def test_cursor_validity(api_client):
     second_page_url = response.data["next"]
     second_page_response = api_client.get(second_page_url)
     assert (
+        second_page_response.status_code == 200
+        and len(second_page_response.data["results"]) > 0
+    )
+    assert (
         response.data["results"][-1]["datetime"]
         >= second_page_response.data["results"][0]["datetime"]
     )
 
     third_page_url = second_page_response.data["next"]
     third_page_response = api_client.get(third_page_url)
+    assert (
+        third_page_response.status_code == 200
+        and len(third_page_response.data["results"]) > 0
+    )
     assert (
         second_page_response.data["results"][-1]["datetime"]
         >= third_page_response.data["results"][0]["datetime"]
@@ -197,6 +223,7 @@ def test_cursor_validity(api_client):
 def test_cursor_validity_end(api_client, observation_parameters):
     url = reverse("observation-list")
     response = api_client.get(url, {**observation_parameters})
+    assert response.status_code == 200 and len(response.data["results"]) > 0
 
     while response.data["next"]:
         next_response = api_client.get(response.data["next"])

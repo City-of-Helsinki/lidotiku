@@ -98,6 +98,7 @@ def test_datetime_no_overlap(api_client, single_counter_parameters):
             "page": 1,
         },
     )
+    assert response.status_code == 200 and len(response.data["results"]) > 0
 
     while response:
         for current_observation, next_observation in zip(
@@ -143,6 +144,7 @@ def test_default_ordering(api_client, single_counter_parameters):
             "page": 1,
         },
     )
+    assert response.status_code == 200 and len(response.data["results"]) > 0
 
     while response:
         for current_observation, next_observation in zip(
@@ -170,6 +172,7 @@ def test_reverse_ordering(api_client, single_counter_parameters):
             "order": "start_time",
         },
     )
+    assert response.status_code == 200 and len(response.data["results"]) > 0
 
     while response:
         for current_observation, next_observation in zip(
@@ -206,6 +209,7 @@ def test_multiple_counters(api_client, min_date, max_date):
             "order": "start_time",
         },
     )
+    assert response.status_code == 200 and len(response.data["results"]) > 0
 
     while response:
         for observation in response.data["results"]:
