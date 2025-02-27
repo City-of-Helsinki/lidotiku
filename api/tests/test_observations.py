@@ -1,8 +1,7 @@
-import math
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import pytest
-import pytz
 from django.db.models import Count
 from django.urls import reverse
 from django.utils.timezone import make_aware
@@ -43,7 +42,7 @@ def test_date_range_filter(api_client, observation_parameters):
     first_datetime = datetime.fromisoformat(response.data["results"][0]["datetime"])
     start_datetime = make_aware(
         datetime.combine(observation_parameters["start_date"], datetime.min.time()),
-        pytz.timezone("Europe/Helsinki"),
+        ZoneInfo("Europe/Helsinki"),
     )
     assert first_datetime >= start_datetime
 
@@ -55,7 +54,8 @@ def test_date_range_filter(api_client, observation_parameters):
 
     last_datetime = datetime.fromisoformat(response.data["results"][-1]["datetime"])
     end_datetime = make_aware(
-        datetime.combine(observation_parameters["end_date"], datetime.max.time())
+        datetime.combine(observation_parameters["end_date"], datetime.max.time()),
+        ZoneInfo("Europe/Helsinki"),
     )
     assert last_datetime <= end_datetime
 

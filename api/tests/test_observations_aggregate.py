@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import pytest
-import pytz
 from django.db.models import Count
 from django.db.models.functions import TruncDate
 from django.urls import reverse
@@ -64,7 +64,7 @@ def test_observations_aggregate_date_filter(api_client, single_counter_parameter
     )
     first_datetime = datetime.fromisoformat(response.data["results"][0]["start_time"])
     start_date = datetime.fromisoformat(single_counter_parameters["start_date"])
-    start_datetime = pytz.timezone("Europe/Helsinki").localize(start_date)
+    start_datetime = start_date.replace(tzinfo=ZoneInfo("Europe/Helsinki"))
     assert first_datetime == start_datetime
 
     while response:
@@ -75,7 +75,7 @@ def test_observations_aggregate_date_filter(api_client, single_counter_parameter
     last_datetime = datetime.fromisoformat(response.data["results"][-1]["start_time"])
     end_date = datetime.fromisoformat(single_counter_parameters["end_date"])
     # With the hour period aggregation we expect the last start_time to be 23:00 as it includes 23:00 to 23:59
-    end_datetime = pytz.timezone("Europe/Helsinki").localize(end_date) + timedelta(
+    end_datetime = end_date.replace(tzinfo=ZoneInfo("Europe/Helsinki")) + timedelta(
         hours=23
     )
     assert last_datetime == end_datetime
