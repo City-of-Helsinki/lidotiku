@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  common:
+    uses: City-of-Helsinki/.github/.github/workflows/ci-django-api.yml@main
+    secrets: inherit
+    with:
+      python-version: 3.11
+      postgres-major-version: 13
+      use-postgis: true
+      extra-commands: |
+        psql $DATABASE_URL < .devcontainer/db_init.sql
+        psql $DATABASE_URL < .devcontainer/lido_test_backup.sql
