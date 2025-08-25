@@ -16,5 +16,5 @@ jobs:
       postgres-major-version: 14
       use-postgis: true
       extra-commands: |
-        psql $DATABASE_URL < .devcontainer/db_init.sql
-        psql $DATABASE_URL < .devcontainer/lido_test_backup.sql
+        psql "${DATABASE_URL/postgis:/postgres:}" < .devcontainer/db_init.sql
+        psql "${DATABASE_URL/postgis:/postgres:}" < .devcontainer/lido_test_backup.sql
