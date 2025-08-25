@@ -13,7 +13,7 @@ jobs:
     secrets: inherit
     with:
       python-version: 3.11
-      postgres-major-version: 13
+      postgres-major-version: 14
       use-postgis: true
       extra-commands: |
         psql $DATABASE_URL < .devcontainer/db_init.sql
