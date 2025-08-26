@@ -33,6 +33,7 @@ resources:
     # Azure DevOps repository
     - repository: lidotiku-pipelines
       type: git
+      ref: refs/heads/ansible_automation_update
       # Azure DevOps project/repository
       name: lidotiku/lidotiku-pipelines
 
