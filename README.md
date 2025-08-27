@@ -97,6 +97,39 @@ To find which lines don't have test coverage:
 
 `ENV=local pytest --cov-config=.coveragerc --cov=api/ --cov-report term-missing`
 
+## Updating requirements
+
+pip-tools is used to manage requirements. To update the requirements, run:
+
+```
+pip-compile requirements.in
+pip-compile requirements-dev.in
+```
+
+## Code format
+
+This project uses [Ruff](https://docs.astral.sh/ruff/) for code formatting and quality checking.
+
+Basic `ruff` commands:
+
+* lint: `ruff check`
+* apply safe lint fixes: `ruff check --fix`
+* check formatting: `ruff format --check`
+* format: `ruff format`
+
+[`pre-commit`](https://pre-commit.com/) can be used to install and
+run all the formatting tools as git hooks automatically before a
+commit.
+
+## Commit message format
+
+New commit messages must adhere to the [Conventional Commits](https://www.conventionalcommits.org/)
+specification, and line length is limited to 72 characters.
+
+When [`pre-commit`](https://pre-commit.com/) is in use, [
+`commitlint`](https://github.com/conventional-changelog/commitlint)
+checks new commit messages for the correct format.
+
 ## Availability checks
 
 The availability of the API can be checked via the `/readiness` and `/healthz` endpoints.
