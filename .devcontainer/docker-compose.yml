@@ -7,10 +7,10 @@ services:
       dockerfile: .devcontainer/Dockerfile
 
     volumes:
-      - ..:/workspace:cached  
+      - ..:/workspace:cached
 
     # Overrides default command so things don't shut down after the process ends.
-    command: > 
+    command: >
       sh -c "sleep infinity"
 
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.

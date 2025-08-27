@@ -225,9 +225,9 @@ class ObservationsCursorPagination(CompoundCursorPagination):
             "required": False,
             "in": "query",
             "description": "A page number within the paginated result set. "
-                           "If this parameter is set, it supercedes the "
-                           "cursor parameter and results will be returned "
-                           "as numbered pages.",
+            "If this parameter is set, it supercedes the "
+            "cursor parameter and results will be returned "
+            "as numbered pages.",
             "schema": {"type": "integer"},
         }
 

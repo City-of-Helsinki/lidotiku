@@ -1,4 +1,4 @@
 [run]
-omit = 
+omit =
     api/migrations/*
     api/tests/*
