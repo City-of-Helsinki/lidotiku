@@ -86,9 +86,9 @@ class CounterFilter(FilterSet):
         field_name="municipality_code",
         lookup_expr="in",
         label="Finnish municipality code of counter location "
-              "(e.g. 091 for Helsinki, 092 for Vantaa, and 049 for Espoo), "
-              "leading zero is optional. "
-              "See further [Kuntanumero](https://fi.wikipedia.org/wiki/Kuntanumero).",
+        "(e.g. 091 for Helsinki, 092 for Vantaa, and 049 for Espoo), "
+        "leading zero is optional. "
+        "See further [Kuntanumero](https://fi.wikipedia.org/wiki/Kuntanumero).",
     )
 
     def distance_filter(self, _queryset, _name, _value):
@@ -186,7 +186,7 @@ class ObservationAggregateFilter(FilterSet):
             "start_time": "Start time of observation to sort the results by.",
         },
         label="Sort order for the results. Ascending = `start_time`, "
-              "descending = `-start_time`.",
+        "descending = `-start_time`.",
     )
 
 
