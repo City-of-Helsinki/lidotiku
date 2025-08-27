@@ -31,7 +31,8 @@ urlpatterns = [
     path(
         "openapi-schema.json",
         get_schema_view(
-            generator_class=LidoSchemaGenerator,  # Customize inputs in the schema generator
+            # Customize inputs in the schema generator
+            generator_class=LidoSchemaGenerator,
             renderer_classes=(CamelCaseJSONRenderer,),
             public=True,
         ),

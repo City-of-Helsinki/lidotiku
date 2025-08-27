@@ -47,7 +47,8 @@ class CounterSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializ
             "source_id": obj.source_id,
             "classifying": obj.classifying,
             "crs_epsg": obj.crs_epsg,
-            # Municipality codes stored in database as integers but correct format includes a leading zero
+            # Municipality codes stored in database as integers
+            # but correct format includes a leading zero
             "municipality_code": f"0{obj.municipality_code}",
             "data_received": obj.data_received,
             "first_stored_observation": datetime_serializer.to_representation(
