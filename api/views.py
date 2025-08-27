@@ -12,25 +12,41 @@ from django.db.models.expressions import Value
 from django.db.models.functions import Trunc
 from django_filters import rest_framework as filters
 from djangorestframework_camel_case.render import (
-    CamelCaseBrowsableAPIRenderer, CamelCaseJSONRenderer)
+    CamelCaseBrowsableAPIRenderer,
+    CamelCaseJSONRenderer,
+)
 from rest_framework import mixins, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework_csv.renderers import CSVRenderer
 
-from .filters import (CounterFilter, DatasourceFilter,
-                      ObservationAggregateFilter, ObservationFilter)
+from .filters import (
+    CounterFilter,
+    DatasourceFilter,
+    ObservationAggregateFilter,
+    ObservationFilter,
+)
 from .models import Counter, Datasource, Observation
-from .paginators import (LargeResultsSetPagination,
-                         ObservationsCursorPagination,
-                         SmallResultsSetPagination)
+from .paginators import (
+    LargeResultsSetPagination,
+    ObservationsCursorPagination,
+    SmallResultsSetPagination,
+)
 from .renderers import FeaturesPaginatedCSVRenderer
-from .schemas import (CounterSchema, DatasourceSchema,
-                      ObservationAggregateSchema, ObservationSchema)
-from .serializers import (CounterDistanceSerializer,
-                          CounterFilterValidationSerializer, CounterSerializer,
-                          DatasourceSerializer, ObservationAggregateSerializer,
-                          ObservationSerializer)
+from .schemas import (
+    CounterSchema,
+    DatasourceSchema,
+    ObservationAggregateSchema,
+    ObservationSchema,
+)
+from .serializers import (
+    CounterDistanceSerializer,
+    CounterFilterValidationSerializer,
+    CounterSerializer,
+    DatasourceSerializer,
+    ObservationAggregateSerializer,
+    ObservationSerializer,
+)
 
 
 # pylint: disable=no-member
@@ -90,7 +106,9 @@ class CounterViewSet(
         if all([latitude, longitude, distance]):
             self.serializer_class = CounterDistanceSerializer
             point = Point(
-                x=float(longitude), y=float(latitude), srid=4326  # type: ignore
+                x=float(longitude),
+                y=float(latitude),
+                srid=4326,  # type: ignore
             )
             queryset = self.queryset.annotate(distance=DistanceFunction("geom", point))
             if "order" not in query_params:

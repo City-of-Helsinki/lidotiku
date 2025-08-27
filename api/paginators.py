@@ -2,8 +2,11 @@ import operator
 from functools import reduce
 
 from django.db.models.query import Q
-from rest_framework.pagination import (CursorPagination, PageNumberPagination,
-                                       _reverse_ordering)
+from rest_framework.pagination import (
+    CursorPagination,
+    PageNumberPagination,
+    _reverse_ordering,
+)
 from rest_framework.utils import json
 from rest_framework.utils.urls import remove_query_param, replace_query_param
 from rest_framework.views import APIView
@@ -177,10 +180,10 @@ class CompoundCursorPagination(CursorPagination):
                 'nearly-unique field on the model, such as "-created" or "pk".'
             )
 
-        assert isinstance(
-            ordering, (str, list, tuple)
-        ), "Invalid ordering. Expected string or tuple, but got {type}".format(
-            type=type(ordering).__name__
+        assert isinstance(ordering, (str, list, tuple)), (
+            "Invalid ordering. Expected string or tuple, but got {type}".format(
+                type=type(ordering).__name__
+            )
         )
 
         if isinstance(ordering, str):

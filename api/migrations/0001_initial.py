@@ -4,46 +4,44 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='EcoCounterCounter',
+            name="EcoCounterCounter",
             fields=[
-                ('id', models.IntegerField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=32)),
-                ('classifying', models.BooleanField()),
-                ('longitude', models.FloatField()),
-                ('latitude', models.FloatField()),
-                ('crs_epsg', models.BigIntegerField()),
-                ('source', models.CharField(max_length=32)),
-                ('geom', models.CharField(max_length=255)),
+                ("id", models.IntegerField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=32)),
+                ("classifying", models.BooleanField()),
+                ("longitude", models.FloatField()),
+                ("latitude", models.FloatField()),
+                ("crs_epsg", models.BigIntegerField()),
+                ("source", models.CharField(max_length=32)),
+                ("geom", models.CharField(max_length=255)),
             ],
             options={
-                'db_table': 'ecocounter_counters',
-                'managed': False,
+                "db_table": "ecocounter_counters",
+                "managed": False,
             },
         ),
         migrations.CreateModel(
-            name='EcoCounterObservation',
+            name="EcoCounterObservation",
             fields=[
-                ('id', models.BigIntegerField(primary_key=True, serialize=False)),
-                ('direction', models.CharField(max_length=32)),
-                ('value', models.BigIntegerField(blank=True)),
-                ('unit', models.CharField(max_length=8)),
-                ('typeofmeasurement', models.CharField(max_length=32)),
-                ('phenomenondurationseconds', models.BigIntegerField()),
-                ('vehicletype', models.CharField(max_length=32)),
-                ('datetime', models.DateTimeField()),
-                ('source', models.CharField(max_length=32)),
+                ("id", models.BigIntegerField(primary_key=True, serialize=False)),
+                ("direction", models.CharField(max_length=32)),
+                ("value", models.BigIntegerField(blank=True)),
+                ("unit", models.CharField(max_length=8)),
+                ("typeofmeasurement", models.CharField(max_length=32)),
+                ("phenomenondurationseconds", models.BigIntegerField()),
+                ("vehicletype", models.CharField(max_length=32)),
+                ("datetime", models.DateTimeField()),
+                ("source", models.CharField(max_length=32)),
             ],
             options={
-                'db_table': 'ecocounter_observations',
-                'managed': False,
+                "db_table": "ecocounter_observations",
+                "managed": False,
             },
         ),
     ]
