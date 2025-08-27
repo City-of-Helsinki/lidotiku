@@ -79,13 +79,16 @@ class CounterFilter(FilterSet):
     longitude = NumberMaxMinFilter(label="Longitude", min_value=-180, max_value=180)
     distance = NumberFilter(
         method="distance_filter",
-        label="Distance in kilometers, how far can a counter be from the defined point.",
+        label="Distance from defined point in kilometers.",
     )
     source = CharFilter(field_name="source", lookup_expr="iexact", label="Data source.")
     municipality_code = NumberInFilter(
         field_name="municipality_code",
         lookup_expr="in",
-        label="Finnish municipality code of counter location (e.g. 091 for Helsinki, 092 for Vantaa, and 049 for Espoo), leading zero is optional. See further [Kuntanumero](https://fi.wikipedia.org/wiki/Kuntanumero).",
+        label="Finnish municipality code of counter location "
+              "(e.g. 091 for Helsinki, 092 for Vantaa, and 049 for Espoo), "
+              "leading zero is optional. "
+              "See further [Kuntanumero](https://fi.wikipedia.org/wiki/Kuntanumero).",
     )
 
     def distance_filter(self, _queryset, _name, _value):
@@ -182,7 +185,8 @@ class ObservationAggregateFilter(FilterSet):
         field_labels={
             "start_time": "Start time of observation to sort the results by.",
         },
-        label="Sort order for the results. Ascending = `start_time`, descending = `-start_time`.",
+        label="Sort order for the results. Ascending = `start_time`, "
+              "descending = `-start_time`.",
     )
 
 

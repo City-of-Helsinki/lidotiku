@@ -44,7 +44,8 @@ class SmallResultsSetPagination(PageNumberPagination):
 
 
 ## Code from https://github.com/sonthonaxrk/django-rest-framework/blob/29d8796b1d96cbe77ecd81663ee7afbace0229e0/rest_framework/pagination.py
-## Utilizes all ordering fields to determine position instead of just the first field in the ordering list.
+## Utilizes all ordering fields to determine position instead of
+# just the first field in the ordering list.
 class CompoundCursorPagination(CursorPagination):
     def paginate_queryset(self, queryset, request, view=None):
         self.page_size = self.get_page_size(request)
@@ -223,7 +224,10 @@ class ObservationsCursorPagination(CompoundCursorPagination):
             "name": "page",
             "required": False,
             "in": "query",
-            "description": "A page number within the paginated result set. If this parameter is set, it supercedes the cursor parameter and results will be returned as numbered pages.",
+            "description": "A page number within the paginated result set. "
+                           "If this parameter is set, it supercedes the "
+                           "cursor parameter and results will be returned "
+                           "as numbered pages.",
             "schema": {"type": "integer"},
         }
 

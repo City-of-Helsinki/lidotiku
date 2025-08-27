@@ -55,7 +55,19 @@ class LidoSchemaGenerator(SchemaGenerator):
         title = title or "LIDO-TIKU API"
         url = url or "/"
         description = description or (
-            "API for accessing traffic measurement data of the city of Helsinki. The measurement data is updated daily and hourly and consists of count and speed observations derived from sensor devices (counters) of different types (data sources), across different measurement intervals according the type of the sensor; typically 15 minutes. The sources include for example induction loops and pedestrian counters.\nThe city of Helsinki traffic open data made available from the LIDO-TIKU API is licensed under the Creative Commons 4.0 BY license according to the JHS-189 recommendation for public authorities in Finland. The license grants the right to use and distribute the data if the following attribution is included:\nSource: City of Helsinki, https://lidotiku.api.hel.fi/api/ , licence CC 4.0 BY: http://creativecommons.org/licenses/by/4.0/"
+            "API for accessing traffic measurement data of the city of Helsinki. "
+            "The measurement data is updated daily and hourly and consists of count "
+            "and speed observations derived from sensor devices (counters) of "
+            "different types (data sources), across different measurement intervals "
+            "according the type of the sensor; typically 15 minutes. The sources"
+            " include for example induction loops and pedestrian counters.\n"
+            "The City of Helsinki traffic open data made available from the "
+            "LIDO-TIKU API is licensed under the Creative Commons 4.0 BY "
+            "license according to the JHS-189 recommendation for public "
+            "authorities in Finland. The license grants the right to use "
+            "and distribute the data if the following attribution "
+            "is included:\nSource: City of Helsinki, https://lidotiku.api.hel.fi/api/ ,"
+            " licence CC 4.0 BY: http://creativecommons.org/licenses/by/4.0/"
         )
         version = version or os.getenv("VERSION", "0.1")
 
@@ -116,7 +128,8 @@ class CounterSchema(BaseSchema):
 
     def get_operation(self, path, method):
         operation = super().get_operation(path, method)
-        # This could be accomplished with drf-spectatular on the View with @extend_schema(parameters=[]) on the retrieve function
+        # This could be accomplished with drf-spectatular on the View
+        # with @extend_schema(parameters=[]) on the retrieve function
         if self.view.action == "retrieve":
             operation["parameters"] = [
                 param for param in operation["parameters"] if param.get("name") == "id"

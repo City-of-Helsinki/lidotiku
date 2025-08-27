@@ -58,7 +58,7 @@
             "name": "distance",
             "required": false,
             "in": "query",
-            "description": "Distance in kilometers, how far can a counter be from the defined point.",
+            "description": "Distance from defined point in kilometers.",
             "schema": {
               "type": "number"
             }
@@ -310,7 +310,7 @@
             "name": "distance",
             "required": false,
             "in": "query",
-            "description": "Distance in kilometers, how far can a counter be from the defined point.",
+            "description": "Distance from defined point in kilometers.",
             "schema": {
               "type": "string"
             }

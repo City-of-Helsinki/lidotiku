@@ -157,13 +157,13 @@ def test_observations_cursor_both_order_parameters(api_client):
 
 # PageNumber pagination: response includes an accurate total count
 @pytest.mark.django_db
-def test_page_number_pagination_total_count(api_client):
+def test_page_number_pagination_observation_total_count(api_client):
     url = reverse("observation-list")
     response = api_client.get(url, {"page": 1, "page_size": 1000})
     assert response.status_code == 200 and len(response.data["results"]) > 0
     total_count = response.data["count"]
     final_page_response = api_client.get(url, {"page": math.ceil(total_count / 1000)})
-    assert (final_page_response.data["next"]) == None
+    assert (final_page_response.data["next"]) is None
 
 
 # PageNumber pagination: For datetime and counter both provided, first takes precedence
@@ -233,7 +233,7 @@ def test_cursor_validity_end(api_client, observation_parameters):
         )
         response = next_response
 
-    assert response.data["next"] == None and response.data["previous"]
+    assert response.data["next"] is None and response.data["previous"]
 
 
 # PageNumber pagination: response includes an accurate total count
@@ -245,7 +245,7 @@ def test_page_number_pagination_total_count(api_client):
     page_size = len(response.data["results"]["features"])
     num_pages = math.ceil(total_count / page_size)
     final_page_response = api_client.get(url, {"page": num_pages})
-    assert (final_page_response.data["next"]) == None
+    assert (final_page_response.data["next"]) is None
 
 
 # Query paramater page_size=0 will use the default page size
@@ -281,4 +281,4 @@ def test_last_page_no_next_link(api_client):
     page_size = len(first_page_response.data["results"]["features"])
     num_pages = math.ceil(total_count / page_size)
     final_page_response = api_client.get(url, {"page": num_pages})
-    assert (final_page_response.data["next"]) == None
+    assert (final_page_response.data["next"]) is None

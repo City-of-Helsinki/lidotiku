@@ -50,7 +50,9 @@ from .serializers import (
 
 
 # pylint: disable=no-member
-# Selects CSVRenderer explicitly for CSV retrieve action instead of deferring to defaults because Django selects unsupported PaginatedCSVRenderer
+# Selects CSVRenderer explicitly for CSV retrieve action
+# instead of deferring to defaults because Django selects
+# unsupported PaginatedCSVRenderer
 class BaseCSVRetrieveViewSet(viewsets.GenericViewSet):
     def get_renderers(self):
         format = self.request.query_params.get("format")
@@ -77,7 +79,8 @@ class CounterViewSet(
     serializer_class = CounterSerializer
     schema = CounterSchema(request_serializer=CounterFilterValidationSerializer)
     queryset = Counter.objects.all()
-    # Defining renderers explicitly to replace default PaginatedCSVRenderer with FeaturesPaginatedCSVRenderer which maps the data from features object
+    # Defining renderers explicitly to replace default PaginatedCSVRenderer
+    # with FeaturesPaginatedCSVRenderer which maps the data from features object
     renderer_classes = [
         CamelCaseJSONRenderer,
         CamelCaseBrowsableAPIRenderer,
@@ -261,7 +264,8 @@ class DatasourceViewSet(
         except FieldError:
             raise ValidationError(
                 detail={
-                    "language": f"Select a valid choice. {language} is not one of the available choices."
+                    "language": f"Select a valid choice. "
+                                f"{language} is not one of the available choices."
                 },
                 code="invalid_choice",
             )
