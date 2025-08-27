@@ -4,18 +4,17 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('api', '0003_counter_observation_delete_ecocountercounter_and_more'),
+        ("api", "0003_counter_observation_delete_ecocountercounter_and_more"),
     ]
 
     operations = [
         migrations.AlterModelTable(
-            name='counter',
+            name="counter",
             table='"lido"."vw_counters"',
         ),
         migrations.AlterModelTable(
-            name='observation',
+            name="observation",
             table='"lido"."vw_observations"',
         ),
     ]

@@ -4,18 +4,17 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('api', '0001_initial'),
+        ("api", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelTable(
-            name='ecocountercounter',
-            table='vw_counters',
+            name="ecocountercounter",
+            table="vw_counters",
         ),
         migrations.AlterModelTable(
-            name='ecocounterobservation',
-            table='vw_observations',
+            name="ecocounterobservation",
+            table="vw_observations",
         ),
     ]

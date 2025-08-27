@@ -4,9 +4,15 @@ from django.contrib.gis.measure import Distance as DistanceObject
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import F
 from django.utils.timezone import make_aware
-from django_filters.rest_framework import (BaseInFilter, CharFilter,
-                                           ChoiceFilter, DateFilter, FilterSet,
-                                           NumberFilter, OrderingFilter)
+from django_filters.rest_framework import (
+    BaseInFilter,
+    CharFilter,
+    ChoiceFilter,
+    DateFilter,
+    FilterSet,
+    NumberFilter,
+    OrderingFilter,
+)
 
 
 class NumberInFilter(BaseInFilter, NumberFilter):
