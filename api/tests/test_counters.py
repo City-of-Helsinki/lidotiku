@@ -1,5 +1,4 @@
 import pytest
-from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.urls import reverse
 from geopy.distance import geodesic
