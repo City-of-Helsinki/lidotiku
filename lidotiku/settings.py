@@ -17,6 +17,9 @@ import environ
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
+GDAL_LIBRARY_PATH = os.environ.get("GDAL_LIBRARY_PATH")
+GEOS_LIBRARY_PATH = os.environ.get("GEOS_LIBRARY_PATH")
+
 env = environ.Env(
     DATABASE_PASSWORD=(str, ""),
     DEBUG=(bool, False),
