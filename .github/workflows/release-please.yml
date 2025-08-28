@@ -1,0 +1,16 @@
+name: release-please
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '1 0 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  common:
+    uses: City-of-Helsinki/.github/.github/workflows/release-please.yml@release_please_workflow-RAT-341
+    secrets: inherit
