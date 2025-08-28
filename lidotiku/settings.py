@@ -18,6 +18,7 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
 env = environ.Env(
+    DATABASE_PASSWORD=(str, ""),
     DEBUG=(bool, False),
     SECRET_KEY=(str, ""),
     ALLOWED_HOSTS=(list, []),
@@ -90,6 +91,8 @@ WSGI_APPLICATION = "lidotiku.wsgi.application"
 
 DATABASES = {"default": env.db_url(engine="django.contrib.gis.db.backends.postgis")}
 
+if env("DATABASE_PASSWORD"):
+    DATABASES["default"]["PASSWORD"] = env("DATABASE_PASSWORD")
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
