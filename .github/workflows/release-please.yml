@@ -13,4 +13,5 @@ permissions:
 jobs:
   common:
     uses: City-of-Helsinki/.github/.github/workflows/release-please.yml@release_please_workflow-RAT-341
-    secrets: inherit
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
