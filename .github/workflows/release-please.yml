@@ -2,7 +2,7 @@ name: release-please
 on:
   push:
     branches:
-      - main
+      - release_please_secret
   schedule:
     - cron: '1 0 * * *'
 
