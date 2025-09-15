@@ -1,6 +1,6 @@
-FROM container-registry.platta-net.hel.fi/devops/python:3.11-slim-bookworm
+FROM helsinki.azurecr.io/ubi9/python-312-gdal
 
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get -y install --no-install-recommends gdal-bin
+RUN dnf update -y
 
 WORKDIR /usr/src/app
 
