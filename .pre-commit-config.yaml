@@ -13,7 +13,7 @@ repos:
       - id: check-toml
       - id: check-added-large-files
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.10  # Sync with requirements-dev.in
+    rev: v0.13.0  # Sync with requirements-dev.in
     hooks:
       - id: ruff
         name: ruff lint
