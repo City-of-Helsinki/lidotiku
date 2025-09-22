@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.0.2...lidotiku-v1.1.0) (2025-09-22)
+
+
+### Features
+
+* Upgrade to Django 5.2 ([8225f64](https://github.com/City-of-Helsinki/lidotiku/commit/8225f64bb3f956a9ee5725e3dd1c974215ab9e54))
+* Upgrade to Python 3.12 ([a92ef00](https://github.com/City-of-Helsinki/lidotiku/commit/a92ef00dc18235a481a5cc23e867d41cf41ead85))
+
 ## [1.0.2](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.0.1...lidotiku-v1.0.2) (2025-09-10)
 
 
