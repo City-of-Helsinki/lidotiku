@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.1.0...lidotiku-v1.1.1) (2025-09-22)
+
+
+### Bug Fixes
+
+* Rollback  django-filters from 25.1 to 24.3 ([b60c41f](https://github.com/City-of-Helsinki/lidotiku/commit/b60c41fc26e634455bc97b71b821d821c5ae3600))
+
 ## [1.1.0](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.0.2...lidotiku-v1.1.0) (2025-09-22)
 
 
