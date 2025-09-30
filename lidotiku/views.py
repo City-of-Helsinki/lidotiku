@@ -1,10 +1,9 @@
-import os
 from typing import Tuple
 
 from django.apps import apps
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.db import DatabaseError, Error, connection
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 
@@ -47,54 +46,3 @@ def readiness(_request: HttpRequest) -> JsonResponse:
         return JsonResponse({"status": "ready"}, status=200)
 
     return JsonResponse({"status": "not ready"}, status=503)
-
-
-@require_GET
-@csrf_exempt
-def swagger_ui(_request: HttpRequest):
-    url = os.getenv("HOST", "localhost:8000")
-    # pylint: disable=line-too-long
-    html = (
-        """
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta
-          name="description"
-          content="SwaggerUI"
-        />
-        <title>SwaggerUI</title>
-        <link
-           rel="stylesheet"
-           href="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui.css" />
-      </head>
-      <body>
-      <div id="swagger-ui"></div>
-      <script
-          src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-bundle.js"
-          crossorigin>
-      </script>
-      <script
-          src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-standalone-preset.js"
-          crossorigin>
-      </script>
-      <script>
-        window.onload = () => {
-          window.ui = SwaggerUIBundle({"""
-        + f"url: '{'http' if 'localhost' in url else 'https'}://{url}/openapi-schema.json',"
-        + """
-            dom_id: '#swagger-ui',
-            presets: [
-              SwaggerUIBundle.presets.apis,
-              SwaggerUIStandalonePreset
-            ],
-            layout: "StandaloneLayout",
-          });
-        };
-      </script>
-      </body>
-    </html>"""
-    )
-    return HttpResponse(html)

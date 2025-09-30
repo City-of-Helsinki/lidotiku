@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "django.contrib.gis",
     "django_filters",
+    "drf_spectacular",
     "corsheaders",
 ]
 
@@ -127,10 +128,36 @@ REST_FRAMEWORK = {
         "djangorestframework_camel_case.render.CamelCaseBrowsableAPIRenderer",
         "rest_framework_csv.renderers.PaginatedCSVRenderer",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
+    "DEFAULT_PERMISSION_CLASSES": [],
     "JSON_UNDERSCOREIZE": {
         "no_underscore_before_number": True,
     },
     "UNAUTHENTICATED_USER": None,  # Required for removing django.contrib.contenttypes
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "LIDO-TIKU API",
+    "DESCRIPTION": "API for accessing traffic measurement data of "
+    "the city of Helsinki. The measurement data is updated daily and hourly "
+    "and consists of count and speed observations derived from sensor devices "
+    "(counters) of different types (data sources), across different measurement "
+    "intervals according the type of the sensor; typically 15 minutes. The sources "
+    "include for example induction loops and pedestrian counters.\n"
+    "The City of Helsinki traffic open data made available from the "
+    "LIDO-TIKU API is licensed under the Creative Commons 4.0 BY "
+    "license according to the JHS-189 recommendation for public "
+    "authorities in Finland. The license grants the right to use "
+    "and distribute the data if the following attribution "
+    "is included:\nSource: City of Helsinki, https://lidotiku.api.hel.fi/api/ ,"
+    "licence CC 4.0 BY: http://creativecommons.org/licenses/by/4.0/",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "VERSION": "v1",
+    "LICENSE": {
+        "name": "Creative Commons 4.0 BY",
+        "url": "https://creativecommons.org/licenses/by/4.0/",
+    },
 }
 
 LOGGING = {

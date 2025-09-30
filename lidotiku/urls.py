@@ -16,10 +16,7 @@ Including another URLconf
 """
 
 from django.urls import include, path
-from djangorestframework_camel_case.render import CamelCaseJSONRenderer
-from rest_framework.schemas import get_schema_view
-
-from api.schemas import LidoSchemaGenerator
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from . import views
 
@@ -28,14 +25,10 @@ urlpatterns = [
     path("", views.health_check),
     path("healthz", views.health_check),
     path("readiness", views.readiness),
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
-        "openapi-schema.json",
-        get_schema_view(
-            # Customize inputs in the schema generator
-            generator_class=LidoSchemaGenerator,
-            renderer_classes=(CamelCaseJSONRenderer,),
-            public=True,
-        ),
+        "swagger",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="schema-docs",
     ),
-    path("swagger", views.swagger_ui),
 ]
