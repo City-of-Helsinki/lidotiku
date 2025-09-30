@@ -15,6 +15,12 @@ from djangorestframework_camel_case.render import (
     CamelCaseBrowsableAPIRenderer,
     CamelCaseJSONRenderer,
 )
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    extend_schema,
+    extend_schema_view,
+)
 from rest_framework import mixins, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -33,17 +39,12 @@ from .paginators import (
     SmallResultsSetPagination,
 )
 from .renderers import FeaturesPaginatedCSVRenderer
-from .schemas import (
-    CounterSchema,
-    DatasourceSchema,
-    ObservationAggregateSchema,
-    ObservationSchema,
-)
 from .serializers import (
     CounterDistanceSerializer,
     CounterFilterValidationSerializer,
     CounterSerializer,
     DatasourceSerializer,
+    GeoJSONPolygonSerializer,
     ObservationAggregateSerializer,
     ObservationSerializer,
 )
@@ -62,6 +63,97 @@ class BaseCSVRetrieveViewSet(viewsets.GenericViewSet):
             return super().get_renderers()
 
 
+def get_source_choices():
+    """Get available source values from the database"""
+    try:
+        return list(
+            Datasource.objects.values_list("name", flat=True)
+            .distinct()
+            .order_by("name")
+        )
+    except RuntimeError:
+        return []  # Return empty list if DB not available (e.g., during tests)
+
+
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="municipality_code",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Finnish municipality code of counter location "
+                "(e.g. 091 for Helsinki, 092 for Vantaa, and 049 for Espoo), "
+                "leading zero is optional. "
+                "See further [Kuntanumero](https://fi.wikipedia.org/wiki/Kuntanumero).",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="source",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Data source.",
+                explode=False,
+                enum=get_source_choices(),
+            ),
+            OpenApiParameter(
+                name="format",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Output format. Default is JSON. Use `format=csv` "
+                "for CSV format.",
+                explode=False,
+                enum=["json", "csv", "api"],
+            ),
+            OpenApiParameter(
+                name="latitude",
+                type=float,
+                location=OpenApiParameter.QUERY,
+                description="Latitude coordinate for distance-based filtering.",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="longitude",
+                type=float,
+                location=OpenApiParameter.QUERY,
+                description="Longitude coordinate for distance-based filtering.",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="distance",
+                type=float,
+                location=OpenApiParameter.QUERY,
+                description="Distance in kilometers for filtering "
+                "counters near coordinates.",
+                explode=False,
+            ),
+        ],
+    ),
+    create=extend_schema(
+        request=GeoJSONPolygonSerializer,
+        examples=[
+            OpenApiExample(
+                "GeoJSON Polygon Example",
+                summary="Query with GeoJSON Polygon",
+                description="Use this GeoJSON polygon to filter counters "
+                "within the specified area",
+                value={
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [24.5, 60.2],
+                            [24.5, 60.9],
+                            [24.8, 60.9],
+                            [24.8, 60.2],
+                            [24.5, 60.2],
+                        ]
+                    ],
+                },
+            )
+        ],
+    ),
+    retrieve=extend_schema(),
+)
 # pylint: disable-next=too-many-ancestors
 class CounterViewSet(
     mixins.RetrieveModelMixin,
@@ -77,7 +169,6 @@ class CounterViewSet(
     filterset_class = CounterFilter
     pagination_class = SmallResultsSetPagination
     serializer_class = CounterSerializer
-    schema = CounterSchema(request_serializer=CounterFilterValidationSerializer)
     queryset = Counter.objects.all()
     # Defining renderers explicitly to replace default PaginatedCSVRenderer
     # with FeaturesPaginatedCSVRenderer which maps the data from features object
@@ -164,6 +255,50 @@ class CounterViewSet(
         return Response(response_data, status=200)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="counter",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Filter observations by counter ID.",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="datetime_after",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Filter observations after this datetime "
+                "(ISO 8601 format).",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="datetime_before",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Filter observations before this datetime "
+                "(ISO 8601 format).",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="source",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Filter by data source.",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="order",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Order results by field. "
+                "Use '-' prefix for descending order.",
+                explode=False,
+            ),
+        ],
+    )
+)
 class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     Returns a paged and sorted list of observations produced by counters,
@@ -174,7 +309,6 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     filterset_class = ObservationFilter
     pagination_class = ObservationsCursorPagination
     serializer_class = ObservationSerializer
-    schema = ObservationSchema()
     queryset = Observation.objects.all()
 
     def get_queryset(self):
@@ -191,6 +325,66 @@ class ObservationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         return queryset
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="counter",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description="Filter observations by counter ID.",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="datetime_after",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Filter observations after this datetime "
+                "(ISO 8601 format).",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="datetime_before",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Filter observations before this datetime "
+                "(ISO 8601 format).",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="period",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Aggregation period (hour, day, week, month, year).",
+                explode=False,
+                enum=["hour", "day", "week", "month", "year"],
+            ),
+            OpenApiParameter(
+                name="measurement_type",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Type of measurement for aggregation (count or speed).",
+                explode=False,
+                enum=["count", "speed"],
+            ),
+            OpenApiParameter(
+                name="source",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Filter by data source.",
+                explode=False,
+            ),
+            OpenApiParameter(
+                name="order",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Order results by field. Use '-' prefix for "
+                "descending order.",
+                explode=False,
+            ),
+        ],
+    )
+)
 class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     Returns a paged and sorted list of the observational data,
@@ -202,7 +396,6 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
     pagination_class = LargeResultsSetPagination
     serializer_class = ObservationAggregateSerializer
     queryset = Observation.objects.all()
-    schema = ObservationAggregateSchema()
 
     def get_queryset(self):
         try:  # Try-except required for schema generation to work with django-filter
@@ -240,6 +433,52 @@ class ObservationAggregateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet
         return queryset
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="language",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Language for localized description (e.g., "
+                "'en', 'fi', 'sv').",
+                explode=False,
+                enum=["en", "fi", "sv"],
+            ),
+            OpenApiParameter(
+                name="format",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Output format. Default is JSON. Use `format=csv` "
+                "for CSV format.",
+                explode=False,
+                enum=["json", "csv", "api"],
+            ),
+        ],
+    ),
+    retrieve=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="language",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Language for localized description (e.g., "
+                "'en', 'fi', 'sv').",
+                explode=False,
+                enum=["en", "fi", "sv"],
+            ),
+            OpenApiParameter(
+                name="format",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Output format. Default is JSON. Use `format=csv` "
+                "for CSV format.",
+                explode=False,
+                enum=["json", "csv", "api"],
+            ),
+        ],
+    ),
+)
 class DatasourceViewSet(
     mixins.ListModelMixin, mixins.RetrieveModelMixin, BaseCSVRetrieveViewSet
 ):
@@ -250,7 +489,6 @@ class DatasourceViewSet(
     queryset = Datasource.objects.all()
     serializer_class = DatasourceSerializer
     filterset_class = DatasourceFilter
-    schema = DatasourceSchema()
     filter_backends = (filters.DjangoFilterBackend,)
     pagination_class = None
 
