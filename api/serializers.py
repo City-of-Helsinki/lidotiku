@@ -1,5 +1,6 @@
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ValidationError
+from drf_spectacular.utils import OpenApiExample, extend_schema_serializer
 from rest_framework import serializers
 
 from .models import Counter, Datasource, Observation
@@ -26,6 +27,33 @@ class ReadOnlySerializer(serializers.Serializer):
         )
 
 
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            "Counter Feature Example",
+            summary="Example counter as GeoJSON Feature",
+            description="A counter represented as a GeoJSON Feature with "
+            "geometry and properties",
+            value={
+                "type": "Feature",
+                "id": 1,
+                "geometry": {"type": "Point", "coordinates": [24.9414, 60.1699]},
+                "properties": {
+                    "id": 1,
+                    "name": "Example Counter",
+                    "source": "eco-counter",
+                    "source_id": "123456",
+                    "classifying": True,
+                    "crs_epsg": 4326,
+                    "municipality_code": "091",
+                    "data_received": True,
+                    "first_stored_observation": "2023-01-01T12:00:00Z",
+                    "last_stored_observation": "2023-12-31T23:59:59Z",
+                },
+            },
+        )
+    ]
+)
 class CounterSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializer):
     geometry = serializers.SerializerMethodField()
     properties = serializers.SerializerMethodField()
@@ -121,6 +149,27 @@ class CounterFilterValidationSerializer(serializers.Serializer):
         return attrs
 
 
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            "Observation Example",
+            summary="Example observation measurement",
+            description="A single observation measurement from a counter",
+            value={
+                "typeofmeasurement": "count",
+                "phenomenondurationseconds": 3600,
+                "vehicletype": "bicycle",
+                "direction": "in",
+                "unit": "count",
+                "value": 25,
+                "datetime": "2023-01-01T12:00:00Z",
+                "source": "eco-counter",
+                "counter": "https://example.com/api/counters/1/",
+                "counter_id": 1,
+            },
+        )
+    ]
+)
 class ObservationSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySerializer):
     datetime = serializers.DateTimeField()
 
@@ -140,6 +189,23 @@ class ObservationSerializer(serializers.HyperlinkedModelSerializer, ReadOnlySeri
         ]
 
 
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            "Observation Aggregate Example",
+            summary="Example aggregated observation data",
+            description="Observation data aggregated over a time period",
+            value={
+                "period": "hour",
+                "counter_id": 1,
+                "start_time": "2023-01-01T12:00:00Z",
+                "direction": "in",
+                "unit": "count",
+                "aggregated_value": 150,
+            },
+        )
+    ]
+)
 class ObservationAggregateSerializer(
     serializers.HyperlinkedModelSerializer, ReadOnlySerializer
 ):
@@ -163,6 +229,21 @@ class ObservationAggregateSerializer(
         return obj.get("aggregated_value")
 
 
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            "Datasource Example",
+            summary="Example data source information",
+            description="Information about a traffic data source",
+            value={
+                "name": "eco-counter",
+                "license": "Creative Commons",
+                "description": "Eco-Counter provides bicycle and "
+                "pedestrian counting data",
+            },
+        )
+    ]
+)
 class DatasourceSerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     license = serializers.CharField()
@@ -178,3 +259,18 @@ class DatasourceSerializer(serializers.ModelSerializer):
             "license",
             "description",
         ]
+
+
+class GeoJSONPolygonSerializer(serializers.Serializer):
+    """Serializer for GeoJSON Polygon used in POST requests to filter counters."""
+
+    type = serializers.ChoiceField(choices=["Polygon"])
+    coordinates = serializers.ListField(
+        child=serializers.ListField(
+            child=serializers.ListField(child=serializers.FloatField(), min_length=2),
+            min_length=4,
+        )
+    )
+    bbox = serializers.ListField(
+        child=serializers.FloatField(), min_length=4, required=False
+    )
