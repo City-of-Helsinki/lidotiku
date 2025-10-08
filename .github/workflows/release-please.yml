@@ -12,4 +12,4 @@ permissions:
 
 jobs:
   common:
-    uses: City-of-Helsinki/.github/.github/workflows/release-please.yml@release_please_workflow-RAT-341
+    uses: City-of-Helsinki/.github/.github/workflows/release-please.yml@main
