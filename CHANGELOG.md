@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.1.1...lidotiku-v1.2.0) (2025-10-14)
+
+
+### Features
+
+* Migrate to drf-spectacular ([b944893](https://github.com/City-of-Helsinki/lidotiku/commit/b9448937f3e3f0818ba11b562d1a69cea52c78a2))
+* Setup drf-spectacular ([9004e3d](https://github.com/City-of-Helsinki/lidotiku/commit/9004e3d4998252d85bed7445d9a8019f60a78e30))
+
+
+### Dependencies
+
+* Add drf-spectacular ([33b8173](https://github.com/City-of-Helsinki/lidotiku/commit/33b8173c8f700041772d8057057ade4f9dd85ee8))
+
 ## [1.1.1](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.1.0...lidotiku-v1.1.1) (2025-09-22)
 
 
