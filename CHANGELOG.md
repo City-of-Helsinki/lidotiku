@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.2.0...lidotiku-v1.2.1) (2025-11-10)
+
+
+### Dependencies
+
+* Bump django from 5.2.6 to 5.2.7 ([3cfaa47](https://github.com/City-of-Helsinki/lidotiku/commit/3cfaa47ea40f13948dc6d48fa4be58aa8178a5b5))
+* Bump django from 5.2.7 to 5.2.8 ([d1495cf](https://github.com/City-of-Helsinki/lidotiku/commit/d1495cff7f61e89e5a14be023ca2c99d4789acf5))
+
 ## [1.2.0](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.1.1...lidotiku-v1.2.0) (2025-10-14)
 
 
