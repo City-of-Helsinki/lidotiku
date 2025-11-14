@@ -27,6 +27,7 @@ django==5.2.8 \
     #   -r requirements.in
     #   django-cors-headers
     #   django-filter
+    #   django-logger-extra
     #   djangorestframework
     #   drf-spectacular
     #   sentry-sdk
@@ -41,6 +42,10 @@ django-environ==0.12.0 \
 django-filter==25.1 \
     --hash=sha256:1ec9eef48fa8da1c0ac9b411744b16c3f4c31176c867886e4c48da369c407153 \
     --hash=sha256:4fa48677cf5857b9b1347fed23e355ea792464e0fe07244d1fdfb8a806215b80
+    # via -r requirements.in
+django-logger-extra==1.1.0 \
+    --hash=sha256:bc9450ead1e87aad1866210657d1a9f8efe9e21bfea9b53618d9fd0c829f1179 \
+    --hash=sha256:f44ab408c812474163a21b13a7acba48407ba52b128260370e8f4ccb2ecab89b
     # via -r requirements.in
 djangorestframework==3.16.1 \
     --hash=sha256:166809528b1aced0a17dc66c24492af18049f2c9420dbd0be29422029cfc3ff7 \

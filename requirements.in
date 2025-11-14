@@ -6,6 +6,7 @@ djangorestframework-csv~=3.0
 django-cors-headers~=4.8
 django-environ~=0.12
 django-filter~=25.0
+django-logger-extra
 drf-spectacular
 gunicorn~=23.0
 inflection~=0.5
