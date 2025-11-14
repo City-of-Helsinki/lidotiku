@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.2.1...lidotiku-v1.3.0) (2025-11-14)
+
+
+### Features
+
+* **sentry:** Update sentry configuration ([6e19438](https://github.com/City-of-Helsinki/lidotiku/commit/6e19438ece4987b8f8eefb0857b57d41a682e818))
+
+
+### Dependencies
+
+* Bump sentry-sdk from 2.39.0 to 2.44.0 ([c8f1650](https://github.com/City-of-Helsinki/lidotiku/commit/c8f1650de5ce7ee1c29caa6caf037fa8a6bfa30e))
+
 ## [1.2.1](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.2.0...lidotiku-v1.2.1) (2025-11-10)
 
 
