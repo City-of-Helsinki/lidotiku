@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.0](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.3.0...lidotiku-v1.4.0) (2025-11-20)
+
+
+### Features
+
+* Add gunicorn json logging config ([4db5c00](https://github.com/City-of-Helsinki/lidotiku/commit/4db5c00dafc56af7559360dabba32e7b5236a750))
+* Configure json logging in django ([22df4f4](https://github.com/City-of-Helsinki/lidotiku/commit/22df4f44e897f8bff91a416a938d2d0435466cd0))
+
+
+### Dependencies
+
+* Add django-logger-extra ([b243be3](https://github.com/City-of-Helsinki/lidotiku/commit/b243be305839364293dba9c399ad0754f503c3f8))
+
 ## [1.3.0](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.2.1...lidotiku-v1.3.0) (2025-11-14)
 
 
