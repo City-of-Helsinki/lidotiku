@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.4.0...lidotiku-v1.4.1) (2025-12-04)
+
+
+### Dependencies
+
+* Update packages ([b0c93a5](https://github.com/City-of-Helsinki/lidotiku/commit/b0c93a5b2c540e5f2d7a9cd7a159fa30b23ce8af))
+
 ## [1.4.0](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.3.0...lidotiku-v1.4.0) (2025-11-20)
 
 
