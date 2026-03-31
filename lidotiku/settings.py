@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "logger_extra",
+    "helsinki_health_endpoints",
 ]
 
 MIDDLEWARE = [
@@ -207,6 +208,9 @@ LOGGING = {
     },
 }
 
+# Django helsinki health endpoints
+SENTRY_RELEASE = env("SENTRY_RELEASE")
+
 SENTRY_TRACES_SAMPLE_RATE = env("SENTRY_TRACES_SAMPLE_RATE")
 SENTRY_TRACES_IGNORE_PATHS = env.list("SENTRY_TRACES_IGNORE_PATHS")
 
@@ -229,7 +233,7 @@ if env("SENTRY_DSN"):
     sentry_sdk.init(
         dsn=env("SENTRY_DSN"),
         environment=env("SENTRY_ENVIRONMENT"),
-        release=env("SENTRY_RELEASE"),
+        release=SENTRY_RELEASE,
         integrations=[DjangoIntegration()],
         traces_sampler=sentry_traces_sampler,
         profile_session_sample_rate=env("SENTRY_PROFILE_SESSION_SAMPLE_RATE"),

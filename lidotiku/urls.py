@@ -18,17 +18,13 @@ Including another URLconf
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from . import views
-
 urlpatterns = [
     path("api/", include("api.urls")),
-    path("", views.health_check),
-    path("healthz", views.health_check),
-    path("readiness", views.readiness),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "swagger",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="schema-docs",
     ),
+    path("", include("helsinki_health_endpoints.urls")),
 ]
