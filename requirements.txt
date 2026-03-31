@@ -27,6 +27,7 @@ django==5.2.12 \
     #   -r requirements.in
     #   django-cors-headers
     #   django-filter
+    #   django-helsinki-health-endpoints
     #   django-logger-extra
     #   djangorestframework
     #   drf-spectacular
@@ -42,6 +43,10 @@ django-environ==0.12.0 \
 django-filter==25.2 \
     --hash=sha256:760e984a931f4468d096f5541787efb8998c61217b73006163bf2f9523fe8f23 \
     --hash=sha256:9c0f8609057309bba611062fe1b720b4a873652541192d232dd28970383633e3
+    # via -r requirements.in
+django-helsinki-health-endpoints==1.0.0 \
+    --hash=sha256:75670113e99bfd1fc23e317a3a22cff563140f495655c2a5f6ab219389dafd52 \
+    --hash=sha256:eebf1baa6917d7b0e11123aec191df773883102ec1653025a86d7037dba389e2
     # via -r requirements.in
 django-logger-extra==1.1.0 \
     --hash=sha256:bc9450ead1e87aad1866210657d1a9f8efe9e21bfea9b53618d9fd0c829f1179 \
