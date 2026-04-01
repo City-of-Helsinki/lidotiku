@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.5.0](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.4.2...lidotiku-v1.5.0) (2026-04-01)
+
+
+### Features
+
+* Use django-helsinki-health-endpoints for readiness and healthz ([a9505c2](https://github.com/City-of-Helsinki/lidotiku/commit/a9505c2d4aacd97c0f34f4f3a63cf60f7ccc982a))
+
+
+### Dependencies
+
+* Bump pygments from 2.19.2 to 2.20.0 ([3bf7424](https://github.com/City-of-Helsinki/lidotiku/commit/3bf74248b692f60b40a3c2c5cd381825bdc4c9a0))
+* Bump requests from 2.32.5 to 2.33.0 ([7c67128](https://github.com/City-of-Helsinki/lidotiku/commit/7c67128007b62e16af365af8664ea70d7c19d225))
+* Bump urllib3 2.5.0 to 2.6.3 ([9c69855](https://github.com/City-of-Helsinki/lidotiku/commit/9c69855501ca29d67e3f5604c7494e4d88fe5479))
+
 ## [1.4.2](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.4.1...lidotiku-v1.4.2) (2026-03-10)
 
 
