@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.1](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.0...lidotiku-v1.5.1) (2026-04-14)
+
+
+### Dependencies
+
+* Bump django from 5.2.12 to 5.2.13 ([e7b7fd3](https://github.com/City-of-Helsinki/lidotiku/commit/e7b7fd30bc4d492e7842f7fe829a1055b8e66f17))
+* Bump pytest from 9.0.1 to 9.0.3 ([70ff77b](https://github.com/City-of-Helsinki/lidotiku/commit/70ff77bf17ace661f9fd9b5452f8b9170bc3aae7))
+
 ## [1.5.0](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.4.2...lidotiku-v1.5.0) (2026-04-01)
 
 
