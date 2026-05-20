@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.3](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.2...lidotiku-v1.5.3) (2026-05-20)
+
+
+### Dependencies
+
+* Bump idna from 3.11 to 3.15 ([e32e557](https://github.com/City-of-Helsinki/lidotiku/commit/e32e557edf3c6cbcd9a32b64ba690b2c534133a3))
+
 ## [1.5.2](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.1...lidotiku-v1.5.2) (2026-05-11)
 
 
