@@ -1,4 +1,4 @@
--c requirements.txt
+-r requirements.txt
 django-stubs~=5.2.5
 djangorestframework-stubs~=3.15
 pytest-django~=4.11
