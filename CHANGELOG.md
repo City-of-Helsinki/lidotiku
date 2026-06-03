@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.4](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.3...lidotiku-v1.5.4) (2026-06-03)
+
+
+### Dependencies
+
+* Bump urllib3 from 2.6.3 to 2.7.0 ([0566921](https://github.com/City-of-Helsinki/lidotiku/commit/0566921602d880b2a5f446c2c7365b7b334df746))
+
 ## [1.5.3](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.2...lidotiku-v1.5.3) (2026-05-20)
 
 
