@@ -45,6 +45,14 @@ or e.g. gunicorn:
 
 The project is set up with devcontainer, which will allow running a containerized development environment with VSCode. You will need the extension `ms-vscode-remote.remote-containers`, and also `docker` and `docker-compose`.
 
+Before opening the project in the devcontainer, copy the local environment template and adjust values as needed:
+
+```
+cp .devcontainer/.env.local.example .devcontainer/.env.local
+```
+
+`.devcontainer/.env.local` is git-ignored, so it is safe to put personal/local secrets there. It is read automatically when running commands with `ENV=local` (see e.g. [Testing](#testing) and [Typing](#typing)).
+
 Once the project is opened in a devcontainer, the environment should be set for development. It should be possible to run it remotely also for example with GitHub Codespaces.
 
 Two containers are run, one for the django application and one for the PostgreSQL database with the PostGIS extension.

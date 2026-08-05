@@ -129,6 +129,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Local devcontainer environment overrides (copy from .env.local.example)
+.devcontainer/.env.local
+
 # Spyder project settings
 .spyderproject
 .spyproject
