@@ -24,8 +24,8 @@ To access it you can view `/openapi-schema.json`.
 
 Static file can also be generated:
 
-- JSON: `ENV=local ./manage.py generateschema --file openapi-schema.json --format openapi-json --generator_class api.schemas.LidoSchemaGenerator`
-- YAML: `ENV=local ./manage.py generateschema --file openapi-schema.yml --generator_class api.schemas.LidoSchemaGenerator`
+- JSON: `ENV=local uv run manage.py generateschema --file openapi-schema.json --format openapi-json --generator_class api.schemas.LidoSchemaGenerator`
+- YAML: `ENV=local uv run manage.py generateschema --file openapi-schema.yml --generator_class api.schemas.LidoSchemaGenerator`
 
 To view the docs in swagger-ui you can use `/swagger` to access. Optionally you can load it to some other swagger-ui with the url for `/openapi-schema.json`
 
@@ -33,13 +33,13 @@ To view the docs in swagger-ui you can use `/swagger` to access. Optionally you 
 
 ## Running the API locally
 
-Utilize django runserver:
+Utilize Django runserver:
 
-`./manage.py runserver`
+`ENV=local uv run manage.py runserver`
 
-or e.g. gunicorn:
+or with Gunicorn:
 
-`gunicorn --bind 0.0.0.0:8000 lidotiku.wsgi --reload`
+`ENV=local uv run --group prod gunicorn --bind 0.0.0.0:8000 lidotiku.wsgi --reload`
 
 ## Devcontainer
 
@@ -55,7 +55,7 @@ cp .devcontainer/.env.local.example .devcontainer/.env.local
 
 Once the project is opened in a devcontainer, the environment should be set for development. It should be possible to run it remotely also for example with GitHub Codespaces.
 
-Two containers are run, one for the django application and one for the PostgreSQL database with the PostGIS extension.
+Two containers are run, one for the Django application and one for the PostgreSQL database with the PostGIS extension.
 
 ## Database
 
@@ -88,7 +88,7 @@ It is recommended to use the sample if running tests for performance reasons.
 ## Typing
 
 To check typing run:
-`ENV=local mypy . --check-untyped-defs`
+`ENV=local uv run mypy . --check-untyped-defs`
 
 This is to be automated later in the build process.
 
@@ -99,24 +99,39 @@ Use a database that has been configured with `db_init.sql` and `lido_test_backup
 
 To run the tests:
 
-`ENV=local pytest`
+`ENV=local uv run pytest`
 
 To find which lines don't have test coverage:
 
-`ENV=local pytest --cov-config=.coveragerc --cov=api/ --cov-report term-missing`
+`ENV=local uv run pytest --cov-config=.coveragerc --cov=api/ --cov-report term-missing`
 
 ## Updating requirements
 
-pip-tools is used to manage requirements. To update the requirements, run:
+[uv](https://docs.astral.sh/uv/) is used to manage dependencies. Production dependencies are
+listed in `[project.dependencies]`, development dependencies in
+`[dependency-groups.dev]`, and production-only extras (e.g. `uwsgi`) in
+`[dependency-groups.prod]` in `pyproject.toml`.
+
+To add or update a dependency, run e.g.:
 
 ```
-pip-compile requirements.in
-pip-compile requirements-dev.in
+uv add some-package
+uv add --group dev some-dev-package
+```
+
+To sync your local environment with the lockfile:
+
+```
+uv sync --locked
 ```
 
 ## Code format
 
 This project uses [Ruff](https://docs.astral.sh/ruff/) for code formatting and quality checking.
+
+Ruff is run automatically via the `pre-commit` hooks. If you want to use it
+manually without `pre-commit`, install it separately, e.g. with
+`uv tool install ruff`.
 
 Basic `ruff` commands:
 
