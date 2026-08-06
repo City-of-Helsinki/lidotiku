@@ -55,6 +55,8 @@ cp .devcontainer/.env.local.example .devcontainer/.env.local
 
 Once the project is opened in a devcontainer, the environment should be set for development. It should be possible to run it remotely also for example with GitHub Codespaces.
 
+The devcontainer installs the development dependencies with `uv sync --locked --group dev` and installs Ruff separately with `uv tool`. VS Code uses the project `.venv` and the Ruff extension for Python formatting and lint fixes.
+
 Two containers are run, one for the Django application and one for the PostgreSQL database with the PostGIS extension.
 
 ## Database
@@ -129,9 +131,9 @@ uv sync --locked
 
 This project uses [Ruff](https://docs.astral.sh/ruff/) for code formatting and quality checking.
 
-Ruff is run automatically via the `pre-commit` hooks. If you want to use it
-manually without `pre-commit`, install it separately, e.g. with
-`uv tool install ruff`.
+Ruff is installed separately with `uv tool`, run automatically via the
+`pre-commit` hooks, and configured as the VS Code formatter and linter in the
+devcontainer. Run the standalone `ruff` command directly.
 
 Basic `ruff` commands:
 

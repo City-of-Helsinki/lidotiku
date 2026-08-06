@@ -5,7 +5,11 @@ ENV PYTHONUNBUFFERED 1
 
 COPY --from=ghcr.io/astral-sh/uv:0.12.1@sha256:cf4eedcaa81655197f625739489effcbe71b61ceb1506f332c3facae5deceded /uv /uvx /usr/local/bin/
 
-RUN apt-get update && apt-get -y install --no-install-recommends postgresql-client gdal-bin
+RUN UV_TOOL_DIR=/usr/local/share/uv/tools \
+    UV_TOOL_BIN_DIR=/usr/local/bin \
+    uv tool install ruff==0.16.1 \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends postgresql-client gdal-bin
 
 # [Optional] If your requirements rarely change, uncomment this section to add them to the image.
 # COPY pyproject.toml uv.lock /tmp/uv-tmp/
