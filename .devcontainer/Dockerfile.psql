@@ -1,14 +1,14 @@
-FROM postgres:14.8-bookworm
+FROM postgres:17-bookworm
 
 RUN apt-get update \
-      && apt-cache showpkg postgresql-14-postgis-3 \
+      && apt-cache showpkg postgresql-17-postgis-3 \
       && apt-get install -y --no-install-recommends \
       # ca-certificates: for accessing remote raster files;
       #   fix: https://github.com/postgis/docker-postgis/issues/307
       ca-certificates \
       \
-      postgresql-14-postgis-3 \
-      postgresql-14-postgis-3-scripts \
+      postgresql-17-postgis-3 \
+      postgresql-17-postgis-3-scripts \
       && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /docker-entrypoint-initdb.d
