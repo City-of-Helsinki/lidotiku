@@ -1,6 +1,6 @@
 {
 	"name": "Python3+Postgres+Django",
-	"dockerComposeFile": "docker-compose.yml",
+	"dockerComposeFile": "compose.yaml",
 	"service": "app",
 	"workspaceFolder": "/workspace",
 	"forwardPorts": [5431, 8000],
