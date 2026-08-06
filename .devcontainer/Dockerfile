@@ -3,12 +3,13 @@ FROM mcr.microsoft.com/vscode/devcontainers/python:3.12-bookworm
 
 ENV PYTHONUNBUFFERED 1
 
+COPY --from=ghcr.io/astral-sh/uv:0.12.1@sha256:cf4eedcaa81655197f625739489effcbe71b61ceb1506f332c3facae5deceded /uv /uvx /usr/local/bin/
+
 RUN apt-get update && apt-get -y install --no-install-recommends postgresql-client gdal-bin
 
 # [Optional] If your requirements rarely change, uncomment this section to add them to the image.
-# COPY requirements.txt /tmp/pip-tmp/
-# RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
-#    && rm -rf /tmp/pip-tmp
+# COPY pyproject.toml uv.lock /tmp/uv-tmp/
+# RUN cd /tmp/uv-tmp && uv sync --locked && rm -rf /tmp/uv-tmp
 
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
