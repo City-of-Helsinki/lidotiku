@@ -13,6 +13,9 @@ services:
 
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
     network_mode: service:db
+    depends_on:
+      db:
+        condition: service_healthy
 
     # Uncomment the next line to use a non-root user for all processes.
     # user: vscode
@@ -23,11 +26,16 @@ services:
       dockerfile: Dockerfile.psql
     restart: unless-stopped
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data-v17:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
       POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres -p 5431"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
     expose:
       - "5431"
     ports:
@@ -35,4 +43,4 @@ services:
     command: -p 5431
 
 volumes:
-  postgres-data:
+  postgres-data-v17:
