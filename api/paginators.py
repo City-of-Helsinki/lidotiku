@@ -43,7 +43,7 @@ class SmallResultsSetPagination(PageNumberPagination):
     max_page_size = 1000
 
 
-## Code from https://github.com/sonthonaxrk/django-rest-framework/blob/29d8796b1d96cbe77ecd81663ee7afbace0229e0/rest_framework/pagination.py
+## Code from https://github.com/sonthonaxrk/django-rest-framework/blob/29d8796/rest_framework/pagination.py
 ## Utilizes all ordering fields to determine position instead of
 # just the first field in the ordering list.
 class CompoundCursorPagination(CursorPagination):
