@@ -56,8 +56,8 @@ from .serializers import (
 # unsupported PaginatedCSVRenderer
 class BaseCSVRetrieveViewSet(viewsets.GenericViewSet):
     def get_renderers(self):
-        format = self.request.query_params.get("format")
-        if format == "csv" and self.action == "retrieve":
+        requested_format = self.request.query_params.get("format")
+        if requested_format == "csv" and self.action == "retrieve":
             return [CSVRenderer()]
         else:
             return super().get_renderers()
