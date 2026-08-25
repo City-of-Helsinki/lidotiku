@@ -224,19 +224,20 @@ class CounterViewSet(
             counters = Counter.objects.filter(geom__within=geometry)
             serializer = self.get_serializer(counters, many=True)
             data = {"type": "FeatureCollection", "features": serializer.data}
-            return Response(data, status=200)
+            response = Response(data, status=200)
         except (
             TypeError,
             ValueError,
             GEOSException,
             GDALException,
         ) as error:
-            return Response({"error": f"Invalid GeoJSON data: {error}"}, status=400)
+            response = Response({"error": f"Invalid GeoJSON data: {error}"}, status=400)
         except (
             DatabaseError,
             SuspiciousOperation,
         ):
-            return Response({"error": "Unable to process the request."}, status=500)
+            response = Response({"error": "Unable to process the request."}, status=500)
+        return response
 
     # pylint: disable-next=useless-parent-delegation
     def retrieve(self, request, *args, **kwargs):
