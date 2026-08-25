@@ -59,8 +59,7 @@ class BaseCSVRetrieveViewSet(viewsets.GenericViewSet):
         requested_format = self.request.query_params.get("format")
         if requested_format == "csv" and self.action == "retrieve":
             return [CSVRenderer()]
-        else:
-            return super().get_renderers()
+        return super().get_renderers()
 
 
 def get_source_choices():
