@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.6](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.5...lidotiku-v1.5.6) (2026-08-27)
+
+
+### Dependencies
+
+* Bump sqlparse from 0.5.5 to 0.6.0 ([8986c67](https://github.com/City-of-Helsinki/lidotiku/commit/8986c678b2c2996f8dc8cc8bb0e1f313d74b911e))
+
 ## [1.5.5](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.4...lidotiku-v1.5.5) (2026-08-14)
 
 
