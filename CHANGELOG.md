@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.7](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.6...lidotiku-v1.5.7) (2026-09-04)
+
+
+### Dependencies
+
+* Bump djangorestframework from 3.17.1 to 3.17.2 ([7e9b2eb](https://github.com/City-of-Helsinki/lidotiku/commit/7e9b2eb37a0c9656ac8923c6b6d2fda0b7d5a4dc))
+
 ## [1.5.6](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.5...lidotiku-v1.5.6) (2026-08-27)
 
 
