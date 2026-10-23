@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.5.8](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.7...lidotiku-v1.5.8) (2026-10-23)
+
+
+### Bug Fixes
+
+* Bump uv version to 0.13.5 ([e174849](https://github.com/City-of-Helsinki/lidotiku/commit/e17484938d208658b60c3df851b3e1b83a3df387))
+
+
+### Dependencies
+
+* Bump certifi to 2026.10.19 ([aa9d2dd](https://github.com/City-of-Helsinki/lidotiku/commit/aa9d2dd61ba333dd03d6562fbfe5ca6fbc9ebdd5))
+
 ## [1.5.7](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.6...lidotiku-v1.5.7) (2026-09-04)
 
 
