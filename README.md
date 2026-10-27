@@ -39,7 +39,20 @@ Utilize Django runserver:
 
 or with Gunicorn:
 
+`ENV=local uv run manage.py collectstatic --noinput`
+
 `ENV=local uv run --group prod gunicorn --bind 0.0.0.0:8000 lidotiku.wsgi --reload`
+
+## Static files in production
+
+WhiteNoise serves collected static files through Django, including the CSS and
+JavaScript for the browsable API. The Docker image runs `collectstatic` during
+the image build and includes the generated assets in `static/`. The URL prefix
+can be changed with `STATIC_URL`.
+
+When deploying without Docker, run `uv run manage.py collectstatic --noinput`
+before starting Gunicorn. Static files are served with `DEBUG=False`; no separate
+static-file server is required.
 
 ## Devcontainer
 

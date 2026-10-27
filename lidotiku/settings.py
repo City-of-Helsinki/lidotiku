@@ -22,6 +22,9 @@ from sentry_sdk.types import SamplingContext
 GDAL_LIBRARY_PATH = os.environ.get("GDAL_LIBRARY_PATH")
 GEOS_LIBRARY_PATH = os.environ.get("GEOS_LIBRARY_PATH")
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 env = environ.Env(
     DATABASE_PASSWORD=(str, ""),
     DEBUG=(bool, False),
@@ -34,10 +37,9 @@ env = environ.Env(
     SENTRY_TRACES_SAMPLE_RATE=(float, None),
     SENTRY_TRACES_IGNORE_PATHS=(list, ["/healthz", "/readiness"]),
     SECURE_PROXY_SSL_HEADER=(tuple, None),
+    STATIC_URL=(str, "/static/"),
+    STATIC_ROOT=(str, str(BASE_DIR / "static")),
 )
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 if os.getenv("ENV") == "local":
     environ.Env.read_env(os.path.join(BASE_DIR, ".devcontainer/.env.local"))
@@ -59,6 +61,8 @@ SECURE_PROXY_SSL_HEADER = env("SECURE_PROXY_SSL_HEADER")
 
 INSTALLED_APPS = [
     "api",
+    # disable Django's development server static file handling
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "rest_framework",
     "django.contrib.gis",
@@ -73,6 +77,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "logger_extra.middleware.XRequestIdMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.gzip.GZipMiddleware",
     "djangorestframework_camel_case.middleware.CamelCaseMiddleWare",
@@ -128,7 +133,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = env("STATIC_URL")
+STATIC_ROOT = env("STATIC_ROOT")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
