@@ -19,6 +19,10 @@ RUN uv sync --locked --no-default-groups --group prod
 
 COPY . .
 
+# Django requires DATABASE_URL while loading settings; collectstatic doesn't connect to it.
+RUN DATABASE_URL="postgis://localhost/lidotiku" \
+    python manage.py collectstatic --noinput
+
 USER nobody:0
 
 EXPOSE 8080
