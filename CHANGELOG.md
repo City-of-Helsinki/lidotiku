@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.9](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.8...lidotiku-v1.5.9) (2026-10-31)
+
+
+### Dependencies
+
+* Bump djangorestframework from 3.17.2 to 3.18.2 ([a96884f](https://github.com/City-of-Helsinki/lidotiku/commit/a96884f18bcac38e223f64db67aab3a12b8c6440))
+* Bump urllib3 from 2.7.0 to 2.8.0 ([069dc3c](https://github.com/City-of-Helsinki/lidotiku/commit/069dc3c6e6d691b9d4f43373b4870347112d8ffb))
+
 ## [1.5.8](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.7...lidotiku-v1.5.8) (2026-10-23)
 
 
