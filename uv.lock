@@ -370,7 +370,7 @@ wheels = [
 
 [[package]]
 name = "lidotiku"
-version = "1.5.8"
+version = "1.5.9"
 source = { virtual = "." }
 dependencies = [
     { name = "django" },
