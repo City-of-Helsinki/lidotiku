@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.9...lidotiku-v1.6.0) (2026-11-12)
+
+
+### Features
+
+* Serve collected static files with WhiteNoise ([a2e076f](https://github.com/City-of-Helsinki/lidotiku/commit/a2e076fbe88b139f005c686c261f75ad284e010a))
+
 ## [1.5.9](https://github.com/City-of-Helsinki/lidotiku/compare/lidotiku-v1.5.8...lidotiku-v1.5.9) (2026-11-12)
 
 
